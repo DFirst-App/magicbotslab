@@ -142,7 +142,14 @@
   <script>
     const DERIV_OAUTH_CLIENT_ID = "338udJBKn1EbT7Tc29Snv";
     const DERIV_ACCESS_TOKEN_KEY = "deriv_access_token";
+    const DERIV_OAUTH_SESSION_KEY = "deriv_oauth_session";
     const ACCOUNTS_ENDPOINT = "https://api.derivws.com/trading/v1/options/accounts";
+    const OTP_ENDPOINT_BASE = "https://api.derivws.com/trading/v1/options/accounts";
+    const TOKEN_URL = "https://auth.deriv.com/oauth2/token";
+
+    let liveWs = null;
+    let liveReconnectTimer = null;
+    let selectedRealAccountId = null;
 
     function $(id) {
       return document.getElementById(id);
@@ -165,6 +172,156 @@
       return null;
     }
 
+    function extractAccounts(payload) {
+      if (!payload) return [];
+      if (Array.isArray(payload.accounts)) return payload.accounts;
+      if (Array.isArray(payload.data)) return payload.data;
+      if (Array.isArray(payload.data?.accounts)) return payload.data.accounts;
+      const one = pickAccount(payload);
+      return one ? [one] : [];
+    }
+
+    function isRealAccount(account) {
+      const type = String(account?.account_type || account?.type || "").toLowerCase();
+      const loginid = String(account?.account_id || account?.loginid || "");
+      if (type.includes("real")) return true;
+      if (type.includes("demo") || type.includes("virtual")) return false;
+      if (loginid.startsWith("CR")) return true;
+      if (loginid.startsWith("VRTC")) return false;
+      return false;
+    }
+
+    function choosePreferredAccount(accounts) {
+      if (!accounts.length) return null;
+      const real = accounts.find(isRealAccount);
+      return real || accounts[0];
+    }
+
+    function accountDisplayType(account) {
+      const type = String(resolveValue(account, ["account_type", "type", "platform"], "Deriv"));
+      const real = isRealAccount(account);
+      return real ? `Real (${type})` : `Demo (${type})`;
+    }
+
+    function getStoredSession() {
+      try {
+        const raw = localStorage.getItem(DERIV_OAUTH_SESSION_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function saveSession(session) {
+      localStorage.setItem(DERIV_OAUTH_SESSION_KEY, JSON.stringify(session));
+      localStorage.setItem(DERIV_ACCESS_TOKEN_KEY, session.access_token);
+    }
+
+    async function getValidAccessToken() {
+      const session = getStoredSession();
+      if (session?.access_token && session?.expires_at && Date.now() < session.expires_at - 60_000) {
+        return session.access_token;
+      }
+
+      if (!session?.refresh_token) {
+        return localStorage.getItem(DERIV_ACCESS_TOKEN_KEY);
+      }
+
+      const body = new URLSearchParams({
+        grant_type: "refresh_token",
+        client_id: DERIV_OAUTH_CLIENT_ID,
+        refresh_token: session.refresh_token
+      });
+
+      const response = await fetch(TOKEN_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body
+      });
+      if (!response.ok) throw new Error("Token refresh failed");
+      const tokenData = await response.json();
+      if (!tokenData.access_token) throw new Error("Missing refreshed access token");
+
+      const updated = {
+        access_token: tokenData.access_token,
+        refresh_token: tokenData.refresh_token || session.refresh_token,
+        expires_at: Date.now() + ((tokenData.expires_in || 3600) * 1000)
+      };
+      saveSession(updated);
+      return updated.access_token;
+    }
+
+    async function getLiveWebSocketUrl(token, accountId) {
+      const response = await fetch(`${OTP_ENDPOINT_BASE}/${accountId}/otp`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Deriv-App-ID": DERIV_OAUTH_CLIENT_ID
+        }
+      });
+      if (!response.ok) throw new Error(`OTP error (${response.status})`);
+      const payload = await response.json();
+      const wsUrl = payload?.data?.url || payload?.url;
+      if (!wsUrl) throw new Error("Missing websocket url");
+      return wsUrl;
+    }
+
+    function connectLiveUpdates(wsUrl) {
+      if (liveWs) {
+        try { liveWs.close(); } catch (_) {}
+      }
+      if (liveReconnectTimer) {
+        clearTimeout(liveReconnectTimer);
+      }
+
+      liveWs = new WebSocket(wsUrl);
+      setField("connectionState", "Connecting...");
+      setStatus("Connecting to live real-time updates...");
+
+      liveWs.onopen = () => {
+        setField("connectionState", "Connected (Live)");
+        setStatus("Connected to live stream. Balance updates in real time.");
+        liveWs.send(JSON.stringify({ balance: 1, subscribe: 1, req_id: 1 }));
+        liveWs.send(JSON.stringify({ transaction: 1, subscribe: 1, req_id: 2 }));
+      };
+
+      liveWs.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg.error) return;
+          if (msg.msg_type === "balance" && msg.balance) {
+            const ccy = msg.balance.currency || $("currency").textContent || "";
+            const bal = Number(msg.balance.balance);
+            if (!Number.isNaN(bal)) {
+              setField("balance", `${bal.toLocaleString(undefined, { maximumFractionDigits: 2 })} ${ccy}`.trim());
+            }
+            if (msg.balance.loginid) {
+              setField("accountId", msg.balance.loginid);
+            }
+          }
+        } catch (_) {}
+      };
+
+      liveWs.onclose = () => {
+        setField("connectionState", "Reconnecting...");
+        liveReconnectTimer = setTimeout(async () => {
+          try {
+            const token = await getValidAccessToken();
+            if (!token || !selectedRealAccountId) return;
+            const nextUrl = await getLiveWebSocketUrl(token, selectedRealAccountId);
+            connectLiveUpdates(nextUrl);
+          } catch (_) {
+            setField("connectionState", "Disconnected");
+            setStatus("Live updates disconnected. Reconnect failed.");
+          }
+        }, 2500);
+      };
+
+      liveWs.onerror = () => {
+        setField("connectionState", "Connection error");
+      };
+    }
+
     function resolveValue(account, keys, fallback = "--") {
       for (const k of keys) {
         if (account && account[k] !== undefined && account[k] !== null && account[k] !== "") {
@@ -175,7 +332,7 @@
     }
 
     async function loadDashboard() {
-      const token = localStorage.getItem(DERIV_ACCESS_TOKEN_KEY);
+      const token = await getValidAccessToken();
       if (!token) {
         window.location.href = "index.html";
         return;
@@ -194,12 +351,14 @@
         }
 
         const payload = await response.json();
-        const account = pickAccount(payload) || {};
+        const accounts = extractAccounts(payload);
+        const account = choosePreferredAccount(accounts) || {};
+        selectedRealAccountId = resolveValue(account, ["account_id", "loginid", "id"], null);
 
-        const fullName = resolveValue(account, ["full_name", "fullname", "name"], "Connected user");
+        const fullName = resolveValue(account, ["full_name", "fullname", "name", "owner_name", "display_name"], "--");
         const accountId = resolveValue(account, ["account_id", "loginid", "id"]);
         const currency = resolveValue(account, ["currency"]);
-        const accountType = resolveValue(account, ["account_type", "type", "platform"], "Deriv");
+        const accountType = accountDisplayType(account);
         const balanceRaw = resolveValue(account, ["balance", "amount"], null);
         const balance = balanceRaw === null
           ? "--"
@@ -210,7 +369,16 @@
         setField("currency", currency);
         setField("accountType", accountType);
         setField("balance", balance);
-        setStatus("Account data loaded successfully.");
+        setStatus(isRealAccount(account)
+          ? "Real account connected. Initial details loaded."
+          : "Demo account detected. Connect a real account on Deriv to view live real details.");
+
+        if (selectedRealAccountId && isRealAccount(account)) {
+          const wsUrl = await getLiveWebSocketUrl(token, selectedRealAccountId);
+          connectLiveUpdates(wsUrl);
+        } else {
+          setField("connectionState", "Connected");
+        }
       } catch (err) {
         setField("connectionState", "Error");
         setStatus("Connected, but failed to load account details. Please reconnect.");
@@ -219,6 +387,10 @@
 
     $("logoutBtn").addEventListener("click", () => {
       localStorage.removeItem(DERIV_ACCESS_TOKEN_KEY);
+      localStorage.removeItem(DERIV_OAUTH_SESSION_KEY);
+      if (liveWs) {
+        try { liveWs.close(); } catch (_) {}
+      }
       window.location.href = "index.html";
     });
 

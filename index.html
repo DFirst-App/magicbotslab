@@ -76,6 +76,7 @@
     const PKCE_VERIFIER_KEY = "pkce_code_verifier";
     const OAUTH_STATE_KEY = "oauth_state";
     const DERIV_ACCESS_TOKEN_KEY = "deriv_access_token";
+    const DERIV_OAUTH_SESSION_KEY = "deriv_oauth_session";
 
     function randomString(length = 64) {
       const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
@@ -167,6 +168,14 @@
       }
 
       localStorage.setItem(DERIV_ACCESS_TOKEN_KEY, tokenData.access_token);
+      localStorage.setItem(
+        DERIV_OAUTH_SESSION_KEY,
+        JSON.stringify({
+          access_token: tokenData.access_token,
+          refresh_token: tokenData.refresh_token || null,
+          expires_at: Date.now() + ((tokenData.expires_in || 3600) * 1000)
+        })
+      );
       sessionStorage.removeItem(PKCE_VERIFIER_KEY);
       sessionStorage.removeItem(OAUTH_STATE_KEY);
       return tokenData.access_token;
