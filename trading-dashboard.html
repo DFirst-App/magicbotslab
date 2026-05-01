@@ -2345,7 +2345,7 @@
     const DERIV_OAUTH_SESSION_KEY = 'deriv_oauth_session';
     const ACCOUNT_MODE_KEY = 'deriv_account_mode';
     const ACCOUNTS_ENDPOINT = 'https://api.derivws.com/trading/v1/options/accounts';
-    const OTP_ENDPOINT_BASE = 'https://api.derivws.com/trading/v1/options/accounts';
+    const DERIV_WS_URL = `wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`;
     const VOLATILITY_MARKETS = ['R_10', 'R_25', 'R_50', 'R_75', 'R_100'];
     const BOT_DEFAULTS = {
       initialStake: 1,
@@ -2417,39 +2417,6 @@
         derivBalanceCurrency.textContent = '';
         derivBalanceDisplay.classList.add('disconnected');
       }
-    }
-
-    async function getOtpWebSocketUrl(token) {
-      const res = await fetch(ACCOUNTS_ENDPOINT, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Deriv-App-ID': APP_ID
-        }
-      });
-      if (!res.ok) throw new Error(`Accounts ${res.status}`);
-      const payload = await res.json();
-      const accounts = Array.isArray(payload?.accounts)
-        ? payload.accounts
-        : (Array.isArray(payload?.data) ? payload.data : []);
-
-      const account = currentAccountMode === 'demo'
-        ? (accounts.find(isDemoAccount) || accounts[0])
-        : (accounts.find((a) => !isDemoAccount(a)) || accounts[0]);
-      const accountId = account?.account_id || account?.loginid || account?.id;
-      if (!accountId) throw new Error('Missing accountId');
-
-      const otpRes = await fetch(`${OTP_ENDPOINT_BASE}/${accountId}/otp`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Deriv-App-ID': APP_ID
-        }
-      });
-      if (!otpRes.ok) throw new Error(`OTP ${otpRes.status}`);
-      const otpPayload = await otpRes.json();
-      const wsUrl = otpPayload?.data?.url || otpPayload?.url;
-      if (!wsUrl) throw new Error('Missing ws url');
-      return wsUrl;
     }
 
     const botsList = document.getElementById('botsList');
@@ -2526,7 +2493,6 @@
         currentAccountMode = currentAccountMode === 'real' ? 'demo' : 'real';
         localStorage.setItem(ACCOUNT_MODE_KEY, currentAccountMode);
         updateAccountModeButton();
-        otpWsUrl = null;
         if (currentBotInstance?.isRunning) {
           currentBotInstance.stop('Switched account mode. Restart bot to continue.', 'warning');
         }
@@ -2699,26 +2665,11 @@
       }
     }
     setMartingaleEnabled(true);
-    let otpWsUrl = null;
-    async function ensureOtpWsUrl() {
-      if (otpWsUrl) return otpWsUrl;
-      const token = resolveAuthToken();
-      if (!token) return null;
-      try {
-        otpWsUrl = await getOtpWebSocketUrl(token);
-        return otpWsUrl;
-      } catch (e) {
-        console.error('Failed to get OTP WebSocket URL:', e);
-        return null;
-      }
-    }
-
     const sharedDependencies = () => ({
-      wsUrl: otpWsUrl,
+      wsUrl: DERIV_WS_URL,
       defaults: BOT_DEFAULTS,
       markets: VOLATILITY_MARKETS,
-      resolveAuthToken,
-      getWsUrl: ensureOtpWsUrl
+      resolveAuthToken
     });
 
     const BOT_DEFINITIONS = [
@@ -2837,7 +2788,7 @@
       }
     }
 
-    async function handleBotOpen(key) {
+    function handleBotOpen(key) {
       const def = BOT_DEFINITION_MAP[key];
       if (!def) return;
 
@@ -2846,15 +2797,6 @@
       }
 
       currentBotKey = key;
-      // Ensure we use the OAuth + OTP authenticated WebSocket URL before creating the bot instance.
-      const wsUrl = await ensureOtpWsUrl();
-      if (!wsUrl) {
-        botUI?.showStatus('Unable to start bots. Reconnect your Deriv account first.', 'error');
-        return;
-      }
-      otpWsUrl = wsUrl;
-      // Recreate instance to pick up OTP wsUrl
-      delete botInstances[key];
       currentBotInstance = getBotInstance(key);
       activeBotName.textContent = def.name;
       currentMartingaleDefault = def.defaultMartingale ?? BOT_DEFAULTS.martingaleMultiplier;
