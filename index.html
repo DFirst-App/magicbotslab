@@ -34,6 +34,21 @@
       color: #9ca3af;
     }
 
+    .status {
+      margin-top: 14px;
+      min-height: 20px;
+      font-size: 13px;
+      color: #93c5fd;
+    }
+
+    .status.error {
+      color: #fca5a5;
+    }
+
+    .status.success {
+      color: #86efac;
+    }
+
     .connect-btn {
       width: 100%;
       padding: 12px 16px;
@@ -43,7 +58,7 @@
       font-weight: 700;
       color: #ffffff;
       background: #2563eb;
-      cursor: default;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -51,7 +66,104 @@
   <main class="card">
     <h1>MagicBotsLab</h1>
     <p>Landing page</p>
-    <button type="button" class="connect-btn">Connect Account</button>
+    <button type="button" class="connect-btn" id="connectBtn">Connect Account</button>
+    <div class="status" id="statusText"></div>
   </main>
+  <script>
+    const DERIV_OAUTH_CLIENT_ID = "338udJBKn1EbT7Tc29Snv";
+    const OAUTH_URL = "https://auth.deriv.com/oauth2/auth";
+    const PKCE_VERIFIER_KEY = "pkce_code_verifier";
+    const OAUTH_STATE_KEY = "oauth_state";
+
+    function randomString(length = 64) {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+      const arr = new Uint8Array(length);
+      crypto.getRandomValues(arr);
+      return Array.from(arr, (v) => chars[v % chars.length]).join("");
+    }
+
+    function toBase64Url(bytes) {
+      return btoa(String.fromCharCode(...bytes))
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
+    }
+
+    async function createCodeChallenge(verifier) {
+      const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
+      return toBase64Url(new Uint8Array(digest));
+    }
+
+    function setStatus(message, type = "") {
+      const statusEl = document.getElementById("statusText");
+      if (!statusEl) return;
+      statusEl.className = `status ${type}`.trim();
+      statusEl.textContent = message;
+    }
+
+    async function startOAuthLogin() {
+      const connectBtn = document.getElementById("connectBtn");
+      if (connectBtn) {
+        connectBtn.disabled = true;
+        connectBtn.textContent = "Connecting...";
+      }
+
+      try {
+        const verifier = randomString(64);
+        const state = randomString(32);
+        const challenge = await createCodeChallenge(verifier);
+        const redirectUri = `${window.location.origin}${window.location.pathname}`;
+
+        sessionStorage.setItem(PKCE_VERIFIER_KEY, verifier);
+        sessionStorage.setItem(OAUTH_STATE_KEY, state);
+
+        const authUrl = new URL(OAUTH_URL);
+        authUrl.searchParams.set("response_type", "code");
+        authUrl.searchParams.set("client_id", DERIV_OAUTH_CLIENT_ID);
+        authUrl.searchParams.set("redirect_uri", redirectUri);
+        authUrl.searchParams.set("scope", "trade account_manage");
+        authUrl.searchParams.set("state", state);
+        authUrl.searchParams.set("code_challenge", challenge);
+        authUrl.searchParams.set("code_challenge_method", "S256");
+
+        window.location.href = authUrl.toString();
+      } catch (error) {
+        setStatus("Unable to start OAuth flow. Please try again.", "error");
+        if (connectBtn) {
+          connectBtn.disabled = false;
+          connectBtn.textContent = "Connect Account";
+        }
+      }
+    }
+
+    function handleOAuthCallback() {
+      const params = new URLSearchParams(window.location.search);
+      const error = params.get("error");
+      const code = params.get("code");
+      const returnedState = params.get("state");
+
+      if (error) {
+        setStatus("Authorization was cancelled or failed.", "error");
+        return;
+      }
+
+      if (!code) return;
+
+      const storedState = sessionStorage.getItem(OAUTH_STATE_KEY);
+      if (!storedState || returnedState !== storedState) {
+        setStatus("OAuth state verification failed. Please reconnect.", "error");
+        return;
+      }
+
+      setStatus("Deriv authorization successful. Code received.", "success");
+      sessionStorage.removeItem(OAUTH_STATE_KEY);
+      // Keep verifier for server-side token exchange implementation.
+      // This page intentionally does not call the token endpoint from browser.
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+
+    document.getElementById("connectBtn")?.addEventListener("click", startOAuthLogin);
+    handleOAuthCallback();
+  </script>
 </body>
 </html>
