@@ -1,264 +1,3060 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MagicBotsLab Trading Bots</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Redirect to landing page if not connected -->
+  <script>
+    (function() {
+      try {
+        const accessToken = localStorage.getItem('deriv_access_token');
+        const oauthSession = localStorage.getItem('deriv_oauth_session');
+        // If no connection token found, redirect to landing page
+        if (!accessToken && !oauthSession) {
+          window.location.replace('index.html');
+        }
+      } catch (e) {
+        // If localStorage is not accessible, redirect to landing page
+        window.location.replace('index.html');
+      }
+    })();
+  </script>
+  
+  <!-- Primary Meta Tags -->
+  <title>Download Free Trading Bots - AI Bots, XAUUSD, Forex, Crypto & Binary Options | Magic Automation Lab</title>
+  <meta name="title" content="Download Free Trading Bots - AI Bots, XAUUSD, Forex, Crypto & Binary Options">
+  <meta name="description" content="Magic Automation Lab - Free Deriv bots and magic bots. Download free automated trading bots for forex, crypto, binary options, XAUUSD, gold, EURUSD, GBPUSD, and Bitcoin. 10+ AI-powered bots with smart recovery and risk management. Free download.">
+  <meta name="keywords" content="magicbotslab, magicbotslab.com, free deriv bots, deriv bots, magic bots, magic lab, magic automation lab, free trading bots, automated trading bots, forex trading bots, crypto trading bots, binary options bots, free automated bots, mt5 free bots, mt5 free, free mt5 bots, download trading bots, AI trading bots, XAUUSD bots, gold trading bots, EURUSD bots, GBPUSD bots, BTC bots, Bitcoin trading bots, Ethereum bots, algorithmic trading, trading automation, forex robots, crypto robots, trading signals, automated forex, trading software, volatility trading, digit trading, deriv trading bots, smart volatility bot, magic random bot, rise fall bot, no touch bot, smart differ bot, all markets bot, trading bot download, free EA download, profitable trading bots, best trading bots, automated trading system, trading algorithm, bot trading, trading automation software, free forex robots, free crypto bots, binary options automation, volatility trading bots, digit trading bots, smart money bots, trading signals free, real-time trading signals, professional trading bots, free automated trading bots, free automated trading, free bots, magic trading bots, magic automation, magic bot lab">
+  <meta name="author" content="Magic Automation Lab">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="language" content="English">
+  <meta name="theme-color" content="#0f1117">
+  <meta name="distribution" content="global">
+  <meta name="rating" content="general">
+  <meta name="target" content="all">
+  <meta name="audience" content="all">
+  <meta name="coverage" content="worldwide">
+  <meta name="subject" content="Free Trading Bots Download - AI Trading, XAUUSD, Forex, Crypto Bots">
+  <meta name="classification" content="Trading Software, Automated Trading, Trading Bots, AI Trading">
+  <meta name="category" content="Finance, Trading, Automation, Software">
+  
+  <!-- International SEO -->
+  <link rel="alternate" hreflang="en" href="https://magicbotslab.com/trading-bots.html">
+  <link rel="alternate" hreflang="x-default" href="https://magicbotslab.com/trading-bots.html">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://magicbotslab.com/trading-bots.html">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://magicbotslab.com/trading-bots.html">
+  <meta property="og:title" content="Download Free Trading Bots - AI Bots, XAUUSD, Forex, Crypto & Binary Options">
+  <meta property="og:description" content="Download free automated trading bots for forex, crypto, binary options, XAUUSD, gold, EURUSD, GBPUSD, and Bitcoin. 10+ professional AI-powered bots with smart recovery and risk management. Free download.">
+  <meta property="og:image" content="https://magicbotslab.com/og-image-trading-bots.jpg">
+  <meta property="og:site_name" content="Magic Automation Lab">
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Download Free Trading Bots - AI Bots, XAUUSD, Forex, Crypto & Binary Options">
+  <meta name="twitter:description" content="Download free automated trading bots for forex, crypto, binary options, XAUUSD, gold, EURUSD, GBPUSD, and Bitcoin. 10+ professional AI-powered bots with smart recovery. Free download.">
+  <meta name="twitter:image" content="https://magicbotslab.com/og-image-trading-bots.jpg">
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-4WCDE6D602"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-4WCDE6D602');
+  </script>
+  
+  <!-- Favicon - Google Search Requirements: SVG for modern browsers, ICO as fallback -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Automated Trading Bots",
+    "description": "Collection of free automated trading bots for forex, crypto, binary options, XAUUSD, gold, EURUSD, GBPUSD, and Bitcoin trading. Download AI-powered trading bots with smart recovery.",
+    "url": "https://magicbotslab.com/trading-bots.html",
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "All Markets Differ Bot",
+          "description": "Digit differ strategy bot cycling through volatility markets",
+          "applicationCategory": "FinanceApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "name": "Smart Volatility Bot",
+          "description": "ATR-driven CALL/PUT scalping bot with volatility analysis",
+          "applicationCategory": "FinanceApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "name": "Magic Random Strategy Bot",
+          "description": "Multi-strategy bot with random market and digit selection",
+          "applicationCategory": "FinanceApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "name": "Smart Differ Pro Bot",
+          "description": "Advanced digit differ strategy for volatility markets",
+          "applicationCategory": "FinanceApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "name": "Rise/Fall Pro Bot",
+          "description": "Momentum-confirmed CALL/PUT trading bot",
+          "applicationCategory": "FinanceApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "name": "Alien Rise/Fall Bot",
+          "description": "Rapid trend re-entry trading bot",
+          "applicationCategory": "FinanceApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "name": "Smart Even Bot",
+          "description": "Anti-streak even/odd pattern trading bot",
+          "applicationCategory": "FinanceApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "name": "No Touch Sentinel Bot",
+          "description": "Trend-sensing No Touch trading bot",
+          "applicationCategory": "FinanceApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        }
+      ]
+    }
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b1220;
-      --panel: #111827;
-      --line: #1f2937;
-      --text: #e5e7eb;
-      --muted: #94a3b8;
-      --accent: #22c55e;
-      --accent2: #2563eb;
+      color-scheme: dark;
+      --bg: #0f1117;
+      --panel: #171b24;
+      --panel-strong: #1f2531;
+      --panel-soft: rgba(23, 27, 36, 0.9);
+      --accent: #00d2ff;
+      --accent-2: #ff7a18;
+      --text: #f5f7ff;
+      --muted: #98a2bd;
+      --border: rgba(255,255,255,0.08);
+      --success: #24d970;
+      --danger: #ff5f6d;
+      --warning: #fcd34d;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
-      min-height: 100vh;
-      font-family: Arial, sans-serif;
-      background: radial-gradient(circle at 10% 0%, #0f172a 0%, var(--bg) 45%, #020617 100%);
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at top right, rgba(0, 210, 255, 0.25), transparent 40%), var(--bg);
       color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
-    .wrap {
-      max-width: 1080px;
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: 
+        linear-gradient(rgba(0, 210, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 210, 255, 0.03) 1px, transparent 1px);
+      background-size: 32px 32px;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 24px 16px 40px;
+      min-height: 100vh;
+      padding: 24px;
+      padding-bottom: 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
     }
 
-    .topbar {
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 8px;
+      position: relative;
+    }
+
+    .header-default {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 18px;
+      gap: 16px;
     }
 
-    .brand {
+    .header-default h1 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .back-btn .full-text {
+      display: inline;
+    }
+
+    .back-btn .short-text {
+      display: none;
+    }
+
+    .header-active {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .header-active button {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .header-active button:hover {
+      background: rgba(0, 210, 255, 0.15);
+      border-color: rgba(0, 210, 255, 0.4);
+    }
+
+    .header-active span {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.8);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .header.show-active .header-default {
+      display: none;
+    }
+
+    .header.show-active .header-active {
+      display: inline-flex;
+    }
+
+    .header-mt5-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 210, 255, 0.4);
+      color: #00d2ff;
+      font-size: 11px;
+      font-weight: 600;
+      text-decoration: none;
+      background: rgba(0, 210, 255, 0.08);
+      transition: all 0.2s ease;
+      font-family: 'Inter', system-ui, sans-serif;
+      margin-left: auto;
+    }
+
+    .header-mt5-btn:hover {
+      background: rgba(0, 210, 255, 0.15);
+      border-color: rgba(0, 210, 255, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .header-mt5-btn .full-text {
+      display: inline;
+    }
+
+    .header-mt5-btn .short-text {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .header-mt5-btn {
+        padding: 5px 8px;
+        font-size: 10px;
+        gap: 4px;
+      }
+
+      .header-mt5-btn .full-text {
+        display: none;
+      }
+
+      .header-mt5-btn .short-text {
+        display: inline;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-mt5-btn {
+        padding: 4px 6px;
+        font-size: 9px;
+        gap: 3px;
+      }
+    }
+
+    .section-heading {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      justify-content: space-between;
+    }
+
+    .section-heading.hidden {
+      display: none !important;
+    }
+
+    .page:has(.header.show-active) .section-heading {
+      display: none !important;
+    }
+
+    .section-heading-text {
       display: flex;
       flex-direction: column;
       gap: 4px;
     }
 
-    .brand-title {
-      font-size: 18px;
-      font-weight: 800;
+    .section-heading h2 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text);
+      letter-spacing: 0.02em;
+      font-family: 'Inter', system-ui, sans-serif;
     }
 
-    .brand-subtitle {
-      font-size: 12px;
+    .section-heading p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .deriv-balance-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.12), rgba(0, 210, 255, 0.06));
+      border: 1px solid rgba(0, 210, 255, 0.25);
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .deriv-balance-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(152, 162, 189, 0.8);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .deriv-balance-value {
+      font-size: 13px;
+      font-weight: 700;
+      color: #00d2ff;
+      letter-spacing: -0.01em;
+    }
+
+    .deriv-balance-currency {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(152, 162, 189, 0.7);
+      margin-left: 2px;
+    }
+
+    .deriv-balance-display.disconnected {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .deriv-balance-display.disconnected .deriv-balance-value {
       color: var(--muted);
     }
 
-    .btn {
+    .secondary-btn-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
       border-radius: 10px;
-      padding: 8px 12px;
-      cursor: pointer;
-      border: 1px solid #374151;
-      background: #1f2937;
-      color: #f8fafc;
-      font-weight: 700;
+      border: 1px solid rgba(0, 210, 255, 0.4);
+      color: #00d2ff;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      background: rgba(0, 210, 255, 0.08);
+      transition: all 0.2s ease;
     }
 
-    .btn.primary {
-      border-color: rgba(37, 99, 235, 0.35);
-      background: linear-gradient(135deg, rgba(37, 99, 235, 0.9), rgba(29, 78, 216, 0.85));
+    .secondary-btn-link:hover {
+      background: rgba(0, 210, 255, 0.15);
+      border-color: rgba(0, 210, 255, 0.6);
+      transform: translateY(-1px);
     }
 
-    .notice {
-      background: rgba(34, 197, 94, 0.08);
-      border: 1px solid rgba(34, 197, 94, 0.18);
-      border-radius: 12px;
-      padding: 12px;
-      color: rgba(187, 247, 208, 0.95);
-      margin-bottom: 14px;
+    .bots-layout {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      width: 100%;
+      flex-wrap: wrap;
     }
 
-    .notice.error {
-      background: rgba(239, 68, 68, 0.08);
-      border-color: rgba(239, 68, 68, 0.2);
-      color: rgba(254, 202, 202, 0.95);
-    }
-
-    .grid {
+    .bots-list {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      flex: 1 1 600px;
     }
 
-    .card {
+    .bots-list.hidden {
+      display: none;
+    }
+
+    .bot-card {
       background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 14px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      border-radius: 18px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bot-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      border: 1px solid transparent;
+      background: linear-gradient(120deg, rgba(0, 210, 255, 0.35), rgba(255, 122, 24, 0.2));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 0;
+    }
+
+    .bot-card.active::after,
+    .bot-card:hover::after {
+      opacity: 1;
+    }
+
+    .bot-card-content {
+      position: relative;
+      z-index: 1;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      min-height: 160px;
+      gap: 14px;
     }
 
-    .card-title {
-      font-weight: 800;
-      font-size: 14px;
-    }
-
-    .pill-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .pill {
-      font-size: 11px;
-      padding: 3px 8px;
+    .bot-chip {
+      display: inline-flex;
+      padding: 4px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.22);
-      color: rgba(226, 232, 240, 0.9);
-      background: rgba(148, 163, 184, 0.06);
+      background: rgba(0, 210, 255, 0.12);
+      border: 1px solid rgba(0, 210, 255, 0.25);
+      color: #00d2ff;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
     }
 
-    .pill.live {
-      border-color: rgba(34, 197, 94, 0.3);
-      background: rgba(34, 197, 94, 0.12);
-      color: rgba(187, 247, 208, 1);
+    .bot-badges-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
     }
 
-    .card-desc {
+    .bot-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: 1px solid;
+    }
+
+    .bot-badge--popular {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+    }
+
+    .bot-badge--beginner {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: rgba(34, 197, 94, 0.4);
+      color: #4ade80;
+    }
+
+    .bot-badge--fast {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: rgba(59, 130, 246, 0.4);
+      color: #60a5fa;
+    }
+
+    .bot-badge--stable {
+      background: rgba(168, 85, 247, 0.15);
+      border-color: rgba(168, 85, 247, 0.4);
+      color: #c084fc;
+    }
+
+    .bot-card h3 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .bot-card p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .bot-meta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .bot-meta li {
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       font-size: 12px;
       color: var(--muted);
-      line-height: 1.35;
     }
 
-    .actions {
+    .open-bot-btn {
       margin-top: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 210, 255, 0.35);
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.18) 0%, rgba(0, 210, 255, 0.08) 100%);
+      color: #00d2ff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+      font-family: inherit;
+      box-shadow: 0 2px 8px rgba(0, 210, 255, 0.15);
+      position: relative;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .open-bot-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      z-index: -1;
+    }
+
+    .open-bot-btn:hover {
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.28) 0%, rgba(0, 210, 255, 0.14) 100%);
+      border-color: rgba(0, 210, 255, 0.6);
+      box-shadow: 0 6px 20px rgba(0, 210, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .open-bot-btn:hover::before {
+      opacity: 1;
+    }
+
+    .open-bot-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 10px rgba(0, 210, 255, 0.2);
+    }
+
+    .open-bot-btn:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px rgba(0, 210, 255, 0.5);
+    }
+
+    .bot-detail-panel {
+      flex: 1 1 520px;
+      background: var(--panel-soft);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      padding: 24px;
+      min-height: 520px;
       display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .panel-placeholder {
+      display: none;
+    }
+
+    .bot-detail-panel[hidden] {
+      display: none;
+    }
+
+    .bot-panel-content {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .bot-panel-content[hidden] {
+      display: none !important;
+    }
+
+    .bot-panel-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .bot-panel-grid {
+      display: grid;
+      gap: 20px;
+      width: 100%;
+    }
+
+    .bot-column {
+      min-width: 0;
+    }
+
+    .bot-history-column {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .history-card {
+      background: rgba(15, 17, 23, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 560px;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .history-card h4 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .bot-config,
+    .bot-stats {
+      background: rgba(15, 17, 23, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .bot-config h4,
+    .bot-stats h4 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .config-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
       gap: 8px;
     }
 
-    .actions .btn {
-      flex: 1;
+    .input-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
     }
 
-    @media (max-width: 900px) {
-      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .input-group input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(15, 17, 23, 0.8);
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
     }
-    @media (max-width: 620px) {
-      .grid { grid-template-columns: 1fr; }
+
+    .input-group small {
+      color: rgba(152, 162, 189, 0.75);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 768px) {
+      .bot-config .input-group small {
+        display: none;
+      }
+    }
+
+    .config-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.35), rgba(0, 210, 255, 0.15));
+      border: 1px solid rgba(0, 210, 255, 0.6);
+      color: #00d2ff;
+    }
+
+    .primary-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .secondary-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text);
+    }
+
+    .secondary-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    @keyframes btn-liquid-flow {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    @keyframes btn-glow-pulse-start {
+      0%, 100% { box-shadow: 0 0 14px rgba(0, 212, 255, 0.4), 0 0 28px rgba(0, 212, 255, 0.15); border-color: rgba(0, 212, 255, 0.55); }
+      50% { box-shadow: 0 0 22px rgba(0, 212, 255, 0.6), 0 0 40px rgba(0, 212, 255, 0.25); border-color: rgba(0, 212, 255, 0.75); }
+    }
+    @keyframes btn-glow-pulse-stop {
+      0%, 100% { box-shadow: 0 0 14px rgba(251, 146, 60, 0.35), 0 0 28px rgba(251, 146, 60, 0.12); border-color: rgba(251, 146, 60, 0.5); }
+      50% { box-shadow: 0 0 22px rgba(251, 146, 60, 0.55), 0 0 40px rgba(251, 146, 60, 0.2); border-color: rgba(251, 146, 60, 0.7); }
+    }
+    .primary-btn.btn-liquid-glow,
+    .secondary-btn.btn-liquid-glow {
+      position: relative;
+      overflow: hidden;
+    }
+    .primary-btn.btn-liquid-glow {
+      animation: btn-glow-pulse-start 2.2s ease-in-out infinite;
+      border-color: rgba(0, 212, 255, 0.6);
+    }
+    .secondary-btn.btn-liquid-glow {
+      animation: btn-glow-pulse-stop 2.2s ease-in-out infinite;
+      border-color: rgba(251, 146, 60, 0.55);
+      color: rgba(251, 180, 120, 0.95);
+    }
+    .primary-btn.btn-liquid-glow::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(
+        110deg,
+        transparent 0%,
+        transparent 35%,
+        rgba(0, 212, 255, 0.28) 50%,
+        transparent 65%,
+        transparent 100%
+      );
+      background-size: 200% 100%;
+      animation: btn-liquid-flow 2.5s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .secondary-btn.btn-liquid-glow::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(
+        110deg,
+        transparent 0%,
+        transparent 35%,
+        rgba(251, 146, 60, 0.25) 50%,
+        transparent 65%,
+        transparent 100%
+      );
+      background-size: 200% 100%;
+      animation: btn-liquid-flow 2.5s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .status-badge[data-state="idle"] {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--muted);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .status-badge[data-state="running"] {
+      background: rgba(36, 217, 112, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(36, 217, 112, 0.3);
+    }
+
+    .status-badge[data-state="error"] {
+      background: rgba(255, 68, 79, 0.12);
+      color: var(--danger);
+      border: 1px solid rgba(255, 68, 79, 0.3);
+    }
+
+    .status-text {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .stats-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .stat-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .stat-card:last-child {
+      border-bottom: none;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: rgba(152, 162, 189, 0.7);
+      font-weight: 500;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .stat-value {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .stat-value.positive {
+      color: #24d970;
+    }
+
+    .stat-value.negative {
+      color: #ff5f6d;
+    }
+
+    /* Colorful data display for different stat types */
+    #balanceValue {
+      color: #00d2ff;
+    }
+
+    #totalProfitValue.positive {
+      color: #24d970;
+    }
+
+    #totalProfitValue.negative {
+      color: #ff5f6d;
+    }
+
+    #totalTradesValue {
+      color: #ff7a18;
+    }
+
+    #winRateValue {
+      color: #a855f7;
+    }
+
+    #currentStakeValue {
+      color: #00d2ff;
+    }
+
+    #consecutiveLossesValue {
+      color: #ff5f6d;
+    }
+
+    #targetValue {
+      color: #fcd34d;
+    }
+
+    #runningTimeValue {
+      color: #00d2ff;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 6px;
+      scroll-behavior: smooth;
+    }
+
+    .history-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .history-list::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+    }
+
+    .history-list::-webkit-scrollbar-thumb {
+      background: rgba(0, 210, 255, 0.3);
+      border-radius: 3px;
+    }
+
+    .history-list::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 210, 255, 0.5);
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+      transform: translateX(0);
+    }
+
+    .history-item--enter {
+      animation: history-slide-in 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .history-item--enter.win {
+      animation: history-slide-in-win 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .history-item--enter.loss {
+      animation: history-slide-in-loss 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes history-slide-in {
+      0% {
+        opacity: 0;
+        transform: translateX(-36px);
+        box-shadow: 0 0 20px rgba(0, 210, 255, 0.5), 0 0 40px rgba(0, 210, 255, 0.2);
+      }
+      25% {
+        opacity: 1;
+        transform: translateX(4px);
+        box-shadow: 0 0 24px rgba(0, 210, 255, 0.45), 0 0 48px rgba(0, 210, 255, 0.18);
+      }
+      50% {
+        transform: translateX(-2px);
+        box-shadow: 0 0 16px rgba(0, 210, 255, 0.3), 0 0 32px rgba(0, 210, 255, 0.1);
+      }
+      75% {
+        transform: translateX(1px);
+        box-shadow: 0 0 8px rgba(0, 210, 255, 0.15);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+        box-shadow: none;
+      }
+    }
+
+    @keyframes history-slide-in-win {
+      0% {
+        opacity: 0;
+        transform: translateX(-36px);
+        box-shadow: 0 0 22px rgba(36, 217, 112, 0.55), 0 0 44px rgba(36, 217, 112, 0.25);
+      }
+      25% {
+        opacity: 1;
+        transform: translateX(4px);
+        box-shadow: 0 0 26px rgba(36, 217, 112, 0.5), 0 0 52px rgba(36, 217, 112, 0.2);
+      }
+      50% {
+        transform: translateX(-2px);
+        box-shadow: 0 0 18px rgba(36, 217, 112, 0.35), 0 0 36px rgba(36, 217, 112, 0.12);
+      }
+      75% {
+        transform: translateX(1px);
+        box-shadow: 0 0 10px rgba(36, 217, 112, 0.18);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+        box-shadow: none;
+      }
+    }
+
+    @keyframes history-slide-in-loss {
+      0% {
+        opacity: 0;
+        transform: translateX(-36px);
+        box-shadow: 0 0 22px rgba(255, 95, 109, 0.5), 0 0 44px rgba(255, 95, 109, 0.22);
+      }
+      25% {
+        opacity: 1;
+        transform: translateX(4px);
+        box-shadow: 0 0 26px rgba(255, 95, 109, 0.45), 0 0 52px rgba(255, 95, 109, 0.18);
+      }
+      50% {
+        transform: translateX(-2px);
+        box-shadow: 0 0 18px rgba(255, 95, 109, 0.3), 0 0 36px rgba(255, 95, 109, 0.1);
+      }
+      75% {
+        transform: translateX(1px);
+        box-shadow: 0 0 10px rgba(255, 95, 109, 0.15);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+        box-shadow: none;
+      }
+    }
+
+    .history-item.win {
+      border-color: rgba(36, 217, 112, 0.3);
+    }
+
+    .history-item.loss {
+      border-color: rgba(255, 68, 79, 0.3);
+    }
+
+    .history-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      color: var(--muted);
+    }
+
+    .history-profit {
+      font-weight: 600;
+    }
+
+    .history-profit.win {
+      color: var(--success);
+    }
+
+    .history-profit.loss {
+      color: var(--danger);
+    }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 16px 24px;
+      background: rgba(15, 17, 23, 0.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .footer-content {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .footer-text {
+      font-size: 13px;
+      color: rgba(152, 162, 189, 0.8);
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .powered-by {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: rgba(152, 162, 189, 0.8);
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .powered-by span:last-child {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ff444f;
+      text-transform: lowercase;
+      letter-spacing: 0.06em;
+    }
+
+    @media (min-width: 1024px) {
+      .bot-panel-grid {
+        grid-template-columns: 1.05fr 0.9fr 1fr;
+        align-items: start;
+      }
+
+      .bot-stats {
+        height: 100%;
+      }
+
+      .bot-history-column {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .history-card {
+        height: 100%;
+        max-height: 100%;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+
+      .history-list {
+        max-height: 380px;
+        overflow-y: auto;
+      }
+    }
+
+    @media (max-width: 1023px) {
+      .bots-layout {
+        flex-direction: column;
+      }
+
+      .bots-list {
+        max-width: none;
+        width: 100%;
+      }
+
+      .bot-panel-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .bot-history-column {
+        width: 100%;
+      }
+
+      .history-card {
+        max-height: none;
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .history-list {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        padding-bottom: 20px;
+        margin-bottom: -20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .page {
+        padding: 20px 16px;
+        padding-bottom: 90px;
+      }
+
+      .header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .header h1 {
+        font-size: 14px;
+      }
+
+      .back-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+
+      .back-btn .full-text {
+        display: none !important;
+      }
+
+      .back-btn .short-text {
+        display: inline !important;
+      }
+
+      .section-heading {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .deriv-balance-display {
+        align-self: flex-start;
+        padding: 5px 10px;
+      }
+
+      .deriv-balance-label {
+        font-size: 10px;
+      }
+
+      .deriv-balance-value {
+        font-size: 12px;
+      }
+
+      .deriv-balance-currency {
+        font-size: 10px;
+      }
+
+      .header-active {
+        gap: 6px;
+        flex: 1;
+        min-width: 0;
+      }
+
+      .header-active button {
+        padding: 5px 8px;
+        font-size: 10px;
+        white-space: nowrap;
+      }
+
+      .header-active span {
+        font-size: 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 120px;
+      }
+
+      .header-mt5-btn {
+        flex-shrink: 0;
+      }
+
+      .bot-detail-panel {
+        padding: 18px;
+        padding-bottom: 40px;
+        overflow-y: auto;
+        max-height: calc(100vh - 200px);
+      }
+
+      .bot-panel-content {
+        padding-bottom: 20px;
+      }
+
+      .bot-config {
+        padding: 14px;
+        gap: 14px;
+        border-radius: 12px;
+      }
+
+      .bot-config h4 {
+        font-size: 16px;
+      }
+
+      .config-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .input-group {
+        gap: 6px;
+      }
+
+      .input-group label {
+        font-size: 11px;
+      }
+
+      .input-group input {
+        padding: 10px 12px;
+        font-size: 13px;
+        border-radius: 8px;
+      }
+
+      .config-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+
+      .primary-btn,
+      .secondary-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 10px 16px;
+        font-size: 13px;
+      }
+
+      footer {
+        padding: 14px 16px;
+      }
+
+      .footer-content {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+      }
+
+      .footer-text,
+      .powered-by {
+        font-size: 12px;
+      }
+    }
+
+    /* Deposit Popup Modal */
+    .deposit-popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .deposit-popup-overlay.show {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .deposit-popup {
+      background: var(--panel);
+      border-radius: 20px;
+      padding: 28px;
+      max-width: 420px;
+      width: 100%;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      position: relative;
+      animation: slideUp 0.3s ease;
+      z-index: 1001;
+    }
+
+    .deposit-popup-balance {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      padding: 6px 12px;
+      background: rgba(0, 210, 255, 0.1);
+      border: 1px solid rgba(0, 210, 255, 0.25);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #00d2ff;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .deposit-popup-header {
+      margin-bottom: 16px;
+    }
+
+    .deposit-popup-title {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--text);
+      margin: 0 0 8px;
+      letter-spacing: 0.02em;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .deposit-popup-message {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .deposit-popup-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .deposit-popup-btn {
+      flex: 1;
+      min-width: 120px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .deposit-popup-btn-primary {
+      background: linear-gradient(135deg, rgba(36, 217, 112, 0.2) 0%, rgba(36, 217, 112, 0.1) 100%);
+      border: 1px solid rgba(36, 217, 112, 0.4);
+      color: #24d970;
+    }
+
+    .deposit-popup-btn-primary:hover {
+      background: linear-gradient(135deg, rgba(36, 217, 112, 0.3) 0%, rgba(36, 217, 112, 0.15) 100%);
+      border-color: rgba(36, 217, 112, 0.6);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(36, 217, 112, 0.2);
+    }
+
+    .deposit-popup-btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text);
+    }
+
+    .deposit-popup-btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    @media (max-width: 768px) {
+      .deposit-popup-title {
+        font-size: 14px;
+        margin-top: 8px;
+        font-weight: 500;
+      }
+
+      .deposit-popup-message {
+        font-size: 13px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .deposit-popup {
+        padding: 20px;
+        border-radius: 16px;
+        margin: 16px;
+      }
+
+      .deposit-popup-title {
+        font-size: 13px;
+        margin-top: 6px;
+        margin-bottom: 6px;
+        font-weight: 500;
+      }
+
+      .deposit-popup-message {
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .deposit-popup-actions {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .deposit-popup-btn {
+        width: 100%;
+        min-width: auto;
+      }
+    }
+
+    /* Low Balance Recommendation Popup */
+    .low-balance-recommend-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(6px);
+      z-index: 1002;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      box-sizing: border-box;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .low-balance-recommend-overlay.show {
+      display: flex;
+    }
+
+    .low-balance-recommend-popup {
+      background: var(--panel);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 400px;
+      width: 100%;
+      border: 1px solid rgba(0, 210, 255, 0.2);
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+      position: relative;
+      animation: slideUp 0.3s ease;
+    }
+
+    .low-balance-recommend-timer {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(0, 210, 255, 0.15);
+      border: 1px solid rgba(0, 210, 255, 0.35);
+      color: #00d2ff;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .low-balance-recommend-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0 0 8px;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .low-balance-recommend-balance {
+      font-size: 14px;
+      font-weight: 600;
+      color: #00d2ff;
+      margin: 0 0 12px;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .low-balance-recommend-message {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin: 0 0 16px;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .low-balance-recommend-message strong {
+      color: #00d2ff;
+    }
+
+    .low-balance-recommend-tips {
+      background: rgba(0, 210, 255, 0.06);
+      border: 1px solid rgba(0, 210, 255, 0.12);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+    }
+
+    .low-balance-recommend-tips-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: rgba(152, 162, 189, 0.9);
+      display: block;
+      margin-bottom: 8px;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .low-balance-recommend-tips-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .low-balance-recommend-tips-list li {
+      position: relative;
+      padding-left: 28px;
+      margin-bottom: 8px;
+    }
+
+    .low-balance-recommend-tips-list li:last-child {
+      margin-bottom: 0;
+    }
+
+    .low-balance-recommend-tips-list li::before {
+      content: '\2713';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(0, 210, 255, 0.4);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 18px;
+    }
+
+    .low-balance-recommend-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .low-balance-recommend-btn {
+      flex: 1;
+      min-width: 100px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', system-ui, sans-serif;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border: 1px solid;
+      box-sizing: border-box;
+    }
+
+    .low-balance-recommend-btn-ok {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: var(--text);
+    }
+
+    .low-balance-recommend-btn-ok:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .low-balance-recommend-btn-deposit {
+      background: linear-gradient(135deg, rgba(36, 217, 112, 0.2) 0%, rgba(36, 217, 112, 0.1) 100%);
+      border-color: rgba(36, 217, 112, 0.4);
+      color: #24d970;
+    }
+
+    .low-balance-recommend-btn-deposit:hover {
+      background: linear-gradient(135deg, rgba(36, 217, 112, 0.3) 0%, rgba(36, 217, 112, 0.15) 100%);
+      border-color: rgba(36, 217, 112, 0.6);
+    }
+
+    @media (max-width: 480px) {
+      .low-balance-recommend-popup {
+        padding: 20px;
+        border-radius: 14px;
+      }
+
+      .low-balance-recommend-title {
+        font-size: 16px;
+      }
+
+      .low-balance-recommend-message {
+        font-size: 13px;
+      }
+
+      .low-balance-recommend-tips-list {
+        font-size: 12px;
+      }
+
+      .low-balance-recommend-actions {
+        flex-direction: column;
+      }
+
+      .low-balance-recommend-btn {
+        width: 100%;
+        min-width: auto;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page {
+        padding-bottom: 85px;
+      }
+
+      .header {
+        gap: 6px;
+      }
+
+      .back-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+        min-width: auto;
+      }
+
+      .back-btn .full-text {
+        display: none !important;
+      }
+
+      .back-btn .short-text {
+        display: inline !important;
+      }
+
+      .section-heading h2 {
+        font-size: 15px;
+      }
+
+      .section-heading p {
+        font-size: 12px;
+      }
+
+      .deriv-balance-display {
+        padding: 4px 8px;
+        gap: 6px;
+      }
+
+      .deriv-balance-label {
+        font-size: 9px;
+      }
+
+      .deriv-balance-value {
+        font-size: 11px;
+      }
+
+      .deriv-balance-currency {
+        font-size: 9px;
+      }
+
+      .header-active {
+        gap: 4px;
+      }
+
+      .header-active button {
+        padding: 4px 6px;
+        font-size: 9px;
+      }
+
+      .header-active span {
+        font-size: 9px;
+        max-width: 100px;
+      }
+
+      .bot-detail-panel {
+        padding-bottom: 50px;
+        max-height: calc(100vh - 180px);
+      }
+
+      .bot-config {
+        padding: 12px;
+        gap: 12px;
+        border-radius: 10px;
+      }
+
+      .bot-config h4 {
+        font-size: 15px;
+      }
+
+      .config-grid {
+        gap: 10px;
+      }
+
+      .input-group {
+        gap: 5px;
+      }
+
+      .input-group label {
+        font-size: 10px;
+      }
+
+      .input-group input {
+        padding: 8px 10px;
+        font-size: 12px;
+        border-radius: 6px;
+      }
+
+      .config-actions {
+        gap: 8px;
+      }
+
+      .primary-btn,
+      .secondary-btn {
+        padding: 9px 14px;
+        font-size: 12px;
+      }
+
+      .history-card {
+        min-height: 350px;
+      }
+
+      .history-list {
+        padding-bottom: 30px;
+      }
+
+      footer {
+        padding: 12px 16px;
+      }
+
+      .footer-content {
+        gap: 8px;
+      }
+
+      .footer-text,
+      .powered-by {
+        font-size: 11px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="topbar">
-      <div class="brand">
-        <div class="brand-title">Trading Bots Dashboard</div>
-        <div class="brand-subtitle" id="connectionMeta">Checking connection…</div>
+  <div class="grid-bg"></div>
+  <main class="page">
+    <div class="header" id="pageHeader">
+      <div class="header-default" id="headerDefault">
+        <h1>Automated Trading Bots</h1>
+        <a href="index.html" class="back-btn">
+          <span class="full-text">← Back to Dashboard</span>
+          <span class="short-text">← Back</span>
+        </a>
       </div>
-      <div style="display:flex; gap:10px;">
-        <button class="btn" id="backBtn" type="button">Back</button>
-        <button class="btn primary" id="connectBtn" type="button" style="display:none;">Reconnect</button>
+      <div class="header-active" id="headerActive">
+        <button id="headerBackBtn">← Back to bots</button>
+        <span id="activeBotName">BOT NAME</span>
+      </div>
+      <a class="header-mt5-btn" href="mt5trading-bots.html">
+        <span class="full-text">Explore MT5 Bots →</span>
+        <span class="short-text">MT5 Bots →</span>
+      </a>
+    </div>
+
+    <div class="section-heading" id="sectionHeading">
+      <div class="section-heading-text">
+        <h2>Deriv Bots</h2>
+        <p>Choose any bot and start automated trading with smart risk management.</p>
+      </div>
+      <div class="deriv-balance-display" id="derivBalanceDisplay">
+        <span class="deriv-balance-label">Balance</span>
+        <span class="deriv-balance-value" id="derivBalanceValue">-</span>
+        <span class="deriv-balance-currency" id="derivBalanceCurrency"></span>
       </div>
     </div>
 
-    <div class="notice" id="noticeBox">Loading…</div>
-
-    <div class="grid" id="botsGrid" style="display:none;">
-      <div class="card">
-        <div class="card-title">Smart Recovery Differ</div>
-        <div class="pill-row">
-          <span class="pill live">Live</span>
-          <span class="pill">Volatility</span>
-          <span class="pill">Digit</span>
+    <div class="bots-layout">
+      <div class="bots-list" id="botsList">
+        <div class="bot-card" id="smartRecoveryDifferCard">
+          <div class="bot-card-content">
+            <div class="bot-badges-row">
+              <span class="bot-chip">Smart Recovery</span>
+              <span class="bot-badge bot-badge--popular">Popular</span>
+            </div>
+            <h3>Smart Recovery Differ</h3>
+            <p>Starts with digit differ trades on random numbers. On loss, intelligently analyzes all volatility markets to identify the best market for digit over 4 or under 5, executing recovery trades until win.</p>
+            <ul class="bot-meta">
+              <li>Rating: 5.0/5</li>
+              <li>Strategy: Smart Recovery · Market Analysis</li>
+              <li>Recovery: Intelligent Market Analysis</li>
+            </ul>
+            <button class="open-bot-btn" id="openSmartRecoveryDiffer">Open Bot</button>
+          </div>
         </div>
-        <div class="card-desc">Auto-executes digit strategies with recovery logic and risk controls.</div>
-        <div class="actions">
-          <button class="btn primary" type="button" disabled>Open</button>
-          <button class="btn" type="button" disabled>Settings</button>
+
+        <div class="bot-card" id="allMarketsDifferCard">
+          <div class="bot-card-content">
+            <div class="bot-badges-row">
+              <span class="bot-chip">Digits Differ</span>
+              <span class="bot-badge bot-badge--beginner">Beginner</span>
+            </div>
+            <h3>All Markets Differ</h3>
+            <p>Cycles through Volatility 10–100 markets, rotating digits per trade with recovery logic tuned for high-frequency differ contracts.</p>
+            <ul class="bot-meta">
+              <li>Rating: 4.9/5</li>
+              <li>Strategy: Random Markets & Digits</li>
+              <li>Recovery: Smart Recovery</li>
+            </ul>
+            <button class="open-bot-btn" id="openAllMarketsDiffer">Open Bot</button>
+          </div>
+        </div>
+
+        <div class="bot-card" id="allMarketsOverCard">
+          <div class="bot-card-content">
+            <div class="bot-badges-row">
+              <span class="bot-chip">Digits Over</span>
+              <span class="bot-badge bot-badge--fast">Fast</span>
+            </div>
+            <h3>Random Markets Over 0</h3>
+            <p>Fires Digit Over 0 contracts across Volatility 10–100, rotating markets after every trade with the same protective recovery logic.</p>
+            <ul class="bot-meta">
+              <li>Rating: 4.7/5</li>
+              <li>Strategy: Random Markets · Over 0</li>
+              <li>Recovery: Smart Recovery</li>
+            </ul>
+            <button class="open-bot-btn" id="openAllMarketsOver">Open Bot</button>
+          </div>
+        </div>
+
+        <div class="bot-card" id="allMarketsUnderCard">
+          <div class="bot-card-content">
+            <div class="bot-badges-row">
+              <span class="bot-chip">Digits Under</span>
+              <span class="bot-badge bot-badge--stable">Stable</span>
+            </div>
+            <h3>Random Markets Under 9</h3>
+            <p>Targets Digit Under 9 entries on every tick while rotating through Volatility 10–100 markets for better distribution.</p>
+            <ul class="bot-meta">
+              <li>Rating: 4.8/5</li>
+              <li>Strategy: Random Markets · Under 9</li>
+              <li>Recovery: Smart Recovery</li>
+            </ul>
+            <button class="open-bot-btn" id="openAllMarketsUnder">Open Bot</button>
+          </div>
+        </div>
+
+        <div class="bot-card" id="smartDifferCard">
+          <div class="bot-card-content">
+            <span class="bot-chip">Digit Differ</span>
+            <h3>Smart Differ Pro</h3>
+            <p>Advanced digit differ strategy cycling through Volatility 10–100 markets with intelligent digit selection and smart recovery logic.</p>
+            <ul class="bot-meta">
+              <li>Rating: 4.9/5</li>
+              <li>Strategy: Multi-Market Digit Differ</li>
+              <li>Recovery: Smart Recovery</li>
+            </ul>
+            <button class="open-bot-btn" id="openSmartDiffer">Open Bot</button>
+          </div>
+        </div>
+
+        <div class="bot-card" id="magicRandomBotCard">
+          <div class="bot-card-content">
+            <span class="bot-chip">Magic Random</span>
+            <h3>Magic Random Strategy</h3>
+            <p>Randomly selects between Differ, Under 9, and Over 0 trades across all markets with intelligent stop conditions and digit tracking.</p>
+            <ul class="bot-meta">
+              <li>Rating: 4.9/5</li>
+              <li>Strategy: Random Differ/Under/Over · Multi-Market</li>
+              <li>Recovery: Smart Recovery with Win-Gated Stops</li>
+            </ul>
+            <button class="open-bot-btn" id="openMagicRandomBot">Open Bot</button>
+          </div>
+        </div>
+
+        <div class="bot-card" id="smartVolatilityCard">
+          <div class="bot-card-content">
+            <span class="bot-chip">Volatility AI</span>
+            <h3>Smart Volatility</h3>
+            <p>Tracks R75 tick speed, measures ATR in real-time, and flips between CALL and PUT contracts while auto-scaling stake and duration.</p>
+            <ul class="bot-meta">
+              <li>Rating: 4.95/5</li>
+              <li>Strategy: ATR-driven CALL/PUT scalps</li>
+              <li>Recovery: Volatility-weighted stake shaping</li>
+            </ul>
+            <button class="open-bot-btn" id="openSmartVolatility">Open Bot</button>
+          </div>
+        </div>
+
+        <div class="bot-card" id="smartEvenCard">
+          <div class="bot-card-content">
+            <span class="bot-chip">Digits Even/Odd</span>
+            <h3>Smart Even</h3>
+            <p>Scans R50 digit streaks, waits for imbalance confirmation, and attacks DIGITEVEN/DIGITODD entries with adaptive recovery logic.</p>
+            <ul class="bot-meta">
+              <li>Rating: 4.92/5</li>
+              <li>Strategy: Anti-streak even/odd patterning</li>
+              <li>Recovery: Pattern-aware martingale</li>
+            </ul>
+            <button class="open-bot-btn" id="openSmartEven">Open Bot</button>
+          </div>
+        </div>
+
+        <div class="bot-card" id="noTouchCard">
+          <div class="bot-card-content">
+            <span class="bot-chip">Range Guard</span>
+            <h3>No Touch Sentinel</h3>
+            <p>Monitors R100 momentum, RSI, and volatility snapshots to fire NOTOUCH contracts with directional barriers only when range strength spikes.</p>
+            <ul class="bot-meta">
+              <li>Rating: 4.88/5</li>
+              <li>Strategy: Trend-sensing No Touch</li>
+              <li>Recovery: 3.1× smart scaling</li>
+            </ul>
+            <button class="open-bot-btn" id="openNoTouch">Open Bot</button>
+          </div>
+        </div>
+
+        <div class="bot-card" id="alienRiseFallCard">
+          <div class="bot-card-content">
+            <span class="bot-chip">Trend Pulse</span>
+            <h3>Alien Rise/Fall</h3>
+            <p>Tracks R10 waves using fast RSI + EMA filters, waits for confirmed bursts, then fires CALL/PUT contracts with adaptive recovery.</p>
+            <ul class="bot-meta">
+              <li>Rating: 4.94/5</li>
+              <li>Strategy: Rapid trend re-entry</li>
+              <li>Recovery: 3.1× adaptive martingale</li>
+            </ul>
+            <button class="open-bot-btn" id="openAlienRiseFall">Open Bot</button>
+          </div>
+        </div>
+
+        <div class="bot-card" id="riseFallCard">
+          <div class="bot-card-content">
+            <span class="bot-chip">Momentum</span>
+            <h3>Rise/Fall Pro</h3>
+            <p>Blends RSI, MACD, and multi-frame momentum to time R10 CALL/PUT entries with volume-weighted confirmation.</p>
+            <ul class="bot-meta">
+              <li>Rating: 4.9/5</li>
+              <li>Strategy: Momentum-confirmed Rise/Fall</li>
+              <li>Recovery: 3.1× adaptive martingale</li>
+            </ul>
+            <button class="open-bot-btn" id="openRiseFall">Open Bot</button>
+          </div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-title">Magic Random Strategy</div>
-        <div class="pill-row">
-          <span class="pill live">Live</span>
-          <span class="pill">Volatility</span>
-          <span class="pill">Randomized</span>
-        </div>
-        <div class="card-desc">Rotates symbols and strategies to spread risk and capture opportunities.</div>
-        <div class="actions">
-          <button class="btn primary" type="button" disabled>Open</button>
-          <button class="btn" type="button" disabled>Settings</button>
+      <div class="bot-detail-panel" id="botDetailPanel" hidden>
+        <div class="panel-placeholder" id="panelPlaceholder"></div>
+
+        <div class="bot-panel-content" id="botPanelContent" hidden>
+          <div class="bot-panel-header">
+            <div class="status-badge" id="botStatusBadge" data-state="idle">Idle</div>
+            <div class="status-text" id="botStatusText">Waiting for bot configuration.</div>
+          </div>
+
+          <div class="bot-panel-grid">
+            <div class="bot-column" id="botConfigColumn">
+              <div class="bot-config" id="botConfig">
+                <h4>Configuration</h4>
+                <div class="config-grid">
+                  <div class="input-group">
+                    <label for="stakeInput">Initial Stake (USD)</label>
+                    <input type="number" id="stakeInput" min="0.35" step="0.01" value="1">
+                    <small>Default $1. Minimum $0.35. Adjust to match your balance and risk tolerance.</small>
+                  </div>
+                  <div class="input-group">
+                    <label for="takeProfitInput">Take Profit (USD)</label>
+                    <input type="number" id="takeProfitInput" min="5" step="1" value="100">
+                    <small>Bot stops automatically once this profit target is reached.</small>
+                  </div>
+                  <div class="input-group">
+                    <label for="stopLossInput">Stop Loss (USD)</label>
+                    <input type="number" id="stopLossInput" min="50" step="1" value="1000">
+                    <small>Bot halts immediately if losses reach this amount.</small>
+                  </div>
+                  <div class="input-group" id="martingaleGroup">
+                    <label for="martingaleInput">Martingale Multiplier</label>
+                    <input type="number" id="martingaleInput" min="1" step="0.1" value="16">
+                    <small id="martingaleCaption">Default ×16. Applies after each loss.</small>
+                  </div>
+                </div>
+
+                <div class="config-actions">
+                  <button class="primary-btn btn-liquid-glow" id="startBotBtn">Start Bot</button>
+                  <button class="secondary-btn" id="stopBotBtn" disabled>Stop Bot</button>
+                  <div class="status-text" id="accountHint">Connect your Deriv account from the dashboard before running bots.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bot-column" id="botStatsColumn">
+              <div class="bot-stats" id="botStats">
+                <h4>Live Performance</h4>
+                <div class="stats-grid">
+                  <div class="stat-card">
+                    <span class="stat-label">Account Balance</span>
+                    <span class="stat-value" id="balanceValue">-</span>
+                  </div>
+                  <div class="stat-card">
+                    <span class="stat-label">Total Profit</span>
+                    <span class="stat-value" id="totalProfitValue">$0.00</span>
+                  </div>
+                  <div class="stat-card">
+                    <span class="stat-label">Total Trades</span>
+                    <span class="stat-value" id="totalTradesValue">0</span>
+                  </div>
+                  <div class="stat-card">
+                    <span class="stat-label">Win Rate</span>
+                    <span class="stat-value" id="winRateValue">0%</span>
+                  </div>
+                  <div class="stat-card">
+                    <span class="stat-label">Current Stake</span>
+                    <span class="stat-value" id="currentStakeValue">$0.00</span>
+                  </div>
+                  <div class="stat-card">
+                    <span class="stat-label">Consecutive Losses</span>
+                    <span class="stat-value" id="consecutiveLossesValue">0</span>
+                  </div>
+                  <div class="stat-card">
+                    <span class="stat-label">Market / Digit</span>
+                    <span class="stat-value" id="targetValue">-</span>
+                  </div>
+                  <div class="stat-card">
+                    <span class="stat-label">Running Time</span>
+                    <span class="stat-value" id="runningTimeValue">00:00:00</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bot-column bot-history-column">
+              <div class="history-card">
+                <h4>Recent Trades</h4>
+                <div class="history-list" id="historyList">
+                  <!-- Trades injected here -->
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+    </div>
+  </main>
 
-      <div class="card">
-        <div class="card-title">Smart Volatility</div>
-        <div class="pill-row">
-          <span class="pill live">Live</span>
-          <span class="pill">Calls/Puts</span>
-          <span class="pill">Signals</span>
-        </div>
-        <div class="card-desc">Signal-driven call/put bot with live monitoring and performance stats.</div>
-        <div class="actions">
-          <button class="btn primary" type="button" disabled>Open</button>
-          <button class="btn" type="button" disabled>Settings</button>
-        </div>
+  <!-- Deposit Popup Modal -->
+  <div class="deposit-popup-overlay" id="depositPopupOverlay">
+    <div class="deposit-popup">
+      <div class="deposit-popup-balance" id="depositPopupBalance"></div>
+      <div class="deposit-popup-header">
+        <h3 class="deposit-popup-title">Low Account Balance</h3>
+        <p class="deposit-popup-message">
+          Your account needs more funds to run the trading bot effectively. Adding funds will help you maximize your trading opportunities and achieve better results.
+        </p>
+      </div>
+      <div class="deposit-popup-actions">
+        <a href="https://p2p.deriv.com/advertiser/426826?advert_id=3182910&t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk" target="_blank" rel="noopener" class="deposit-popup-btn deposit-popup-btn-primary" id="depositPopupBtn">
+          Deposit Funds
+        </a>
+        <button class="deposit-popup-btn deposit-popup-btn-secondary" id="depositPopupCancel">
+          Maybe Later
+        </button>
       </div>
     </div>
   </div>
 
+  <!-- Low Balance Recommendation Popup (once per bot per day, balance < 1000) -->
+  <div class="low-balance-recommend-overlay" id="lowBalanceRecommendOverlay" aria-hidden="true">
+    <div class="low-balance-recommend-popup" id="lowBalanceRecommendPopup">
+      <div class="low-balance-recommend-timer" id="lowBalanceRecommendTimer">5</div>
+      <h3 class="low-balance-recommend-title">Balance tip</h3>
+      <p class="low-balance-recommend-balance" id="lowBalanceRecommendBalance">Your balance: —</p>
+      <p class="low-balance-recommend-message">
+        For more stable results and less struggle, we recommend a balance of <strong>1,000 USD</strong> or more. You can grow your account slowly—the bot works with any balance; this is only a recommendation.
+      </p>
+      <div class="low-balance-recommend-tips">
+        <span class="low-balance-recommend-tips-label">Tips for small accounts:</span>
+        <ul class="low-balance-recommend-tips-list">
+          <li>Use a small stake per trade</li>
+          <li>Grow your account slowly—patience pays</li>
+          <li>Build balance step by step</li>
+        </ul>
+      </div>
+      <div class="low-balance-recommend-actions">
+        <button type="button" class="low-balance-recommend-btn low-balance-recommend-btn-ok" id="lowBalanceRecommendOk">OK</button>
+        <a href="https://p2p.deriv.com/advertiser/426826?advert_id=3182910&t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk" target="_blank" rel="noopener" class="low-balance-recommend-btn low-balance-recommend-btn-deposit" id="lowBalanceRecommendDeposit" style="display: none;">Deposit</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-text">© 2026 Magic Automation Lab</div>
+      <div class="powered-by">
+        <span>Powered by</span>
+        <span>deriv</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="popup-notifications.js"></script>
+  <script src="bots/allMarketsDiffer.js"></script>
+  <script src="bots/allMarketsOver.js"></script>
+  <script src="bots/allMarketsUnder.js"></script>
+  <script src="bots/magicRandomBot.js"></script>
+  <script src="bots/smartVolatility.js"></script>
+  <script src="bots/smartEven.js"></script>
+  <script src="bots/noTouch.js"></script>
+  <script src="bots/alienRiseFall.js"></script>
+  <script src="bots/riseFall.js"></script>
+  <script src="bots/smartDifferBot.js"></script>
+  <script src="bots/smartRecoveryDiffer.js"></script>
   <script>
-    const DERIV_ACCESS_TOKEN_KEY = "deriv_access_token";
-    const DERIV_OAUTH_SESSION_KEY = "deriv_oauth_session";
+    const APP_ID = '338udJBKn1EbT7Tc29Snv';
+    const DERIV_ACCESS_TOKEN_KEY = 'deriv_access_token';
+    const DERIV_OAUTH_SESSION_KEY = 'deriv_oauth_session';
+    const ACCOUNTS_ENDPOINT = 'https://api.derivws.com/trading/v1/options/accounts';
+    const VOLATILITY_MARKETS = ['R_10', 'R_25', 'R_50', 'R_75', 'R_100'];
+    const BOT_DEFAULTS = {
+      initialStake: 1,
+      minStake: 0.35,
+      takeProfit: 100,
+      stopLoss: 1000,
+      martingaleMultiplier: 16
+    };
 
-    function $(id) { return document.getElementById(id); }
+    // Deriv Balance Display
+    const derivBalanceValue = document.getElementById('derivBalanceValue');
+    const derivBalanceCurrency = document.getElementById('derivBalanceCurrency');
+    const derivBalanceDisplay = document.getElementById('derivBalanceDisplay');
 
-    function getToken() {
-      return localStorage.getItem(DERIV_ACCESS_TOKEN_KEY);
-    }
-
-    function setNotice(message, isError = false) {
-      const box = $("noticeBox");
-      box.className = `notice${isError ? " error" : ""}`;
-      box.textContent = message;
-    }
-
-    function showBotsGrid(show) {
-      $("botsGrid").style.display = show ? "" : "none";
-    }
-
-    function updateMeta(text) {
-      $("connectionMeta").textContent = text;
-    }
-
-    $("backBtn").addEventListener("click", () => {
-      window.location.href = "dashboard.html";
-    });
-
-    $("connectBtn").addEventListener("click", () => {
-      window.location.href = "index.html";
-    });
-
-    (function init() {
-      const token = getToken();
+    async function updateDerivBalanceDisplay() {
+      const token = resolveAuthToken();
       if (!token) {
-        updateMeta("Not connected to Deriv");
-        $("connectBtn").style.display = "";
-        setNotice("Please connect your Deriv account first to access the trading bots dashboard.", true);
-        showBotsGrid(false);
+        derivBalanceValue.textContent = 'Not Connected';
+        derivBalanceCurrency.textContent = '';
+        derivBalanceDisplay.classList.add('disconnected');
         return;
       }
 
-      updateMeta("Connected to Deriv (session active)");
-      setNotice("Bots dashboard loaded. (Bot actions will be enabled when bot execution UI is added.)");
-      showBotsGrid(true);
+      try {
+        const res = await fetch(ACCOUNTS_ENDPOINT, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Deriv-App-ID': APP_ID
+          }
+        });
+        if (!res.ok) throw new Error(`Accounts ${res.status}`);
+
+        const payload = await res.json();
+        const accounts = Array.isArray(payload?.accounts)
+          ? payload.accounts
+          : (Array.isArray(payload?.data) ? payload.data : []);
+
+        const isReal = (acc) => {
+          const type = String(acc?.account_type || acc?.type || '').toLowerCase();
+          const loginid = String(acc?.account_id || acc?.loginid || '');
+          if (type.includes('real')) return true;
+          if (type.includes('demo') || type.includes('virtual')) return false;
+          if (loginid.startsWith('CR')) return true;
+          if (loginid.startsWith('VRTC')) return false;
+          return false;
+        };
+
+        const account = accounts.find(isReal) || accounts[0];
+        if (!account) throw new Error('No account');
+
+        const balance = Number(account.balance ?? 0);
+        const currency = account.currency || 'USD';
+        lastKnownBalance = Number.isFinite(balance) ? balance : 0;
+        lastKnownCurrency = currency;
+        derivBalanceValue.textContent = lastKnownBalance.toFixed(2);
+        derivBalanceCurrency.textContent = currency;
+        derivBalanceDisplay.classList.remove('disconnected');
+      } catch (e) {
+        derivBalanceValue.textContent = 'Error';
+        derivBalanceCurrency.textContent = '';
+        derivBalanceDisplay.classList.add('disconnected');
+      }
+    }
+
+    const botsList = document.getElementById('botsList');
+    const panelPlaceholder = document.getElementById('panelPlaceholder');
+    const botDetailPanel = document.getElementById('botDetailPanel');
+    const botPanelContent = document.getElementById('botPanelContent');
+    const pageHeader = document.getElementById('pageHeader');
+    const headerBackBtn = document.getElementById('headerBackBtn');
+    const activeBotName = document.getElementById('activeBotName');
+    const sectionHeading = document.getElementById('sectionHeading');
+    const martingaleGroup = document.getElementById('martingaleGroup');
+
+    let martingaleInputEl = null;
+    let currentMartingaleDefault = BOT_DEFAULTS.martingaleMultiplier;
+
+    let botUI = null;
+    let currentBotInstance = null;
+    let currentBotKey = null;
+    const botInstances = {};
+    let lastKnownBalance = null;
+    let lastKnownCurrency = 'USD';
+    let martingaleEnabled = true;
+
+    activeBotName.textContent = 'Select a bot';
+
+    function openBotPanelUI() {
+      botDetailPanel.hidden = false;
+      botPanelContent.hidden = false;
+      botsList?.classList.add('hidden');
+      pageHeader.classList.add('show-active');
+      sectionHeading.hidden = true;
+      sectionHeading.classList.add('hidden');
+    }
+
+    function closeBotPanel(stopBot = true) {
+      if (stopBot && currentBotInstance?.isRunning) {
+        currentBotInstance.stop('Bot hidden. Restart when ready.', 'warning');
+      }
+      currentBotInstance = null;
+      currentBotKey = null;
+      document.querySelectorAll('.bot-card').forEach(card => card.classList.remove('active'));
+      pageHeader.classList.remove('show-active');
+      botDetailPanel.hidden = true;
+      botPanelContent.hidden = true;
+      botsList?.classList.remove('hidden');
+      sectionHeading.hidden = false;
+      sectionHeading.classList.remove('hidden');
+      botUI?.showStatus('Waiting for bot configuration.');
+    }
+
+    headerBackBtn.addEventListener('click', () => closeBotPanel());
+
+    function resolveAuthToken() {
+      try {
+        const sessionRaw = localStorage.getItem(DERIV_OAUTH_SESSION_KEY);
+        if (sessionRaw) {
+          const session = JSON.parse(sessionRaw);
+          if (session?.access_token) return session.access_token;
+        }
+      } catch (_) {}
+
+      try {
+        const token = localStorage.getItem(DERIV_ACCESS_TOKEN_KEY);
+        if (token) return token;
+      } catch (_) {}
+
+      return null;
+    }
+
+    // Initialize balance display
+    if (derivBalanceValue && derivBalanceCurrency && derivBalanceDisplay) {
+      // Wait for DOM to be ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          updateDerivBalanceDisplay();
+          setInterval(updateDerivBalanceDisplay, 15000);
+        });
+      } else {
+        updateDerivBalanceDisplay();
+        setInterval(updateDerivBalanceDisplay, 15000);
+      }
+    }
+
+    // Disable bot execution until bots are migrated to the new OAuth + OTP API.
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.open-bot-btn').forEach((btn) => {
+          btn.disabled = true;
+          btn.title = 'Bots migration to new OAuth API is next.';
+        });
+      });
+    } else {
+      document.querySelectorAll('.open-bot-btn').forEach((btn) => {
+        btn.disabled = true;
+        btn.title = 'Bots migration to new OAuth API is next.';
+      });
+    }
+
+    function initBotUI() {
+      const startBtn = document.getElementById('startBotBtn');
+      const stopBtn = document.getElementById('stopBotBtn');
+      const statusBadge = document.getElementById('botStatusBadge');
+      const statusText = document.getElementById('botStatusText');
+      const balanceValue = document.getElementById('balanceValue');
+      const totalProfitValue = document.getElementById('totalProfitValue');
+      const totalTradesValue = document.getElementById('totalTradesValue');
+      const winRateValue = document.getElementById('winRateValue');
+      const currentStakeValue = document.getElementById('currentStakeValue');
+      const consecutiveLossesValue = document.getElementById('consecutiveLossesValue');
+      const targetValue = document.getElementById('targetValue');
+      const runningTimeValue = document.getElementById('runningTimeValue');
+      const historyList = document.getElementById('historyList');
+
+      const stakeInput = document.getElementById('stakeInput');
+      const takeProfitInput = document.getElementById('takeProfitInput');
+      const stopLossInput = document.getElementById('stopLossInput');
+      const martingaleInput = document.getElementById('martingaleInput');
+      martingaleInputEl = martingaleInput;
+
+      const historyLimit = 20;
+
+      return {
+        getConfigValues() {
+          const martingaleValue = martingaleEnabled
+            ? parseFloat(martingaleInput.value) || BOT_DEFAULTS.martingaleMultiplier
+            : 1;
+          return {
+            initialStake: parseFloat(stakeInput.value) || BOT_DEFAULTS.initialStake,
+            takeProfit: parseFloat(takeProfitInput.value) || BOT_DEFAULTS.takeProfit,
+            stopLoss: parseFloat(stopLossInput.value) || BOT_DEFAULTS.stopLoss,
+            martingaleMultiplier: martingaleValue
+          };
+        },
+        validateConfig(config) {
+          if (config.initialStake < BOT_DEFAULTS.minStake) {
+            return { valid: false, message: `Minimum stake is $${BOT_DEFAULTS.minStake.toFixed(2)}.` };
+          }
+          if (config.takeProfit <= 0) {
+            return { valid: false, message: 'Take profit must be greater than 0.' };
+          }
+          if (config.stopLoss <= 0) {
+            return { valid: false, message: 'Stop loss must be greater than 0.' };
+          }
+          if (martingaleEnabled && config.martingaleMultiplier < 1) {
+            return { valid: false, message: 'Martingale multiplier must be at least 1.' };
+          }
+          return { valid: true };
+        },
+        setRunningState(isRunning) {
+          startBtn.disabled = isRunning;
+          stopBtn.disabled = !isRunning;
+          if (isRunning) {
+            startBtn.classList.remove('btn-liquid-glow');
+            stopBtn.classList.add('btn-liquid-glow');
+          } else {
+            startBtn.classList.add('btn-liquid-glow');
+            stopBtn.classList.remove('btn-liquid-glow');
+          }
+          statusBadge.dataset.state = isRunning ? 'running' : 'idle';
+          statusBadge.textContent = isRunning ? 'Running' : 'Idle';
+        },
+        showStatus(message, type = 'info') {
+          statusText.textContent = message;
+          if (type === 'error') {
+            statusBadge.dataset.state = 'error';
+            statusBadge.textContent = 'Error';
+            // Check for insufficient balance error
+            if (message && message.toLowerCase().includes('insufficient')) {
+              showDepositPopup();
+            }
+          } else if (type === 'success') {
+            statusBadge.dataset.state = 'running';
+            statusBadge.textContent = 'Running';
+          } else if (type === 'warning') {
+            statusBadge.dataset.state = 'idle';
+            statusBadge.textContent = 'Attention';
+          } else if (!startBtn.disabled) {
+            statusBadge.dataset.state = 'idle';
+            statusBadge.textContent = 'Idle';
+          }
+        },
+        updateBalance(value, currency = 'USD') {
+          lastKnownBalance = value;
+          lastKnownCurrency = currency;
+          balanceValue.textContent = `${currency} ${Number(value).toFixed(2)}`;
+        },
+        updateStats(stats) {
+          totalProfitValue.textContent = `${stats.totalProfit >= 0 ? '+' : ''}$${stats.totalProfit.toFixed(2)}`;
+          totalProfitValue.classList.toggle('positive', stats.totalProfit > 0);
+          totalProfitValue.classList.toggle('negative', stats.totalProfit < 0);
+          totalTradesValue.textContent = stats.totalTrades;
+          winRateValue.textContent = `${stats.winRate}%`;
+          currentStakeValue.textContent = `$${Number(stats.currentStake).toFixed(2)}`;
+          consecutiveLossesValue.textContent = stats.consecutiveLosses;
+          targetValue.textContent = `${stats.market} / ${stats.digit}`;
+          runningTimeValue.textContent = stats.runningTime;
+        },
+        updateTargets(market, digit) {
+          targetValue.textContent = `${market} / ${digit}`;
+        },
+        updateRunningTime(value) {
+          runningTimeValue.textContent = value;
+        },
+        resetHistory() {
+          historyList.innerHTML = '';
+        },
+        addHistoryEntry(entry) {
+          const item = document.createElement('div');
+          item.className = `history-item ${entry.win ? 'win' : 'loss'} history-item--enter`;
+
+          const meta = document.createElement('div');
+          meta.className = 'history-meta';
+          meta.innerHTML = `
+            <strong>${entry.market} · Digit ${entry.digit}</strong>
+            <span>${entry.timestamp.toLocaleTimeString()}</span>
+            <span>Stake: $${Number(entry.stake).toFixed(2)}</span>
+          `;
+
+          const profit = document.createElement('div');
+          profit.className = `history-profit ${entry.win ? 'win' : 'loss'}`;
+          profit.textContent = `${entry.win ? '+' : ''}$${entry.profit.toFixed(2)}`;
+
+          item.appendChild(meta);
+          item.appendChild(profit);
+
+          historyList.prepend(item);
+          while (historyList.children.length > historyLimit) {
+            historyList.removeChild(historyList.lastChild);
+          }
+        },
+        setMartingaleVisibility(show) {
+          if (martingaleGroup) {
+            martingaleGroup.style.display = show ? '' : 'none';
+          }
+        }
+      };
+    }
+
+    botUI = initBotUI();
+    function setMartingaleEnabled(enabled) {
+      martingaleEnabled = enabled;
+      botUI.setMartingaleVisibility(enabled);
+      if (!enabled && martingaleInputEl) {
+        martingaleInputEl.value = '1';
+      } else if (enabled && martingaleInputEl) {
+        martingaleInputEl.value = currentMartingaleDefault;
+      }
+    }
+    setMartingaleEnabled(true);
+    const sharedDependencies = () => ({
+      wsUrl: DERIV_WS_URL,
+      defaults: BOT_DEFAULTS,
+      markets: VOLATILITY_MARKETS,
+      resolveAuthToken
+    });
+
+    const BOT_DEFINITIONS = [
+      {
+        key: 'smartRecoveryDiffer',
+        name: 'Smart Recovery Differ',
+        cardId: 'smartRecoveryDifferCard',
+        buttonId: 'openSmartRecoveryDiffer',
+        defaultMartingale: 3.1,
+        createInstance: () => new window.SmartRecoveryDifferBot(botUI, sharedDependencies())
+      },
+      {
+        key: 'allMarketsDiffer',
+        name: 'All Markets Differ',
+        cardId: 'allMarketsDifferCard',
+        buttonId: 'openAllMarketsDiffer',
+        createInstance: () => new window.AllMarketsDifferBot(botUI, sharedDependencies())
+      },
+      {
+        key: 'allMarketsOver',
+        name: 'Random Markets Over 0',
+        cardId: 'allMarketsOverCard',
+        buttonId: 'openAllMarketsOver',
+        createInstance: () => new window.AllMarketsOverBot(botUI, sharedDependencies())
+      },
+      {
+        key: 'allMarketsUnder',
+        name: 'Random Markets Under 9',
+        cardId: 'allMarketsUnderCard',
+        buttonId: 'openAllMarketsUnder',
+        createInstance: () => new window.AllMarketsUnderBot(botUI, sharedDependencies())
+      },
+      {
+        key: 'smartRecoveryDiffer',
+        name: 'Smart Recovery Differ',
+        cardId: 'smartRecoveryDifferCard',
+        buttonId: 'openSmartRecoveryDiffer',
+        defaultMartingale: 3.1,
+        createInstance: () => new window.SmartRecoveryDifferBot(botUI, sharedDependencies())
+      },
+      {
+        key: 'magicRandomBot',
+        name: 'Magic Random Strategy',
+        cardId: 'magicRandomBotCard',
+        buttonId: 'openMagicRandomBot',
+        createInstance: () => new window.MagicRandomBot(botUI, sharedDependencies())
+      },
+      {
+        key: 'smartVolatility',
+        name: 'Smart Volatility',
+        cardId: 'smartVolatilityCard',
+        buttonId: 'openSmartVolatility',
+        supportsMartingale: false,
+        createInstance: () => new window.SmartVolatilityBot(botUI, sharedDependencies())
+      },
+      {
+        key: 'smartEven',
+        name: 'Smart Even',
+        cardId: 'smartEvenCard',
+        buttonId: 'openSmartEven',
+        defaultMartingale: 3.1,
+        createInstance: () => new window.SmartEvenBot(botUI, sharedDependencies())
+      },
+      {
+        key: 'noTouch',
+        name: 'No Touch Sentinel',
+        cardId: 'noTouchCard',
+        buttonId: 'openNoTouch',
+        defaultMartingale: 16,
+        createInstance: () => new window.NoTouchBot(botUI, sharedDependencies())
+      },
+      {
+        key: 'alienRiseFall',
+        name: 'Alien Rise/Fall',
+        cardId: 'alienRiseFallCard',
+        buttonId: 'openAlienRiseFall',
+        defaultMartingale: 3.1,
+        createInstance: () => new window.AlienRiseFallBot(botUI, sharedDependencies())
+      },
+      {
+        key: 'riseFall',
+        name: 'Rise/Fall Pro',
+        cardId: 'riseFallCard',
+        buttonId: 'openRiseFall',
+        defaultMartingale: 3.1,
+        createInstance: () => new window.RiseFallBot(botUI, sharedDependencies())
+      },
+      {
+        key: 'smartDiffer',
+        name: 'Smart Differ Pro',
+        cardId: 'smartDifferCard',
+        buttonId: 'openSmartDiffer',
+        defaultMartingale: 16,
+        createInstance: () => new window.SmartDifferBot(botUI, sharedDependencies())
+      }
+    ];
+
+    const BOT_DEFINITION_MAP = BOT_DEFINITIONS.reduce((acc, def) => {
+      acc[def.key] = def;
+      return acc;
+    }, {});
+
+    function getBotInstance(key) {
+      if (!botInstances[key]) {
+        const def = BOT_DEFINITION_MAP[key];
+        if (!def) return null;
+        botInstances[key] = def.createInstance();
+      }
+      return botInstances[key];
+    }
+
+    function setActiveCard(key) {
+      document.querySelectorAll('.bot-card').forEach(card => card.classList.remove('active'));
+      if (key && BOT_DEFINITION_MAP[key]) {
+        document.getElementById(BOT_DEFINITION_MAP[key].cardId)?.classList.add('active');
+      }
+    }
+
+    function handleBotOpen(key) {
+      const def = BOT_DEFINITION_MAP[key];
+      if (!def) return;
+
+      if (currentBotKey && currentBotKey !== key && currentBotInstance?.isRunning) {
+        currentBotInstance.stop('Switched bots. Previous session stopped.', 'warning');
+      }
+
+      currentBotKey = key;
+      currentBotInstance = getBotInstance(key);
+      activeBotName.textContent = def.name;
+      currentMartingaleDefault = def.defaultMartingale ?? BOT_DEFAULTS.martingaleMultiplier;
+      setMartingaleEnabled(def.supportsMartingale !== false);
+      if (martingaleInputEl && def.supportsMartingale !== false) {
+        martingaleInputEl.value = currentMartingaleDefault;
+      }
+      // Update martingale caption dynamically
+      const martingaleCaption = document.getElementById('martingaleCaption');
+      if (martingaleCaption) {
+        martingaleCaption.textContent = `Default ×${currentMartingaleDefault}. Applies after each loss.`;
+      }
+      setActiveCard(key);
+      openBotPanelUI();
+      // Scroll to top on small screens, center on large screens
+      const isSmallScreen = window.innerWidth <= 768;
+      if (isSmallScreen) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        botPanelContent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      if (lastKnownBalance !== null) {
+        botUI.updateBalance(lastKnownBalance, lastKnownCurrency);
+      }
+
+      // Low balance recommendation popup: ensure balance is fetched then show once per bot per day when balance < 1000
+      if (typeof fetchBalanceAndShowLowBalancePopupIfNeeded === 'function') {
+        fetchBalanceAndShowLowBalancePopupIfNeeded(key);
+      }
+    }
+
+    BOT_DEFINITIONS.forEach((def) => {
+      const card = document.getElementById(def.cardId);
+      const button = document.getElementById(def.buttonId);
+      card?.addEventListener('click', () => handleBotOpen(def.key));
+      button?.addEventListener('click', (event) => {
+        event.stopPropagation();
+        handleBotOpen(def.key);
+      });
+    });
+
+    document.getElementById('startBotBtn').addEventListener('click', () => {
+      if (!currentBotInstance) {
+        botUI.showStatus('Select a bot first to configure and start.', 'warning');
+        return;
+      }
+      const config = botUI.getConfigValues();
+      const validation = botUI.validateConfig(config);
+      if (!validation.valid) {
+        botUI.showStatus(validation.message, 'error');
+        return;
+      }
+      currentBotInstance.start(config);
+    });
+
+    document.getElementById('stopBotBtn').addEventListener('click', () => {
+      if (currentBotInstance) {
+        currentBotInstance.stop('Bot stopped by user.', 'warning');
+      }
+    });
+
+    // Triple-click "Deriv Bots" + password "idle" -> balance prompt -> open sim mode
+    (function() {
+      const derivBotsHeading = document.querySelector('.section-heading-text h2');
+      if (!derivBotsHeading) return;
+      let clickCount = 0;
+      let clickTimer = null;
+      derivBotsHeading.addEventListener('click', () => {
+        clickCount++;
+        if (clickTimer) clearTimeout(clickTimer);
+        if (clickCount >= 3) {
+          clickCount = 0;
+          const pwd = prompt('Password:');
+          if (pwd !== 'idle') return;
+          const balance = prompt('Enter balance (USD):', localStorage.getItem('simBalance') || '1000');
+          if (balance === null) return;
+          const balanceNum = parseFloat(balance);
+          if (isNaN(balanceNum) || balanceNum <= 0) {
+            alert('Please enter a valid balance greater than 0.');
+            return;
+          }
+          localStorage.setItem('simBalance', balanceNum.toString());
+          window.open(`simtrading-bots.html?balance=${balanceNum}`, '_blank');
+        } else {
+          clickTimer = setTimeout(() => { clickCount = 0; }, 400);
+        }
+      });
     })();
+
+    // Deposit Popup Functions
+    const depositPopupOverlay = document.getElementById('depositPopupOverlay');
+    const depositPopupCancel = document.getElementById('depositPopupCancel');
+    const depositPopupBalance = document.getElementById('depositPopupBalance');
+
+    function showDepositPopup() {
+      if (depositPopupOverlay) {
+        // Update balance display in popup
+        if (depositPopupBalance && lastKnownBalance !== null) {
+          depositPopupBalance.textContent = `${lastKnownCurrency} ${Number(lastKnownBalance).toFixed(2)}`;
+        } else if (depositPopupBalance) {
+          depositPopupBalance.textContent = 'Balance: -';
+        }
+        depositPopupOverlay.classList.add('show');
+      }
+    }
+
+    function hideDepositPopup() {
+      if (depositPopupOverlay) {
+        depositPopupOverlay.classList.remove('show');
+      }
+    }
+
+    // Close popup on cancel
+    if (depositPopupCancel) {
+      depositPopupCancel.addEventListener('click', () => {
+        hideDepositPopup();
+      });
+    }
+
+    // Close popup when clicking overlay (outside the popup)
+    if (depositPopupOverlay) {
+      depositPopupOverlay.addEventListener('click', (e) => {
+        if (e.target === depositPopupOverlay) {
+          hideDepositPopup();
+        }
+      });
+    }
+
+    // Close popup on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && depositPopupOverlay?.classList.contains('show')) {
+        hideDepositPopup();
+      }
+    });
+
+    // Low Balance Recommendation Popup (once per bot per day, balance < 1000 USD)
+    const LOW_BALANCE_RECOMMEND_STORAGE_PREFIX = 'lowBalancePopup_';
+    const LOW_BALANCE_RECOMMEND_THRESHOLD = 1000;
+    const LOW_BALANCE_RECOMMEND_DEPOSIT_URL = 'https://p2p.deriv.com/advertiser/426826?advert_id=3182910&t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk';
+    const lowBalanceRecommendOverlay = document.getElementById('lowBalanceRecommendOverlay');
+    const lowBalanceRecommendPopup = document.getElementById('lowBalanceRecommendPopup');
+    const lowBalanceRecommendTimerEl = document.getElementById('lowBalanceRecommendTimer');
+    const lowBalanceRecommendBalanceEl = document.getElementById('lowBalanceRecommendBalance');
+    const lowBalanceRecommendOk = document.getElementById('lowBalanceRecommendOk');
+    const lowBalanceRecommendDeposit = document.getElementById('lowBalanceRecommendDeposit');
+
+    function fetchBalanceAndShowLowBalancePopupIfNeeded(botKey) {
+      if (lastKnownBalance != null) {
+        showLowBalanceRecommendPopupIfNeeded(botKey);
+        return;
+      }
+      const token = resolveAuthToken();
+      if (!token) return;
+      const ws = new WebSocket(DERIV_WS_URL);
+      ws.onopen = function () {
+        ws.send(JSON.stringify({ authorize: token, req_id: Date.now() }));
+      };
+      ws.onmessage = function (msg) {
+        try {
+          const response = JSON.parse(msg.data);
+          if (response.error) { ws.close(); return; }
+          if (response.msg_type === 'authorize' && response.authorize) {
+            var balance = Number(response.authorize.balance || 0);
+            var currency = response.authorize.currency || 'USD';
+            lastKnownBalance = balance;
+            lastKnownCurrency = currency;
+            if (derivBalanceValue) derivBalanceValue.textContent = balance.toFixed(2);
+            if (derivBalanceCurrency) derivBalanceCurrency.textContent = currency;
+            if (derivBalanceDisplay) derivBalanceDisplay.classList.remove('disconnected');
+            ws.close();
+            showLowBalanceRecommendPopupIfNeeded(botKey);
+          }
+        } catch (e) { ws.close(); }
+      };
+      ws.onerror = function () { ws.close(); };
+      setTimeout(function () {
+        if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+          ws.close();
+        }
+      }, 5000);
+    }
+
+    function getLowBalanceRecommendStorageKey(botKey) {
+      const today = new Date().toISOString().slice(0, 10);
+      return LOW_BALANCE_RECOMMEND_STORAGE_PREFIX + botKey + '_' + today;
+    }
+
+    function hideLowBalanceRecommendPopup() {
+      if (lowBalanceRecommendOverlay) {
+        lowBalanceRecommendOverlay.classList.remove('show');
+        lowBalanceRecommendOverlay.setAttribute('aria-hidden', 'true');
+      }
+    }
+
+    function showLowBalanceRecommendPopupIfNeeded(botKey) {
+      if (lastKnownBalance == null || lastKnownBalance >= LOW_BALANCE_RECOMMEND_THRESHOLD) return;
+      try {
+        const key = getLowBalanceRecommendStorageKey(botKey);
+        if (localStorage.getItem(key)) return;
+      } catch (e) { return; }
+
+      var autoCloseTimeout = null;
+      var countdownInterval = null;
+      var secondsLeft = 5;
+      var hovered = false;
+
+      if (lowBalanceRecommendBalanceEl) {
+        var bal = lastKnownBalance != null ? Number(lastKnownBalance) : null;
+        var cur = lastKnownCurrency || 'USD';
+        lowBalanceRecommendBalanceEl.textContent = bal != null ? 'Your balance: ' + bal.toFixed(2) + ' ' + cur : 'Your balance: —';
+      }
+      if (lowBalanceRecommendDeposit) {
+        lowBalanceRecommendDeposit.style.display = (lastKnownBalance === 0 || lastKnownBalance === '0') ? '' : 'none';
+      }
+      if (lowBalanceRecommendTimerEl) {
+        lowBalanceRecommendTimerEl.textContent = '5';
+      }
+
+      function clearTimers() {
+        if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+        if (autoCloseTimeout) { clearTimeout(autoCloseTimeout); autoCloseTimeout = null; }
+      }
+
+      function closeAndMarkShown() {
+        clearTimers();
+        hideLowBalanceRecommendPopup();
+        try {
+          localStorage.setItem(getLowBalanceRecommendStorageKey(botKey), '1');
+        } catch (e) {}
+      }
+
+      if (lowBalanceRecommendOk) {
+        lowBalanceRecommendOk.onclick = closeAndMarkShown;
+      }
+      if (lowBalanceRecommendDeposit && lowBalanceRecommendDeposit.style.display !== 'none') {
+        lowBalanceRecommendDeposit.onclick = function () { closeAndMarkShown(); };
+      }
+
+      if (lowBalanceRecommendPopup) {
+        lowBalanceRecommendPopup.onmouseenter = function () {
+          hovered = true;
+          clearTimers();
+        };
+        lowBalanceRecommendPopup.onmouseleave = function () { hovered = false; };
+        lowBalanceRecommendPopup.ontouchstart = function () {
+          hovered = true;
+          clearTimers();
+        };
+      }
+
+      secondsLeft = 5;
+      countdownInterval = setInterval(function () {
+        if (hovered) return;
+        secondsLeft -= 1;
+        if (lowBalanceRecommendTimerEl) lowBalanceRecommendTimerEl.textContent = String(secondsLeft);
+        if (secondsLeft <= 0) {
+          clearTimers();
+          closeAndMarkShown();
+        }
+      }, 1000);
+
+      autoCloseTimeout = setTimeout(function () {
+        if (hovered) return;
+        clearTimers();
+        closeAndMarkShown();
+      }, 5000);
+
+      if (lowBalanceRecommendOverlay) {
+        lowBalanceRecommendOverlay.classList.add('show');
+        lowBalanceRecommendOverlay.setAttribute('aria-hidden', 'false');
+      }
+    }
+
+    if (lowBalanceRecommendOverlay) {
+      lowBalanceRecommendOverlay.addEventListener('click', function (e) {
+        if (e.target === lowBalanceRecommendOverlay) hideLowBalanceRecommendPopup();
+      });
+    }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && lowBalanceRecommendOverlay && lowBalanceRecommendOverlay.classList.contains('show')) {
+        hideLowBalanceRecommendPopup();
+      }
+    });
   </script>
 </body>
 </html>
