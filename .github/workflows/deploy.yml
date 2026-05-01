@@ -25,28 +25,22 @@ jobs:
 
       - name: Build WebBots Dashboard
         run: |
-          # Create web-build directory
+          # Create clean build directory
           mkdir -p web-build
-          
-          # Copy all HTML files from root to web-build
-          for file in *.html; do
-            if [ -f "$file" ]; then
-              cp "$file" web-build/
-              echo "✅ Copied $file"
-            fi
-          done
-          
-          # Copy bots folder (JavaScript strategies) if it exists
-          if [ -d "bots" ]; then
-            mkdir -p web-build/bots
-            cp -r bots/. web-build/bots/
-            echo "✅ Copied bots/ directory"
-          fi
-          
-          # Copy root assets (sitemap, robots, favicon, Bing verification)
-          for f in sitemap.xml robots.txt favicon.svg BingSiteAuth.xml; do
-            if [ -f "$f" ]; then cp "$f" web-build/ && echo "✅ Copied $f"; fi
-          done
+
+          # Publish a blank placeholder page only
+          cat > web-build/index.html << 'EOF'
+          <!doctype html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <title></title>
+          </head>
+          <body></body>
+          </html>
+          EOF
+
           # Create .nojekyll file to ensure GitHub Pages serves all files
           touch web-build/.nojekyll
           echo "✅ Created .nojekyll file"
