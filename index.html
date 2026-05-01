@@ -72,8 +72,10 @@
   <script>
     const DERIV_OAUTH_CLIENT_ID = "338udJBKn1EbT7Tc29Snv";
     const OAUTH_URL = "https://auth.deriv.com/oauth2/auth";
+    const TOKEN_URL = "https://auth.deriv.com/oauth2/token";
     const PKCE_VERIFIER_KEY = "pkce_code_verifier";
     const OAUTH_STATE_KEY = "oauth_state";
+    const DERIV_ACCESS_TOKEN_KEY = "deriv_access_token";
 
     function randomString(length = 64) {
       const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
@@ -136,7 +138,41 @@
       }
     }
 
-    function handleOAuthCallback() {
+    async function exchangeCodeForToken(code) {
+      const verifier = sessionStorage.getItem(PKCE_VERIFIER_KEY);
+      if (!verifier) throw new Error("Missing PKCE verifier");
+
+      const redirectUri = `${window.location.origin}${window.location.pathname}`;
+      const body = new URLSearchParams({
+        grant_type: "authorization_code",
+        client_id: DERIV_OAUTH_CLIENT_ID,
+        code,
+        code_verifier: verifier,
+        redirect_uri: redirectUri
+      });
+
+      const response = await fetch(TOKEN_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body
+      });
+
+      if (!response.ok) {
+        throw new Error(`Token exchange failed (${response.status})`);
+      }
+
+      const tokenData = await response.json();
+      if (!tokenData.access_token) {
+        throw new Error("Missing access token");
+      }
+
+      localStorage.setItem(DERIV_ACCESS_TOKEN_KEY, tokenData.access_token);
+      sessionStorage.removeItem(PKCE_VERIFIER_KEY);
+      sessionStorage.removeItem(OAUTH_STATE_KEY);
+      return tokenData.access_token;
+    }
+
+    async function handleOAuthCallback() {
       const params = new URLSearchParams(window.location.search);
       const error = params.get("error");
       const code = params.get("code");
@@ -155,11 +191,13 @@
         return;
       }
 
-      setStatus("Deriv authorization successful. Code received.", "success");
-      sessionStorage.removeItem(OAUTH_STATE_KEY);
-      // Keep verifier for server-side token exchange implementation.
-      // This page intentionally does not call the token endpoint from browser.
-      window.history.replaceState({}, "", window.location.pathname);
+      setStatus("Authorization successful. Preparing dashboard...", "success");
+      try {
+        await exchangeCodeForToken(code);
+        window.location.href = "dashboard.html";
+      } catch (e) {
+        setStatus("Connected but token exchange failed. Please try again.", "error");
+      }
     }
 
     document.getElementById("connectBtn")?.addEventListener("click", startOAuthLogin);
