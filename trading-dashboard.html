@@ -458,6 +458,20 @@
       color: var(--muted);
     }
 
+    .account-mode-btn {
+      margin-left: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 210, 255, 0.35);
+      background: rgba(0, 210, 255, 0.1);
+      color: #9be8ff;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
     .secondary-btn-link {
       display: inline-flex;
       align-items: center;
@@ -1987,6 +2001,7 @@
         <span class="deriv-balance-label">Balance</span>
         <span class="deriv-balance-value" id="derivBalanceValue">-</span>
         <span class="deriv-balance-currency" id="derivBalanceCurrency"></span>
+        <button type="button" id="accountModeBtn" class="account-mode-btn">Mode: Real</button>
       </div>
     </div>
 
@@ -2328,6 +2343,7 @@
     const APP_ID = '338udJBKn1EbT7Tc29Snv';
     const DERIV_ACCESS_TOKEN_KEY = 'deriv_access_token';
     const DERIV_OAUTH_SESSION_KEY = 'deriv_oauth_session';
+    const ACCOUNT_MODE_KEY = 'deriv_account_mode';
     const ACCOUNTS_ENDPOINT = 'https://api.derivws.com/trading/v1/options/accounts';
     const OTP_ENDPOINT_BASE = 'https://api.derivws.com/trading/v1/options/accounts';
     const VOLATILITY_MARKETS = ['R_10', 'R_25', 'R_50', 'R_75', 'R_100'];
@@ -2343,6 +2359,23 @@
     const derivBalanceValue = document.getElementById('derivBalanceValue');
     const derivBalanceCurrency = document.getElementById('derivBalanceCurrency');
     const derivBalanceDisplay = document.getElementById('derivBalanceDisplay');
+    const accountModeBtn = document.getElementById('accountModeBtn');
+    let currentAccountMode = localStorage.getItem(ACCOUNT_MODE_KEY) === 'demo' ? 'demo' : 'real';
+
+    function updateAccountModeButton() {
+      if (!accountModeBtn) return;
+      accountModeBtn.textContent = currentAccountMode === 'demo' ? 'Mode: Demo' : 'Mode: Real';
+    }
+
+    function isDemoAccount(acc) {
+      const type = String(acc?.account_type || acc?.type || '').toLowerCase();
+      const loginid = String(acc?.account_id || acc?.loginid || '');
+      if (type.includes('demo') || type.includes('virtual')) return true;
+      if (type.includes('real')) return false;
+      if (loginid.startsWith('VRTC')) return true;
+      if (loginid.startsWith('CR')) return false;
+      return false;
+    }
 
     async function updateDerivBalanceDisplay() {
       const token = resolveAuthToken();
@@ -2367,17 +2400,9 @@
           ? payload.accounts
           : (Array.isArray(payload?.data) ? payload.data : []);
 
-        const isReal = (acc) => {
-          const type = String(acc?.account_type || acc?.type || '').toLowerCase();
-          const loginid = String(acc?.account_id || acc?.loginid || '');
-          if (type.includes('real')) return true;
-          if (type.includes('demo') || type.includes('virtual')) return false;
-          if (loginid.startsWith('CR')) return true;
-          if (loginid.startsWith('VRTC')) return false;
-          return false;
-        };
-
-        const account = accounts.find(isReal) || accounts[0];
+        const account = currentAccountMode === 'demo'
+          ? (accounts.find(isDemoAccount) || accounts[0])
+          : (accounts.find((a) => !isDemoAccount(a)) || accounts[0]);
         if (!account) throw new Error('No account');
 
         const balance = Number(account.balance ?? 0);
@@ -2407,17 +2432,9 @@
         ? payload.accounts
         : (Array.isArray(payload?.data) ? payload.data : []);
 
-      const isReal = (acc) => {
-        const type = String(acc?.account_type || acc?.type || '').toLowerCase();
-        const loginid = String(acc?.account_id || acc?.loginid || '');
-        if (type.includes('real')) return true;
-        if (type.includes('demo') || type.includes('virtual')) return false;
-        if (loginid.startsWith('CR')) return true;
-        if (loginid.startsWith('VRTC')) return false;
-        return false;
-      };
-
-      const account = accounts.find(isReal) || accounts[0];
+      const account = currentAccountMode === 'demo'
+        ? (accounts.find(isDemoAccount) || accounts[0])
+        : (accounts.find((a) => !isDemoAccount(a)) || accounts[0]);
       const accountId = account?.account_id || account?.loginid || account?.id;
       if (!accountId) throw new Error('Missing accountId');
 
@@ -2503,6 +2520,21 @@
     }
 
     // Initialize balance display
+    updateAccountModeButton();
+    if (accountModeBtn) {
+      accountModeBtn.addEventListener('click', async () => {
+        currentAccountMode = currentAccountMode === 'real' ? 'demo' : 'real';
+        localStorage.setItem(ACCOUNT_MODE_KEY, currentAccountMode);
+        updateAccountModeButton();
+        otpWsUrl = null;
+        if (currentBotInstance?.isRunning) {
+          currentBotInstance.stop('Switched account mode. Restart bot to continue.', 'warning');
+        }
+        await updateDerivBalanceDisplay();
+        botUI?.showStatus(`Switched to ${currentAccountMode.toUpperCase()} mode.`, 'info');
+      });
+    }
+
     if (derivBalanceValue && derivBalanceCurrency && derivBalanceDisplay) {
       // Wait for DOM to be ready
       if (document.readyState === 'loading') {
