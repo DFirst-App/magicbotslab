@@ -87,10 +87,16 @@
           clearTimeout(this.reconnectTimeout);
           this.reconnectTimeout = null;
         }
-        const token = this.storedToken || this.resolveAuthToken();
-        if (token) {
-          this.ws.send(JSON.stringify({ authorize: token }));
+        const isOtpSocket = typeof this.wsUrl === 'string' && this.wsUrl.includes('otp=');
+        if (isOtpSocket) {
+          this.ui.showStatus('Connected. Starting live stream...', 'success');
+          this.subscribeToBalance();
+          this.subscribeToTicks();
+          this.subscribeToContracts();
+          return;
         }
+        const token = this.storedToken || this.resolveAuthToken();
+        if (token) this.ws.send(JSON.stringify({ authorize: token }));
       };
 
       this.ws.onmessage = (event) => this.handleMessage(event.data);
