@@ -135,6 +135,37 @@
       line-height: 1.35;
     }
 
+    .config-input {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px 12px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 12px;
+      background: rgba(148, 163, 184, 0.06);
+    }
+
+    .config-input label {
+      font-size: 12px;
+      font-weight: 800;
+      color: rgba(226, 232, 240, 0.95);
+    }
+
+    .config-input input {
+      padding: 8px 10px;
+      font-size: 13px;
+      border-radius: 10px;
+      border: 1px solid rgba(55, 65, 81, 1);
+      background: rgba(15, 23, 42, 0.35);
+      color: #f8fafc;
+      outline: none;
+    }
+
+    .config-input input:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
     .actions {
       margin-top: auto;
       display: flex;
@@ -246,6 +277,12 @@
         <div class="bot-stat">Balance: <strong id="botBalance">--</strong></div>
         <div class="bot-stat">Target: <strong id="botTarget">--</strong></div>
         <div class="bot-stat">Last contract: <strong id="botLastContract">--</strong></div>
+        <div class="bot-stat">Total profit: <strong id="botTotalProfit">$0.00</strong></div>
+        <div class="bot-stat">Total trades: <strong id="botTotalTrades">0</strong></div>
+        <div class="bot-stat">Win rate: <strong id="botWinRate">0%</strong></div>
+        <div class="bot-stat">Current stake: <strong id="botCurrentStake">$0.00</strong></div>
+        <div class="bot-stat">Consecutive losses: <strong id="botConsecutiveLosses">0</strong></div>
+        <div class="bot-stat">Running time: <strong id="botRunningTime">00:00:00</strong></div>
       </div>
 
       <div class="card">
@@ -258,8 +295,7 @@
         </div>
         <div class="card-desc">Runs smart recovery digit differ on Volatility 10 only. Normal mode uses <strong>DIGITDIFF</strong>; on loss it enters recovery using <strong>DIGITOVER</strong>/<strong>DIGITUNDER</strong> with martingale.</div>
         <div class="actions">
-          <button class="btn primary bot-start" type="button" data-bot-key="smartRecoveryDiffer">Start Smart Recovery Differ</button>
-          <button class="btn bot-stop" type="button" data-bot-key="smartRecoveryDiffer" disabled>Stop</button>
+          <button class="btn primary bot-open" type="button" data-bot-key="smartRecoveryDiffer">Open Bot</button>
         </div>
       </div>
 
@@ -272,6 +308,40 @@
       </div>
 
       <div class="card">
+        <div class="card-title">Bot Configuration</div>
+        <div class="pill-row">
+          <span class="pill">Initial stake: $1.00</span>
+          <span class="pill">Take profit: $100</span>
+          <span class="pill">Stop loss: $1000</span>
+          <span class="pill">Martingale configurable</span>
+        </div>
+        <div class="card-desc">Each bot keeps its own configuration, trades, and statistics. Select a bot with “Open Bot”, then start it here.</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div class="config-input">
+            <label for="stakeInput">Initial Stake (USD)</label>
+            <input type="number" id="stakeInput" min="0.35" step="0.01" value="1" />
+          </div>
+          <div class="config-input">
+            <label for="takeProfitInput">Take Profit (USD)</label>
+            <input type="number" id="takeProfitInput" min="5" step="1" value="100" />
+          </div>
+          <div class="config-input">
+            <label for="stopLossInput">Stop Loss (USD)</label>
+            <input type="number" id="stopLossInput" min="50" step="1" value="1000" />
+          </div>
+          <div class="config-input" id="martingaleGroup">
+            <label for="martingaleInput">Martingale Multiplier</label>
+            <input type="number" id="martingaleInput" min="1" step="0.1" value="16" />
+            <div class="card-desc" style="margin-top:4px;">Default applies after each loss.</div>
+          </div>
+        </div>
+        <div class="actions" style="margin-top:12px;">
+          <button class="btn primary" type="button" id="startBotBtn" disabled>Start Bot</button>
+          <button class="btn" type="button" id="stopBotBtn" disabled>Stop</button>
+        </div>
+      </div>
+
+      <div class="card">
         <div class="card-title">All Markets Differ</div>
         <div class="pill-row">
           <span class="pill">Digit differ</span>
@@ -279,8 +349,7 @@
         </div>
         <div class="card-desc">Runs across Deriv Options markets using <code>underlying_symbol</code>.</div>
         <div class="actions">
-          <button class="btn primary bot-start" type="button" data-bot-key="allMarketsDiffer">Start</button>
-          <button class="btn bot-stop" type="button" data-bot-key="allMarketsDiffer" disabled>Stop</button>
+          <button class="btn primary bot-open" type="button" data-bot-key="allMarketsDiffer">Open Bot</button>
         </div>
       </div>
 
@@ -292,8 +361,7 @@
         </div>
         <div class="card-desc">Randomized Over 0 sequence (OTP-authenticated WebSocket).</div>
         <div class="actions">
-          <button class="btn primary bot-start" type="button" data-bot-key="allMarketsOver">Start</button>
-          <button class="btn bot-stop" type="button" data-bot-key="allMarketsOver" disabled>Stop</button>
+          <button class="btn primary bot-open" type="button" data-bot-key="allMarketsOver">Open Bot</button>
         </div>
       </div>
 
@@ -305,8 +373,7 @@
         </div>
         <div class="card-desc">Randomized Under 9 sequence (OTP-authenticated WebSocket).</div>
         <div class="actions">
-          <button class="btn primary bot-start" type="button" data-bot-key="allMarketsUnder">Start</button>
-          <button class="btn bot-stop" type="button" data-bot-key="allMarketsUnder" disabled>Stop</button>
+          <button class="btn primary bot-open" type="button" data-bot-key="allMarketsUnder">Open Bot</button>
         </div>
       </div>
 
@@ -317,8 +384,7 @@
         </div>
         <div class="card-desc">Mixes differ/under/over trades using the correct Deriv Options schema.</div>
         <div class="actions">
-          <button class="btn primary bot-start" type="button" data-bot-key="magicRandomBot">Start</button>
-          <button class="btn bot-stop" type="button" data-bot-key="magicRandomBot" disabled>Stop</button>
+          <button class="btn primary bot-open" type="button" data-bot-key="magicRandomBot">Open Bot</button>
         </div>
       </div>
 
@@ -329,8 +395,7 @@
         </div>
         <div class="card-desc">Uses tick analysis and places CALL/PUT trades automatically.</div>
         <div class="actions">
-          <button class="btn primary bot-start" type="button" data-bot-key="smartVolatility">Start</button>
-          <button class="btn bot-stop" type="button" data-bot-key="smartVolatility" disabled>Stop</button>
+          <button class="btn primary bot-open" type="button" data-bot-key="smartVolatility">Open Bot</button>
         </div>
       </div>
 
@@ -341,8 +406,7 @@
         </div>
         <div class="card-desc">Even/odd strategy based on tick signals.</div>
         <div class="actions">
-          <button class="btn primary bot-start" type="button" data-bot-key="smartEven">Start</button>
-          <button class="btn bot-stop" type="button" data-bot-key="smartEven" disabled>Stop</button>
+          <button class="btn primary bot-open" type="button" data-bot-key="smartEven">Open Bot</button>
         </div>
       </div>
 
@@ -353,8 +417,7 @@
         </div>
         <div class="card-desc">Range spike detector; places NOTOUCH contracts.</div>
         <div class="actions">
-          <button class="btn primary bot-start" type="button" data-bot-key="noTouch">Start</button>
-          <button class="btn bot-stop" type="button" data-bot-key="noTouch" disabled>Stop</button>
+          <button class="btn primary bot-open" type="button" data-bot-key="noTouch">Open Bot</button>
         </div>
       </div>
 
@@ -365,8 +428,7 @@
         </div>
         <div class="card-desc">RSI + trend confirmation strategy.</div>
         <div class="actions">
-          <button class="btn primary bot-start" type="button" data-bot-key="alienRiseFall">Start</button>
-          <button class="btn bot-stop" type="button" data-bot-key="alienRiseFall" disabled>Stop</button>
+          <button class="btn primary bot-open" type="button" data-bot-key="alienRiseFall">Open Bot</button>
         </div>
       </div>
 
@@ -377,8 +439,7 @@
         </div>
         <div class="card-desc">Momentum + pattern strategy for rise/fall.</div>
         <div class="actions">
-          <button class="btn primary bot-start" type="button" data-bot-key="riseFall">Start</button>
-          <button class="btn bot-stop" type="button" data-bot-key="riseFall" disabled>Stop</button>
+          <button class="btn primary bot-open" type="button" data-bot-key="riseFall">Open Bot</button>
         </div>
       </div>
 
@@ -389,8 +450,7 @@
         </div>
         <div class="card-desc">Differ-based strategy using the correct Deriv Options schema.</div>
         <div class="actions">
-          <button class="btn primary bot-start" type="button" data-bot-key="smartDiffer">Start</button>
-          <button class="btn bot-stop" type="button" data-bot-key="smartDiffer" disabled>Stop</button>
+          <button class="btn primary bot-open" type="button" data-bot-key="smartDiffer">Open Bot</button>
         </div>
       </div>
     </div>
@@ -412,8 +472,14 @@
     const DERIV_ACCESS_TOKEN_KEY = "deriv_access_token";
     const ACCOUNTS_ENDPOINT = "https://api.derivws.com/trading/v1/options/accounts";
     const OTP_ENDPOINT_BASE = "https://api.derivws.com/trading/v1/options/accounts";
-    const STAKE_USD = 1;
-    const SYMBOL = "R_10";
+    const BOT_DEFAULTS = {
+      initialStake: 1,
+      minStake: 0.35,
+      takeProfit: 100,
+      stopLoss: 1000,
+      martingaleMultiplier: 16
+    };
+    const VOLATILITY_MARKETS = ["R_10", "R_25", "R_50", "R_75", "R_100"];
 
     let botRunning = false;
     let currentAccountId = null;
@@ -423,6 +489,7 @@
     let currentCurrency = "USD";
     let botInstance = null;
     let activeBotKey = null;
+    let botStates = {};
 
     function $(id) { return document.getElementById(id); }
 
@@ -441,17 +508,26 @@
     }
 
     function setControlsForRunning(running) {
-      const startButtons = Array.from(document.querySelectorAll(".bot-start"));
-      const stopButtons = Array.from(document.querySelectorAll(".bot-stop"));
-
-      startButtons.forEach((btn) => {
+      document.querySelectorAll(".bot-open").forEach((btn) => {
         btn.disabled = !!running;
       });
 
-      stopButtons.forEach((btn) => {
-        const key = btn.dataset.botKey;
-        btn.disabled = !(running && key === activeBotKey);
+      const startBtn = $("startBotBtn");
+      const stopBtn = $("stopBotBtn");
+      if (startBtn) startBtn.disabled = !!running || !activeBotKey || !currentAccountId;
+      if (stopBtn) stopBtn.disabled = !running;
+
+      const inputIds = ["stakeInput", "takeProfitInput", "stopLossInput", "martingaleInput"];
+      inputIds.forEach((id) => {
+        const el = $(id);
+        if (el) el.disabled = !!running;
       });
+
+      // Mode toggle is on the Account & Mode card
+      const realBtn = $("realModeBtn");
+      const demoBtn = $("demoModeBtn");
+      if (realBtn) realBtn.disabled = !!running;
+      if (demoBtn) demoBtn.disabled = !!running;
     }
 
     function updateMeta(text) {
@@ -467,6 +543,9 @@
       $("botMode").textContent = currentMode === "real" ? "Real" : "Demo";
       $("realModeBtn").classList.toggle("active", currentMode === "real");
       $("demoModeBtn").classList.toggle("active", currentMode === "demo");
+      if (activeBotKey && botStates[activeBotKey]) {
+        botStates[activeBotKey].mode = currentMode;
+      }
     }
 
     function setBotBalance(balance, currency) {
@@ -602,15 +681,165 @@
       }
       botInstance = null;
       botRunning = false;
-      activeBotKey = null;
       setControlsForRunning(false);
       setBotConnection("Stopped");
     }
 
-    async function startBot(botKey) {
-      const botDef = botKey && botKey.trim ? botKey.trim() : botKey;
-      if (!botDef) return;
+    const BOT_DEFS = {
+      smartRecoveryDiffer: { classRef: window.SmartRecoveryDifferBot, defaultMartingale: 3.1, supportsMartingale: true, markets: VOLATILITY_MARKETS },
+      allMarketsDiffer: { classRef: window.AllMarketsDifferBot, defaultMartingale: BOT_DEFAULTS.martingaleMultiplier, supportsMartingale: true, markets: VOLATILITY_MARKETS },
+      allMarketsOver: { classRef: window.AllMarketsOverBot, defaultMartingale: BOT_DEFAULTS.martingaleMultiplier, supportsMartingale: true, markets: VOLATILITY_MARKETS },
+      allMarketsUnder: { classRef: window.AllMarketsUnderBot, defaultMartingale: BOT_DEFAULTS.martingaleMultiplier, supportsMartingale: true, markets: VOLATILITY_MARKETS },
+      magicRandomBot: { classRef: window.MagicRandomBot, defaultMartingale: BOT_DEFAULTS.martingaleMultiplier, supportsMartingale: true, markets: VOLATILITY_MARKETS },
+      smartVolatility: { classRef: window.SmartVolatilityBot, defaultMartingale: BOT_DEFAULTS.martingaleMultiplier, supportsMartingale: false, markets: VOLATILITY_MARKETS },
+      smartEven: { classRef: window.SmartEvenBot, defaultMartingale: 3.1, supportsMartingale: true, markets: VOLATILITY_MARKETS },
+      noTouch: { classRef: window.NoTouchBot, defaultMartingale: BOT_DEFAULTS.martingaleMultiplier, supportsMartingale: true, markets: VOLATILITY_MARKETS },
+      alienRiseFall: { classRef: window.AlienRiseFallBot, defaultMartingale: 3.1, supportsMartingale: true, markets: VOLATILITY_MARKETS },
+      riseFall: { classRef: window.RiseFallBot, defaultMartingale: 3.1, supportsMartingale: true, markets: VOLATILITY_MARKETS },
+      smartDiffer: { classRef: window.SmartDifferBot, defaultMartingale: BOT_DEFAULTS.martingaleMultiplier, supportsMartingale: true, markets: VOLATILITY_MARKETS }
+    };
+
+    function ensureBotState(botKey) {
+      if (botStates[botKey]) return botStates[botKey];
+      const def = BOT_DEFS[botKey];
+      if (!def) return null;
+      botStates[botKey] = {
+        mode: "real",
+        config: {
+          initialStake: BOT_DEFAULTS.initialStake,
+          takeProfit: BOT_DEFAULTS.takeProfit,
+          stopLoss: BOT_DEFAULTS.stopLoss,
+          martingaleMultiplier: def.defaultMartingale
+        },
+        modes: {
+          real: { history: [], stats: null, lastContract: "--" },
+          demo: { history: [], stats: null, lastContract: "--" }
+        }
+      };
+      return botStates[botKey];
+    }
+
+    function formatMoney(n) {
+      const v = Number(n);
+      if (!Number.isFinite(v)) return "$0.00";
+      return `$${v.toFixed(2)}`;
+    }
+
+    function renderTradeLogFor(botKey) {
+      const log = $("tradeLog");
+      if (!log) return;
+      const state = botStates[botKey];
+      const modeKey = currentMode === "demo" ? "demo" : "real";
+      const history = state?.modes?.[modeKey]?.history;
+      if (!state || !Array.isArray(history) || history.length === 0) {
+        log.innerHTML = `<li class="trade-item">No trades yet. Start the bot to begin.</li>`;
+        return;
+      }
+
+      const limit = 25;
+      const items = history.slice(0, limit);
+      log.innerHTML = "";
+      items.forEach((entry) => {
+        const li = document.createElement("li");
+        li.className = `trade-item ${entry.win ? "win" : "loss"}`.trim();
+        const p = Number(entry.profit ?? 0);
+        const s = Number(entry.stake ?? 0);
+        const market = entry.market || "--";
+        const digit = entry.digit ?? "-";
+        const currency = entry.currency || currentCurrency || "USD";
+        const result = entry.win ? "WIN" : "LOSS";
+        li.textContent = `${new Date(entry.timestamp || Date.now()).toLocaleTimeString()} - ${result} | ${market} | Digit ${digit} | Stake $${s.toFixed(2)} | Profit ${p.toFixed(2)} ${currency}`;
+        log.appendChild(li);
+      });
+    }
+
+    function renderStatsFor(botKey) {
+      const state = botStates[botKey];
+      if (!state) return;
+      const modeKey = currentMode === "demo" ? "demo" : "real";
+      const stats = state.modes?.[modeKey]?.stats;
+      if (!stats) {
+        $("botBalance").textContent = "--";
+        $("botTarget").textContent = "--";
+        $("botLastContract").textContent = "--";
+        $("botTotalProfit").textContent = "$0.00";
+        $("botTotalTrades").textContent = "0";
+        $("botWinRate").textContent = "0%";
+        $("botCurrentStake").textContent = "$0.00";
+        $("botConsecutiveLosses").textContent = "0";
+        $("botRunningTime").textContent = "00:00:00";
+        return;
+      }
+
+      const currency = stats.currency || currentCurrency || "USD";
+      $("botBalance").textContent = stats.balance !== undefined ? `${Number(stats.balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency}` : "--";
+      $("botTarget").textContent = stats.market !== undefined ? `${stats.market}${stats.digit !== undefined ? ` / ${stats.digit}` : ""}` : "--";
+      $("botLastContract").textContent = state.modes?.[modeKey]?.lastContract || "--";
+      $("botTotalProfit").textContent = formatMoney(stats.totalProfit ?? 0);
+      $("botTotalTrades").textContent = String(stats.totalTrades ?? 0);
+      $("botWinRate").textContent = stats.winRate !== undefined ? `${stats.winRate}%`.replace("%%", "%") : "0%";
+      $("botCurrentStake").textContent = formatMoney(stats.currentStake ?? 0);
+      $("botConsecutiveLosses").textContent = String(stats.consecutiveLosses ?? 0);
+      $("botRunningTime").textContent = stats.runningTime || "00:00:00";
+    }
+
+    function setMartingaleVisibility(botKey) {
+      const group = $("martingaleGroup");
+      const def = BOT_DEFS[botKey];
+      if (!group || !def) return;
+      group.style.display = def.supportsMartingale === false ? "none" : "";
+    }
+
+    function openBot(botKey) {
+      if (!botKey) return;
       if (botRunning) return;
+      activeBotKey = botKey;
+      ensureBotState(activeBotKey);
+
+      const state = botStates[activeBotKey];
+      const def = BOT_DEFS[activeBotKey];
+      if (!state || !def) return;
+
+      setMartingaleVisibility(activeBotKey);
+
+      // Mode + account preview
+      setMode(state.mode || "real");
+      currentAccountId = getCurrentModeAccountId();
+      $("botAccountId").textContent = currentAccountId || "--";
+
+      // Config
+      $("stakeInput").value = String(state.config.initialStake);
+      $("takeProfitInput").value = String(state.config.takeProfit);
+      $("stopLossInput").value = String(state.config.stopLoss);
+      $("martingaleInput").value = String(state.config.martingaleMultiplier);
+
+      // Render saved state
+      renderTradeLogFor(activeBotKey);
+      renderStatsFor(activeBotKey);
+
+      // Idle connection indicator
+      setBotConnection("Idle");
+      setControlsForRunning(false);
+
+      const startBtn = $("startBotBtn");
+      if (startBtn) startBtn.disabled = !currentAccountId;
+
+      // Update balance preview
+      const token = getToken();
+      if (token && currentAccountId) {
+        fetchModeBalancePreview(token, currentAccountId).catch(() => {});
+      }
+    }
+
+    async function startBot() {
+      if (botRunning) return;
+      if (!activeBotKey) return;
+
+      const def = BOT_DEFS[activeBotKey];
+      if (!def) {
+        setNotice(`Unknown bot: ${activeBotKey}`, true);
+        return;
+      }
 
       const token = getToken();
       if (!token) {
@@ -618,28 +847,37 @@
         return;
       }
 
-      activeBotKey = botDef;
+      const stake = parseFloat($("stakeInput")?.value);
+      const takeProfit = parseFloat($("takeProfitInput")?.value);
+      const stopLoss = parseFloat($("stopLossInput")?.value);
+      const martingaleMultiplier = parseFloat($("martingaleInput")?.value);
+
+      const safeStake = Number.isFinite(stake) ? Math.max(stake, BOT_DEFAULTS.minStake) : BOT_DEFAULTS.initialStake;
+      const safeTP = Number.isFinite(takeProfit) ? takeProfit : BOT_DEFAULTS.takeProfit;
+      const safeSL = Number.isFinite(stopLoss) ? stopLoss : BOT_DEFAULTS.stopLoss;
+      const safeMartingale = Number.isFinite(martingaleMultiplier) ? martingaleMultiplier : def.defaultMartingale;
+
+      // Persist config for this bot immediately
+      const state = ensureBotState(activeBotKey);
+      if (state) {
+        state.mode = currentMode;
+        state.config.initialStake = safeStake;
+        state.config.takeProfit = safeTP;
+        state.config.stopLoss = safeSL;
+        state.config.martingaleMultiplier = safeMartingale;
+      }
+
+      currentAccountId = getCurrentModeAccountId();
+      if (!currentAccountId) {
+        setNotice(`No ${currentMode} account available for this user`, true);
+        return;
+      }
+
       botRunning = true;
       setControlsForRunning(true);
       setBotConnection("Initializing...");
+
       try {
-        const BOT_DEFS = {
-          smartRecoveryDiffer: { classRef: window.SmartRecoveryDifferBot, martingale: 3.1, markets: [SYMBOL] },
-          allMarketsDiffer: { classRef: window.AllMarketsDifferBot, martingale: 16, markets: [SYMBOL] },
-          allMarketsOver: { classRef: window.AllMarketsOverBot, martingale: 16, markets: [SYMBOL] },
-          allMarketsUnder: { classRef: window.AllMarketsUnderBot, martingale: 16, markets: [SYMBOL] },
-          magicRandomBot: { classRef: window.MagicRandomBot, martingale: 16, markets: [SYMBOL] },
-          smartVolatility: { classRef: window.SmartVolatilityBot, martingale: 16, markets: [SYMBOL] },
-          smartEven: { classRef: window.SmartEvenBot, martingale: 3.1, markets: [SYMBOL] },
-          noTouch: { classRef: window.NoTouchBot, martingale: 16, markets: [SYMBOL] },
-          alienRiseFall: { classRef: window.AlienRiseFallBot, martingale: 3.1, markets: [SYMBOL] },
-          riseFall: { classRef: window.RiseFallBot, martingale: 3.1, markets: [SYMBOL] },
-          smartDiffer: { classRef: window.SmartDifferBot, martingale: 16, markets: [SYMBOL] }
-        };
-
-        const def = BOT_DEFS[botDef];
-        if (!def || !def.classRef) throw new Error(`Unknown bot key: ${botDef}`);
-
         await loadAccountsByMode(token);
         updateAccountModeAvailability();
         currentAccountId = getCurrentModeAccountId();
@@ -649,66 +887,129 @@
         const wsUrl = await getOtpWsUrl(token, currentAccountId);
         if (!wsUrl) throw new Error("Missing authenticated WebSocket URL");
 
-        // UI adapter required by SmartRecoveryDifferBot
+        const thisBotKey = activeBotKey;
+        const thisDef = def;
+        const thisMode = currentMode;
+
         const ui = {
           showStatus: (text) => setBotConnection(text),
           setRunningState: (running) => {
             botRunning = !!running;
             setControlsForRunning(botRunning);
-            if ($("realModeBtn")) $("realModeBtn").disabled = botRunning || !realAccountId;
-            if ($("demoModeBtn")) $("demoModeBtn").disabled = botRunning || !demoAccountId;
           },
           resetHistory: () => {
-            const log = $("tradeLog");
-            if (log) log.innerHTML = "";
+            const s = ensureBotState(thisBotKey);
+            if (s) {
+              const m = s.modes?.[thisMode];
+              if (m) {
+                m.history = [];
+                m.stats = null;
+                m.lastContract = "--";
+              }
+            }
+            renderTradeLogFor(thisBotKey);
+            if (activeBotKey === thisBotKey) renderStatsFor(thisBotKey);
           },
-          updateRunningTime: () => {},
-          updateStats: () => {},
+          updateRunningTime: (runningTime) => {
+            const s = ensureBotState(thisBotKey);
+            const m = s?.modes?.[thisMode];
+            if (m && m.stats) m.stats.runningTime = runningTime;
+            if (activeBotKey === thisBotKey) $("botRunningTime").textContent = runningTime || "00:00:00";
+          },
+          updateStats: (stats) => {
+            const s = ensureBotState(thisBotKey);
+            const m = s?.modes?.[thisMode];
+            if (m) m.stats = stats || m.stats;
+            if (activeBotKey === thisBotKey && stats) {
+              const currency = stats.currency || currentCurrency || "USD";
+              $("botBalance").textContent = `${Number(stats.balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency}`;
+              $("botTarget").textContent = stats.market ? `${stats.market} / ${stats.digit}` : "--";
+              $("botTotalProfit").textContent = formatMoney(stats.totalProfit ?? 0);
+              $("botTotalTrades").textContent = String(stats.totalTrades ?? 0);
+              $("botWinRate").textContent = stats.winRate !== undefined ? `${stats.winRate}%`.replace("%%", "%") : "0%";
+              $("botCurrentStake").textContent = formatMoney(stats.currentStake ?? 0);
+              $("botConsecutiveLosses").textContent = String(stats.consecutiveLosses ?? 0);
+              $("botRunningTime").textContent = stats.runningTime || "00:00:00";
+            }
+          },
           updateBalance: (balance, currency) => {
             currentCurrency = currency || currentCurrency;
+            const s = ensureBotState(thisBotKey);
+            const m = s?.modes?.[thisMode];
+            if (m) {
+              m.stats = m.stats || {};
+              m.stats.balance = balance;
+              m.stats.currency = currency || currentCurrency;
+            }
             setBotBalance(balance, currency || "USD");
           },
           updateTargets: (market, displayTarget) => {
             if ($("botTarget")) $("botTarget").textContent = displayTarget || market || "--";
           },
           addHistoryEntry: ({ win, profit, stake, market, digit, timestamp }) => {
-            const p = Number(profit ?? 0);
-            const s = Number(stake ?? 0);
-            const result = win ? "WIN" : "LOSS";
-            if ($("botLastContract")) {
-              $("botLastContract").textContent = `${result} | ${market || "--"} | Digit ${digit ?? "-"}`;
+            const s = ensureBotState(thisBotKey);
+            if (!s) return;
+            const m = s?.modes?.[thisMode];
+            if (!m) return;
+            const entry = {
+              win: !!win,
+              profit,
+              stake,
+              market,
+              digit,
+              timestamp: timestamp || new Date(),
+              currency: currentCurrency || "USD"
+            };
+            m.history.unshift(entry);
+            while (m.history.length > 25) m.history.pop();
+
+            if (activeBotKey === thisBotKey) {
+              const p = Number(profit ?? 0);
+              const st = Number(stake ?? 0);
+              const result = entry.win ? "WIN" : "LOSS";
+              if ($("botLastContract")) {
+                $("botLastContract").textContent = `${result} | ${market || "--"} | Digit ${digit ?? "-"}`;
+              }
+              if (m) {
+                m.lastContract = `${result} | ${market || "--"} | Digit ${digit ?? "-"}`;
+              }
+              logTrade(
+                `${result} | ${market || "--"} | Digit ${digit ?? "-"} | Stake $${st.toFixed(2)} | Profit ${p.toFixed(2)} ${entry.currency}`,
+                entry.win ? "win" : "loss"
+              );
             }
-            logTrade(
-              `${result} | ${market || "--"} | Digit ${digit ?? "-"} | Stake $${s.toFixed(2)} | Profit ${p.toFixed(2)} ${currentCurrency || "USD"}`,
-              win ? "win" : "loss"
-            );
           }
         };
 
-        botInstance = new def.classRef(ui, {
+        botInstance = new thisDef.classRef(ui, {
           wsUrl,
           defaults: {
-            initialStake: STAKE_USD,
-            stopLoss: 0,
-            takeProfit: 0,
-            martingaleMultiplier: def.martingale
+            initialStake: safeStake,
+            takeProfit: safeTP,
+            stopLoss: safeSL,
+            martingaleMultiplier: safeMartingale
           },
-          markets: def.markets,
+          markets: thisDef.markets,
           resolveAuthToken: () => token,
           otpAuthenticated: true
         });
 
-        logTrade(`Starting ${botDef} (${currentMode.toUpperCase()}) on ${SYMBOL}...`, "win");
+        // Start using the same config we store in UI
         ui.resetHistory();
         botInstance.start({
-          initialStake: STAKE_USD,
-          martingaleMultiplier: def.martingale,
-          stopLoss: 0,
-          takeProfit: 0
+          initialStake: safeStake,
+          takeProfit: safeTP,
+          stopLoss: safeSL,
+          martingaleMultiplier: safeMartingale
         });
+
+        setBotConnection("Running");
+        // Store the initial snapshot for rendering right away
+        const s = ensureBotState(thisBotKey);
+        if (s && s.modes?.[thisMode]?.stats === null) renderStatsFor(thisBotKey);
       } catch (error) {
         stopBot();
-        setNotice(`Failed to start test bot: ${error.message}`, true);
+        setNotice(`Failed to start bot: ${error.message}`, true);
       }
     }
 
@@ -720,12 +1021,13 @@
       window.location.href = "index.html";
     });
 
-    document.querySelectorAll(".bot-start").forEach((btn) => {
-      btn.addEventListener("click", () => startBot(btn.dataset.botKey));
+    document.querySelectorAll(".bot-open").forEach((btn) => {
+      btn.addEventListener("click", () => openBot(btn.dataset.botKey));
     });
-    document.querySelectorAll(".bot-stop").forEach((btn) => {
-      btn.addEventListener("click", stopBot);
-    });
+
+    $("startBotBtn").addEventListener("click", startBot);
+    $("stopBotBtn").addEventListener("click", stopBot);
+
     $("realModeBtn").addEventListener("click", () => {
       if (botRunning) return;
       setMode("real");
@@ -735,6 +1037,11 @@
       if (token && currentAccountId) {
         fetchModeBalancePreview(token, currentAccountId).catch(() => {});
       }
+      if (activeBotKey) {
+        renderTradeLogFor(activeBotKey);
+        renderStatsFor(activeBotKey);
+      }
+      setControlsForRunning(false);
     });
     $("demoModeBtn").addEventListener("click", () => {
       if (botRunning) return;
@@ -745,6 +1052,29 @@
       if (token && currentAccountId) {
         fetchModeBalancePreview(token, currentAccountId).catch(() => {});
       }
+      if (activeBotKey) {
+        renderTradeLogFor(activeBotKey);
+        renderStatsFor(activeBotKey);
+      }
+      setControlsForRunning(false);
+    });
+
+    // Persist config edits per bot (only for the currently selected bot)
+    ["stakeInput", "takeProfitInput", "stopLossInput", "martingaleInput"].forEach((id) => {
+      const el = $(id);
+      if (!el) return;
+      el.addEventListener("input", () => {
+        if (!activeBotKey || !botStates[activeBotKey]) return;
+        const state = botStates[activeBotKey];
+        const stake = parseFloat($("stakeInput").value);
+        const tp = parseFloat($("takeProfitInput").value);
+        const sl = parseFloat($("stopLossInput").value);
+        const mg = parseFloat($("martingaleInput").value);
+        state.config.initialStake = Number.isFinite(stake) ? stake : state.config.initialStake;
+        state.config.takeProfit = Number.isFinite(tp) ? tp : state.config.takeProfit;
+        state.config.stopLoss = Number.isFinite(sl) ? sl : state.config.stopLoss;
+        state.config.martingaleMultiplier = Number.isFinite(mg) ? mg : state.config.martingaleMultiplier;
+      });
     });
 
     (function init() {
@@ -758,17 +1088,17 @@
       }
 
       updateMeta("Connected to Deriv (session active)");
-      setNotice("Bots dashboard loaded. Select Real or Demo mode, then start the bot.");
+      setNotice("Bots dashboard loaded. Open a bot to view its config/trades/stats, then start it.");
       showBotsGrid(true);
       loadAccountsByMode(token)
         .then(() => {
+          // Default open bot
+          const initialBotKey = "smartRecoveryDiffer";
+          activeBotKey = initialBotKey;
+          ensureBotState(initialBotKey);
+          setMode((botStates[initialBotKey] && botStates[initialBotKey].mode) || "real");
           updateAccountModeAvailability();
-          setBotConnection("Idle");
-          if (currentAccountId) {
-            fetchModeBalancePreview(token, currentAccountId).catch(() => {
-              $("botBalance").textContent = "--";
-            });
-          }
+          openBot(initialBotKey);
         })
         .catch(() => {
           setNotice("Connected, but failed to load account mode details.", true);
