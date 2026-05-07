@@ -354,7 +354,8 @@
         currency: "USD",
         duration: 1,
         duration_unit: "t",
-        symbol: SYMBOL,
+        // Deriv Options WebSocket schema expects underlying_symbol (not symbol)
+        underlying_symbol: SYMBOL,
         barrier: currentBarrier,
         req_id: Date.now()
       }));
@@ -414,7 +415,7 @@
           currentContractId = null;
           setTimeout(() => {
             if (botRunning) requestProposal();
-          }, 1200);
+          }, 250);
         }
       }
     }
