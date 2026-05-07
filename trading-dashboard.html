@@ -252,7 +252,26 @@
         <div class="brand-title">Trading Bots Dashboard</div>
         <div class="brand-subtitle" id="connectionMeta">Checking connection…</div>
       </div>
-      <div style="display:flex; gap:10px;">
+      <div style="display:flex; gap:10px; align-items:center;">
+        <div style="position:relative;">
+          <button class="btn" id="accountBtn" type="button" style="display:none;">
+            <span id="accountBtnMode">Real</span> · <span id="accountBtnBalance">--</span>
+          </button>
+          <div id="accountMenu" class="card" style="display:none; position:absolute; right:0; top:44px; width:280px; z-index:20;">
+            <div class="card-title">Account & Mode</div>
+            <div class="pill-row">
+              <span class="pill" id="modePill">Mode: Real</span>
+              <span class="pill live" id="connectionPill">Live</span>
+            </div>
+            <div class="mode-toggle" aria-label="Account mode">
+              <button class="mode-btn active" id="realModeBtn" type="button">Real</button>
+              <button class="mode-btn" id="demoModeBtn" type="button">Demo</button>
+            </div>
+            <div class="bot-stat">Account: <strong id="botAccountId">--</strong></div>
+            <div class="bot-stat">Balance: <strong id="botBalance">--</strong></div>
+          </div>
+        </div>
+        <button class="btn" id="backToBotsBtn" type="button" style="display:none;">← Back to bots</button>
         <button class="btn" id="backBtn" type="button">Back</button>
         <button class="btn primary" id="connectBtn" type="button" style="display:none;">Reconnect</button>
       </div>
@@ -261,31 +280,8 @@
     <div class="notice" id="noticeBox">Loading…</div>
 
     <div class="grid" id="botsGrid" style="display:none;">
-      <div class="card">
-        <div class="card-title">Account & Mode</div>
-        <div class="pill-row">
-          <span class="pill live" id="connectionPill">Live</span>
-          <span class="pill" id="modePill">Mode: Real</span>
-        </div>
-        <div class="mode-toggle" aria-label="Account mode">
-          <button class="mode-btn active" id="realModeBtn" type="button">Real</button>
-          <button class="mode-btn" id="demoModeBtn" type="button">Demo</button>
-        </div>
-        <div class="bot-stat">Mode: <strong id="botMode">Real</strong></div>
-        <div class="bot-stat">Account: <strong id="botAccountId">--</strong></div>
-        <div class="bot-stat">Connection: <strong id="botConnection">Idle</strong></div>
-        <div class="bot-stat">Balance: <strong id="botBalance">--</strong></div>
-        <div class="bot-stat">Target: <strong id="botTarget">--</strong></div>
-        <div class="bot-stat">Last contract: <strong id="botLastContract">--</strong></div>
-        <div class="bot-stat">Total profit: <strong id="botTotalProfit">$0.00</strong></div>
-        <div class="bot-stat">Total trades: <strong id="botTotalTrades">0</strong></div>
-        <div class="bot-stat">Win rate: <strong id="botWinRate">0%</strong></div>
-        <div class="bot-stat">Current stake: <strong id="botCurrentStake">$0.00</strong></div>
-        <div class="bot-stat">Consecutive losses: <strong id="botConsecutiveLosses">0</strong></div>
-        <div class="bot-stat">Running time: <strong id="botRunningTime">00:00:00</strong></div>
-      </div>
 
-      <div class="card">
+      <div class="card bot-list-card">
         <div class="card-title">Smart Recovery Differ (R_10)</div>
         <div class="pill-row">
           <span class="pill live">Live</span>
@@ -299,27 +295,14 @@
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-title">Recent Trades</div>
-        <div class="card-desc">Latest trades appear one by one as the bot executes.</div>
-        <ul class="trade-log" id="tradeLog">
-          <li class="trade-item">No trades yet. Start the bot to begin.</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Bot Configuration</div>
-        <div class="pill-row">
-          <span class="pill">Initial stake: $1.00</span>
-          <span class="pill">Take profit: $100</span>
-          <span class="pill">Stop loss: $1000</span>
-          <span class="pill">Martingale configurable</span>
-        </div>
-        <div class="card-desc">Each bot keeps its own configuration, trades, and statistics. Select a bot with “Open Bot”, then start it here.</div>
+      <div class="card bot-detail-card" id="detailConfigCard" style="display:none;">
+        <div class="card-title" id="activeBotName">Bot Configuration</div>
+        <div class="card-desc" id="activeBotDesc">Open a bot to configure it.</div>
         <div style="display:flex; flex-direction:column; gap:10px;">
           <div class="config-input">
             <label for="stakeInput">Initial Stake (USD)</label>
             <input type="number" id="stakeInput" min="0.35" step="0.01" value="1" />
+            <div class="card-desc" id="minStakeHint" style="margin-top:4px;">Minimum stake is enforced by Deriv for each contract.</div>
           </div>
           <div class="config-input">
             <label for="takeProfitInput">Take Profit (USD)</label>
@@ -332,16 +315,36 @@
           <div class="config-input" id="martingaleGroup">
             <label for="martingaleInput">Martingale Multiplier</label>
             <input type="number" id="martingaleInput" min="1" step="0.1" value="16" />
-            <div class="card-desc" style="margin-top:4px;">Default applies after each loss.</div>
           </div>
         </div>
         <div class="actions" style="margin-top:12px;">
           <button class="btn primary" type="button" id="startBotBtn" disabled>Start Bot</button>
           <button class="btn" type="button" id="stopBotBtn" disabled>Stop</button>
         </div>
+        <div class="bot-stat">Connection: <strong id="botConnection">Idle</strong></div>
+        <div class="bot-stat">Target: <strong id="botTarget">--</strong></div>
+        <div class="bot-stat">Last contract: <strong id="botLastContract">--</strong></div>
       </div>
 
-      <div class="card">
+      <div class="card bot-detail-card" id="detailStatsCard" style="display:none;">
+        <div class="card-title">Statistics</div>
+        <div class="bot-stat">Total profit: <strong id="botTotalProfit">$0.00</strong></div>
+        <div class="bot-stat">Total trades: <strong id="botTotalTrades">0</strong></div>
+        <div class="bot-stat">Win rate: <strong id="botWinRate">0%</strong></div>
+        <div class="bot-stat">Current stake: <strong id="botCurrentStake">$0.00</strong></div>
+        <div class="bot-stat">Consecutive losses: <strong id="botConsecutiveLosses">0</strong></div>
+        <div class="bot-stat">Running time: <strong id="botRunningTime">00:00:00</strong></div>
+      </div>
+
+      <div class="card bot-detail-card" id="detailTradesCard" style="display:none;">
+        <div class="card-title">Recent Trades</div>
+        <div class="card-desc">Latest trades appear one by one as the bot executes.</div>
+        <ul class="trade-log" id="tradeLog">
+          <li class="trade-item">No trades yet. Start the bot to begin.</li>
+        </ul>
+      </div>
+
+      <div class="card bot-list-card">
         <div class="card-title">All Markets Differ</div>
         <div class="pill-row">
           <span class="pill">Digit differ</span>
@@ -353,7 +356,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card bot-list-card">
         <div class="card-title">Random Markets Over 0</div>
         <div class="pill-row">
           <span class="pill">Digit over</span>
@@ -365,7 +368,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card bot-list-card">
         <div class="card-title">Random Markets Under 9</div>
         <div class="pill-row">
           <span class="pill">Digit under</span>
@@ -377,7 +380,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card bot-list-card">
         <div class="card-title">Magic Random Strategy</div>
         <div class="pill-row">
           <span class="pill">DIFF / UNDER / OVER</span>
@@ -388,7 +391,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card bot-list-card">
         <div class="card-title">Smart Volatility</div>
         <div class="pill-row">
           <span class="pill">Volatility-driven</span>
@@ -399,7 +402,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card bot-list-card">
         <div class="card-title">Smart Even</div>
         <div class="pill-row">
           <span class="pill">Even / Odd</span>
@@ -410,7 +413,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card bot-list-card">
         <div class="card-title">No Touch Sentinel</div>
         <div class="pill-row">
           <span class="pill">NOTOUCH</span>
@@ -421,7 +424,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card bot-list-card">
         <div class="card-title">Alien Rise/Fall</div>
         <div class="pill-row">
           <span class="pill">CALL/PUT</span>
@@ -432,7 +435,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card bot-list-card">
         <div class="card-title">Rise/Fall Pro</div>
         <div class="pill-row">
           <span class="pill">CALL/PUT</span>
@@ -443,7 +446,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card bot-list-card">
         <div class="card-title">Smart Differ Pro</div>
         <div class="pill-row">
           <span class="pill">DIGITDIFF</span>
@@ -507,6 +510,27 @@
       $("botsGrid").style.display = show ? "" : "none";
     }
 
+    function showBotListView() {
+      document.querySelectorAll(".bot-list-card").forEach((el) => {
+        el.style.display = "";
+      });
+      document.querySelectorAll(".bot-detail-card").forEach((el) => {
+        el.style.display = "none";
+      });
+      $("backToBotsBtn").style.display = "none";
+      setNotice("Select a bot and click Open Bot.");
+    }
+
+    function showBotDetailView() {
+      document.querySelectorAll(".bot-list-card").forEach((el) => {
+        el.style.display = "none";
+      });
+      document.querySelectorAll(".bot-detail-card").forEach((el) => {
+        el.style.display = "";
+      });
+      $("backToBotsBtn").style.display = "";
+    }
+
     function setControlsForRunning(running) {
       document.querySelectorAll(".bot-open").forEach((btn) => {
         btn.disabled = !!running;
@@ -540,17 +564,20 @@
 
     function setMode(mode) {
       currentMode = mode === "demo" ? "demo" : "real";
-      $("botMode").textContent = currentMode === "real" ? "Real" : "Demo";
+      $("accountBtnMode").textContent = currentMode === "real" ? "Real" : "Demo";
       $("realModeBtn").classList.toggle("active", currentMode === "real");
       $("demoModeBtn").classList.toggle("active", currentMode === "demo");
       if (activeBotKey && botStates[activeBotKey]) {
         botStates[activeBotKey].mode = currentMode;
       }
+      $("modePill").textContent = `Mode: ${currentMode === "real" ? "Real" : "Demo"}`;
     }
 
     function setBotBalance(balance, currency) {
       if (balance === undefined || balance === null || Number.isNaN(Number(balance))) return;
-      $("botBalance").textContent = `${Number(balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency || "USD"}`;
+      const text = `${Number(balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency || "USD"}`;
+      $("botBalance").textContent = text;
+      $("accountBtnBalance").textContent = text;
     }
 
     function logTrade(message, type = "") {
@@ -801,6 +828,7 @@
       if (!state || !def) return;
 
       setMartingaleVisibility(activeBotKey);
+      showBotDetailView();
 
       // Mode + account preview
       setMode(state.mode || "real");
@@ -816,6 +844,23 @@
       // Render saved state
       renderTradeLogFor(activeBotKey);
       renderStatsFor(activeBotKey);
+
+      // Update detail header
+      const nameMap = {
+        smartRecoveryDiffer: "Smart Recovery Differ",
+        allMarketsDiffer: "All Markets Differ",
+        allMarketsOver: "Random Markets Over 0",
+        allMarketsUnder: "Random Markets Under 9",
+        magicRandomBot: "Magic Random Strategy",
+        smartVolatility: "Smart Volatility",
+        smartEven: "Smart Even",
+        noTouch: "No Touch Sentinel",
+        alienRiseFall: "Alien Rise/Fall",
+        riseFall: "Rise/Fall Pro",
+        smartDiffer: "Smart Differ Pro"
+      };
+      $("activeBotName").textContent = nameMap[activeBotKey] || activeBotKey;
+      $("activeBotDesc").textContent = "Configure the bot, then start it. Stats and recent trades update live.";
 
       // Idle connection indicator
       setBotConnection("Idle");
@@ -1021,6 +1066,22 @@
       window.location.href = "index.html";
     });
 
+    $("backToBotsBtn").addEventListener("click", () => {
+      if (botRunning) return;
+      showBotListView();
+    });
+
+    $("accountBtn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      const menu = $("accountMenu");
+      menu.style.display = menu.style.display === "none" || !menu.style.display ? "" : "none";
+    });
+
+    document.addEventListener("click", () => {
+      const menu = $("accountMenu");
+      if (menu) menu.style.display = "none";
+    });
+
     document.querySelectorAll(".bot-open").forEach((btn) => {
       btn.addEventListener("click", () => openBot(btn.dataset.botKey));
     });
@@ -1082,23 +1143,20 @@
       if (!token) {
         updateMeta("Not connected to Deriv");
         $("connectBtn").style.display = "";
+        $("accountBtn").style.display = "none";
         setNotice("Please connect your Deriv account first to access the trading bots dashboard.", true);
         showBotsGrid(false);
         return;
       }
 
       updateMeta("Connected to Deriv (session active)");
-      setNotice("Bots dashboard loaded. Open a bot to view its config/trades/stats, then start it.");
+      $("accountBtn").style.display = "";
+      setNotice("Bots dashboard loaded. Select a bot and click Open Bot.");
       showBotsGrid(true);
       loadAccountsByMode(token)
         .then(() => {
-          // Default open bot
-          const initialBotKey = "smartRecoveryDiffer";
-          activeBotKey = initialBotKey;
-          ensureBotState(initialBotKey);
-          setMode((botStates[initialBotKey] && botStates[initialBotKey].mode) || "real");
           updateAccountModeAvailability();
-          openBot(initialBotKey);
+          showBotListView();
         })
         .catch(() => {
           setNotice("Connected, but failed to load account mode details.", true);
