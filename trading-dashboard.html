@@ -703,45 +703,57 @@
       </div>
 
       <div class="bot-card bot-list-card" id="noTouchCard">
-        <div class="card-title">No Touch Sentinel</div>
-        <div class="pill-row">
-          <span class="pill">NOTOUCH</span>
-        </div>
-        <div class="card-desc">Range spike detector; places NOTOUCH contracts.</div>
-        <div class="actions">
+        <div class="bot-card-content">
+          <span class="bot-chip">Range Guard</span>
+          <h3>No Touch Sentinel</h3>
+          <p>Monitors R100 momentum, RSI, and volatility snapshots to fire NOTOUCH contracts only when range strength spikes.</p>
+          <ul class="bot-meta">
+            <li>Contract: NOTOUCH</li>
+            <li>Market: R_100 tuned</li>
+            <li>Duration: ticks</li>
+          </ul>
           <button class="open-bot-btn bot-open" type="button" data-bot-key="noTouch">Open Bot</button>
         </div>
       </div>
 
       <div class="bot-card bot-list-card" id="alienRiseFallCard">
-        <div class="card-title">Alien Rise/Fall</div>
-        <div class="pill-row">
-          <span class="pill">CALL/PUT</span>
-        </div>
-        <div class="card-desc">RSI + trend confirmation strategy.</div>
-        <div class="actions">
+        <div class="bot-card-content">
+          <span class="bot-chip">Trend Pulse</span>
+          <h3>Alien Rise/Fall</h3>
+          <p>Tracks R10 waves using fast RSI + trend filters, waits for confirmed bursts, then fires CALL/PUT contracts.</p>
+          <ul class="bot-meta">
+            <li>Contracts: CALL/PUT</li>
+            <li>Market: R_10 tuned</li>
+            <li>Duration: ticks</li>
+          </ul>
           <button class="open-bot-btn bot-open" type="button" data-bot-key="alienRiseFall">Open Bot</button>
         </div>
       </div>
 
       <div class="bot-card bot-list-card" id="riseFallCard">
-        <div class="card-title">Rise/Fall Pro</div>
-        <div class="pill-row">
-          <span class="pill">CALL/PUT</span>
-        </div>
-        <div class="card-desc">Momentum + pattern strategy for rise/fall.</div>
-        <div class="actions">
+        <div class="bot-card-content">
+          <span class="bot-chip">Momentum</span>
+          <h3>Rise/Fall Pro</h3>
+          <p>Blends RSI, MACD, and multi-frame momentum to time R10 CALL/PUT entries with confirmation.</p>
+          <ul class="bot-meta">
+            <li>Contracts: CALL/PUT</li>
+            <li>Market: R_10</li>
+            <li>Duration: ticks</li>
+          </ul>
           <button class="open-bot-btn bot-open" type="button" data-bot-key="riseFall">Open Bot</button>
         </div>
       </div>
 
       <div class="bot-card bot-list-card" id="smartDifferCard">
-        <div class="card-title">Smart Differ Pro</div>
-        <div class="pill-row">
-          <span class="pill">DIGITDIFF</span>
-        </div>
-        <div class="card-desc">Differ-based strategy using the correct Deriv Options schema.</div>
-        <div class="actions">
+        <div class="bot-card-content">
+          <span class="bot-chip">Digit Differ</span>
+          <h3>Smart Differ Pro</h3>
+          <p>Advanced digit differ strategy across Volatility 10–100 with intelligent digit selection and smart recovery.</p>
+          <ul class="bot-meta">
+            <li>Contract: DIGITDIFF</li>
+            <li>Markets: Volatility 10–100</li>
+            <li>Duration: 1 tick</li>
+          </ul>
           <button class="open-bot-btn bot-open" type="button" data-bot-key="smartDiffer">Open Bot</button>
         </div>
       </div>
