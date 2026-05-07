@@ -390,6 +390,12 @@
       color: var(--text);
     }
 
+    .stat-value.value-positive { color: var(--success); }
+    .stat-value.value-negative { color: var(--danger); }
+    .stat-value.value-neutral { color: var(--text); }
+    .stat-value.value-accent { color: var(--accent); }
+    .stat-value.value-warning { color: var(--warning); }
+
     .history-list {
       display: flex;
       flex-direction: column;
@@ -1305,6 +1311,13 @@
       if (!state) return;
       const modeKey = currentMode === "demo" ? "demo" : "real";
       const stats = state.modes?.[modeKey]?.stats;
+      const setValueClass = (id, cls) => {
+        const el = $(id);
+        if (!el) return;
+        el.classList.remove("value-positive", "value-negative", "value-neutral", "value-accent", "value-warning");
+        if (cls) el.classList.add(cls);
+      };
+
       if (!stats) {
         $("balanceValue").textContent = "-";
         $("totalProfitValue").textContent = "$0.00";
@@ -1314,10 +1327,21 @@
         $("consecutiveLossesValue").textContent = "0";
         $("targetValue").textContent = "-";
         $("runningTimeValue").textContent = "00:00:00";
+        setValueClass("balanceValue", "value-neutral");
+        setValueClass("totalProfitValue", "value-neutral");
+        setValueClass("totalTradesValue", "value-neutral");
+        setValueClass("winRateValue", "value-neutral");
+        setValueClass("currentStakeValue", "value-accent");
+        setValueClass("consecutiveLossesValue", "value-neutral");
+        setValueClass("targetValue", "value-accent");
+        setValueClass("runningTimeValue", "value-accent");
         return;
       }
 
       const currency = stats.currency || currentCurrency || "USD";
+      const totalProfit = Number(stats.totalProfit ?? 0);
+      const winRateNum = Number(stats.winRate ?? 0);
+      const losses = Number(stats.consecutiveLosses ?? 0);
       $("balanceValue").textContent = stats.balance !== undefined ? `${Number(stats.balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency}` : "-";
       $("totalProfitValue").textContent = formatMoney(stats.totalProfit ?? 0);
       $("totalTradesValue").textContent = String(stats.totalTrades ?? 0);
@@ -1326,6 +1350,14 @@
       $("consecutiveLossesValue").textContent = String(stats.consecutiveLosses ?? 0);
       $("targetValue").textContent = stats.market !== undefined ? `${stats.market}${stats.digit !== undefined ? ` / ${stats.digit}` : ""}` : "-";
       $("runningTimeValue").textContent = stats.runningTime || "00:00:00";
+      setValueClass("balanceValue", "value-accent");
+      setValueClass("totalProfitValue", totalProfit > 0 ? "value-positive" : (totalProfit < 0 ? "value-negative" : "value-neutral"));
+      setValueClass("totalTradesValue", "value-neutral");
+      setValueClass("winRateValue", winRateNum >= 70 ? "value-positive" : (winRateNum >= 45 ? "value-warning" : "value-negative"));
+      setValueClass("currentStakeValue", "value-accent");
+      setValueClass("consecutiveLossesValue", losses >= 3 ? "value-negative" : (losses > 0 ? "value-warning" : "value-positive"));
+      setValueClass("targetValue", "value-accent");
+      setValueClass("runningTimeValue", "value-accent");
     }
 
     function setMartingaleVisibility(botKey) {
