@@ -631,6 +631,122 @@
       color: #ffffff;
     }
 
+    .deposit-popup-overlay,
+    .low-balance-recommend-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 1200;
+      background: rgba(0, 0, 0, 0.68);
+      backdrop-filter: blur(5px);
+    }
+
+    .deposit-popup-overlay.show,
+    .low-balance-recommend-overlay.show {
+      display: flex;
+    }
+
+    .deposit-popup,
+    .low-balance-recommend-popup {
+      width: 100%;
+      max-width: 420px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+      padding: 22px;
+      position: relative;
+    }
+
+    .deposit-popup-balance,
+    .low-balance-recommend-timer {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 11px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 210, 255, 0.35);
+      background: rgba(0, 210, 255, 0.12);
+      color: #00d2ff;
+      font-weight: 700;
+    }
+
+    .deposit-popup-title,
+    .low-balance-recommend-title {
+      margin: 0 0 8px;
+      font-size: 17px;
+      color: var(--text);
+    }
+
+    .deposit-popup-message,
+    .low-balance-recommend-message,
+    .low-balance-recommend-balance {
+      margin: 0 0 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .deposit-popup-actions,
+    .low-balance-recommend-actions {
+      margin-top: 14px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .deposit-popup-btn,
+    .low-balance-recommend-btn {
+      flex: 1;
+      min-width: 120px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(148, 163, 184, 0.08);
+      color: var(--text);
+      text-decoration: none;
+      text-align: center;
+      padding: 11px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .deposit-popup-btn-primary,
+    .low-balance-recommend-btn-deposit {
+      background: linear-gradient(135deg, rgba(36, 217, 112, 0.2), rgba(36, 217, 112, 0.1));
+      border-color: rgba(36, 217, 112, 0.45);
+      color: #24d970;
+    }
+
+    .low-balance-recommend-tips {
+      border: 1px solid rgba(0, 210, 255, 0.2);
+      background: rgba(0, 210, 255, 0.06);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .low-balance-recommend-tips-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #bcd0f3;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .low-balance-recommend-tips-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
     @media (max-width: 900px) {
       .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .bot-panel-grid { grid-template-columns: 1fr; }
@@ -936,6 +1052,45 @@
     </div>
   </div>
 
+  <div class="deposit-popup-overlay" id="depositPopupOverlay">
+    <div class="deposit-popup">
+      <div class="deposit-popup-balance" id="depositPopupBalance"></div>
+      <div class="deposit-popup-header">
+        <h3 class="deposit-popup-title">Low Account Balance</h3>
+        <p class="deposit-popup-message">
+          Your account needs more funds to run this bot effectively. Add funds to continue smooth execution.
+        </p>
+      </div>
+      <div class="deposit-popup-actions">
+        <a href="https://p2p.deriv.com/advertiser/426826?advert_id=3182910&t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk" target="_blank" rel="noopener" class="deposit-popup-btn deposit-popup-btn-primary" id="depositPopupBtn">Deposit Funds</a>
+        <button class="deposit-popup-btn deposit-popup-btn-secondary" id="depositPopupCancel" type="button">Maybe Later</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="low-balance-recommend-overlay" id="lowBalanceRecommendOverlay" aria-hidden="true">
+    <div class="low-balance-recommend-popup" id="lowBalanceRecommendPopup">
+      <div class="low-balance-recommend-timer" id="lowBalanceRecommendTimer">5</div>
+      <h3 class="low-balance-recommend-title">Balance tip</h3>
+      <p class="low-balance-recommend-balance" id="lowBalanceRecommendBalance">Your balance: —</p>
+      <p class="low-balance-recommend-message">
+        For more stable results and less struggle, we recommend a balance of <strong>1,000 USD</strong> or more.
+      </p>
+      <div class="low-balance-recommend-tips">
+        <span class="low-balance-recommend-tips-label">Tips for small accounts:</span>
+        <ul class="low-balance-recommend-tips-list">
+          <li>Use a smaller stake per trade</li>
+          <li>Grow your account gradually</li>
+          <li>Scale stake only after consistency</li>
+        </ul>
+      </div>
+      <div class="low-balance-recommend-actions">
+        <button type="button" class="low-balance-recommend-btn low-balance-recommend-btn-ok" id="lowBalanceRecommendOk">OK</button>
+        <a href="https://p2p.deriv.com/advertiser/426826?advert_id=3182910&t=_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk" target="_blank" rel="noopener" class="low-balance-recommend-btn low-balance-recommend-btn-deposit" id="lowBalanceRecommendDeposit" style="display:none;">Deposit</a>
+      </div>
+    </div>
+  </div>
+
   <script src="popup-notifications.js"></script>
   <script src="bots/smartRecoveryDiffer.js"></script>
   <script src="bots/allMarketsDiffer.js"></script>
@@ -974,6 +1129,8 @@
     let demoModeUnlocked = false;
     let realTapCount = 0;
     let realTapTimer = null;
+    let lastKnownBalance = null;
+    let lastKnownCurrency = "USD";
 
     function $(id) { return document.getElementById(id); }
 
@@ -1074,6 +1231,8 @@
       const text = `${Number(balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency || "USD"}`;
       $("botBalance").textContent = text;
       $("accountBtnBalance").textContent = text;
+      lastKnownBalance = Number(balance);
+      lastKnownCurrency = currency || lastKnownCurrency || "USD";
     }
 
     function logTrade() {
@@ -1396,7 +1555,9 @@
       // Update balance preview
       const token = getToken();
       if (token && currentAccountId) {
-        fetchModeBalancePreview(token, currentAccountId).catch(() => {});
+        fetchModeBalancePreview(token, currentAccountId)
+          .then(() => showLowBalanceRecommendPopupIfNeeded(activeBotKey))
+          .catch(() => {});
       }
     }
 
@@ -1461,7 +1622,12 @@
         const thisMode = currentMode;
 
         const ui = {
-          showStatus: (text) => setBotConnection(text),
+          showStatus: (text) => {
+            setBotConnection(text);
+            if (String(text || "").toLowerCase().includes("insufficient")) {
+              showDepositPopup();
+            }
+          },
           setRunningState: (running) => {
             botRunning = !!running;
             setControlsForRunning(botRunning);
@@ -1563,7 +1729,107 @@
         if (s && s.modes?.[thisMode]?.stats === null) renderStatsFor(thisBotKey);
       } catch (error) {
         stopBot();
+        if (String(error?.message || "").toLowerCase().includes("insufficient")) {
+          showDepositPopup();
+        }
         setNotice(`Failed to start bot: ${error.message}`, true);
+      }
+    }
+
+    const LOW_BALANCE_RECOMMEND_STORAGE_PREFIX = "lowBalancePopup_";
+    const LOW_BALANCE_RECOMMEND_THRESHOLD = 1000;
+    const depositPopupOverlay = $("depositPopupOverlay");
+    const depositPopupCancel = $("depositPopupCancel");
+    const depositPopupBalance = $("depositPopupBalance");
+    const lowBalanceRecommendOverlay = $("lowBalanceRecommendOverlay");
+    const lowBalanceRecommendPopup = $("lowBalanceRecommendPopup");
+    const lowBalanceRecommendTimerEl = $("lowBalanceRecommendTimer");
+    const lowBalanceRecommendBalanceEl = $("lowBalanceRecommendBalance");
+    const lowBalanceRecommendOk = $("lowBalanceRecommendOk");
+    const lowBalanceRecommendDeposit = $("lowBalanceRecommendDeposit");
+
+    function showDepositPopup() {
+      if (!depositPopupOverlay) return;
+      if (depositPopupBalance && lastKnownBalance !== null && Number.isFinite(Number(lastKnownBalance))) {
+        depositPopupBalance.textContent = `${lastKnownCurrency || "USD"} ${Number(lastKnownBalance).toFixed(2)}`;
+      } else if (depositPopupBalance) {
+        depositPopupBalance.textContent = "Balance: -";
+      }
+      depositPopupOverlay.classList.add("show");
+    }
+
+    function hideDepositPopup() {
+      if (depositPopupOverlay) depositPopupOverlay.classList.remove("show");
+    }
+
+    function getLowBalanceRecommendStorageKey(botKey) {
+      const today = new Date().toISOString().slice(0, 10);
+      return `${LOW_BALANCE_RECOMMEND_STORAGE_PREFIX}${botKey || "unknown"}_${today}`;
+    }
+
+    function hideLowBalanceRecommendPopup() {
+      if (!lowBalanceRecommendOverlay) return;
+      lowBalanceRecommendOverlay.classList.remove("show");
+      lowBalanceRecommendOverlay.setAttribute("aria-hidden", "true");
+    }
+
+    function showLowBalanceRecommendPopupIfNeeded(botKey) {
+      if (!botKey || lastKnownBalance == null || Number(lastKnownBalance) >= LOW_BALANCE_RECOMMEND_THRESHOLD) return;
+      try {
+        if (localStorage.getItem(getLowBalanceRecommendStorageKey(botKey))) return;
+      } catch (_) { return; }
+
+      let autoCloseTimeout = null;
+      let countdownInterval = null;
+      let secondsLeft = 5;
+      let paused = false;
+
+      if (lowBalanceRecommendBalanceEl) {
+        const bal = Number(lastKnownBalance);
+        const cur = lastKnownCurrency || "USD";
+        lowBalanceRecommendBalanceEl.textContent = Number.isFinite(bal) ? `Your balance: ${bal.toFixed(2)} ${cur}` : "Your balance: —";
+      }
+      if (lowBalanceRecommendDeposit) {
+        lowBalanceRecommendDeposit.style.display = Number(lastKnownBalance) === 0 ? "" : "none";
+      }
+      if (lowBalanceRecommendTimerEl) lowBalanceRecommendTimerEl.textContent = "5";
+
+      function clearTimers() {
+        if (autoCloseTimeout) clearTimeout(autoCloseTimeout);
+        if (countdownInterval) clearInterval(countdownInterval);
+        autoCloseTimeout = null;
+        countdownInterval = null;
+      }
+
+      function closeAndMarkShown() {
+        clearTimers();
+        hideLowBalanceRecommendPopup();
+        try {
+          localStorage.setItem(getLowBalanceRecommendStorageKey(botKey), "1");
+        } catch (_) {}
+      }
+
+      if (lowBalanceRecommendOk) lowBalanceRecommendOk.onclick = closeAndMarkShown;
+      if (lowBalanceRecommendDeposit) lowBalanceRecommendDeposit.onclick = closeAndMarkShown;
+      if (lowBalanceRecommendPopup) {
+        lowBalanceRecommendPopup.onmouseenter = () => { paused = true; };
+        lowBalanceRecommendPopup.onmouseleave = () => { paused = false; };
+        lowBalanceRecommendPopup.ontouchstart = () => { paused = true; };
+      }
+
+      countdownInterval = setInterval(() => {
+        if (paused) return;
+        secondsLeft -= 1;
+        if (lowBalanceRecommendTimerEl) lowBalanceRecommendTimerEl.textContent = String(secondsLeft);
+        if (secondsLeft <= 0) closeAndMarkShown();
+      }, 1000);
+      autoCloseTimeout = setTimeout(() => {
+        if (!paused) closeAndMarkShown();
+      }, 5000);
+
+      if (lowBalanceRecommendOverlay) {
+        lowBalanceRecommendOverlay.classList.add("show");
+        lowBalanceRecommendOverlay.setAttribute("aria-hidden", "false");
       }
     }
 
@@ -1573,6 +1839,24 @@
 
     $("connectBtn").addEventListener("click", () => {
       window.location.href = "index.html";
+    });
+
+    if (depositPopupCancel) {
+      depositPopupCancel.addEventListener("click", hideDepositPopup);
+    }
+    if (depositPopupOverlay) {
+      depositPopupOverlay.addEventListener("click", (e) => {
+        if (e.target === depositPopupOverlay) hideDepositPopup();
+      });
+    }
+    if (lowBalanceRecommendOverlay) {
+      lowBalanceRecommendOverlay.addEventListener("click", (e) => {
+        if (e.target === lowBalanceRecommendOverlay) hideLowBalanceRecommendPopup();
+      });
+    }
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && depositPopupOverlay?.classList.contains("show")) hideDepositPopup();
+      if (e.key === "Escape" && lowBalanceRecommendOverlay?.classList.contains("show")) hideLowBalanceRecommendPopup();
     });
 
     $("backToBotsBtn").addEventListener("click", () => {
