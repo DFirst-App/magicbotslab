@@ -231,7 +231,7 @@
 
     <div class="grid" id="botsGrid" style="display:none;">
       <div class="card">
-        <div class="card-title">Test Bot: Digit Differ (R_10)</div>
+        <div class="card-title">Smart Recovery Differ (R_10)</div>
         <div class="pill-row">
           <span class="pill live">Live</span>
           <span class="pill">R_10</span>
@@ -242,14 +242,15 @@
           <button class="mode-btn active" id="realModeBtn" type="button">Real</button>
           <button class="mode-btn" id="demoModeBtn" type="button">Demo</button>
         </div>
-        <div class="card-desc">Runs real trades using your OAuth connection: DIGITDIFF on Volatility 10 only, with fixed initial stake of USD 1.</div>
+        <div class="card-desc">Runs smart recovery digit differ on Volatility 10 only. Normal mode uses <strong>DIGITDIFF</strong>; on loss it enters recovery using <strong>DIGITOVER</strong>/<strong>DIGITUNDER</strong> with martingale.</div>
         <div class="bot-stat">Mode: <strong id="botMode">Real</strong></div>
         <div class="bot-stat">Account: <strong id="botAccountId">--</strong></div>
         <div class="bot-stat">Connection: <strong id="botConnection">Idle</strong></div>
         <div class="bot-stat">Balance: <strong id="botBalance">--</strong></div>
+        <div class="bot-stat">Target: <strong id="botTarget">--</strong></div>
         <div class="bot-stat">Last contract: <strong id="botLastContract">--</strong></div>
         <div class="actions">
-          <button class="btn primary" type="button" id="startBotBtn">Start Test Bot</button>
+          <button class="btn primary" type="button" id="startBotBtn">Start Smart Recovery Differ</button>
           <button class="btn" type="button" id="stopBotBtn" disabled>Stop</button>
         </div>
       </div>
@@ -265,18 +266,18 @@
       <div class="card">
         <div class="card-title">Bot Configuration</div>
         <div class="pill-row">
-          <span class="pill">Contract: DIGITDIFF</span>
-          <span class="pill">Symbol: R_10</span>
+          <span class="pill">Markets: R_10 only</span>
+          <span class="pill">Normal: DIGITDIFF</span>
+          <span class="pill">Recovery: DIGITOVER / DIGITUNDER</span>
           <span class="pill">Duration: 1 tick</span>
-          <span class="pill">Basis: Stake</span>
-          <span class="pill">Currency: USD</span>
-          <span class="pill">Stake: 1.00</span>
+          <span class="pill">Initial stake: $1.00</span>
         </div>
-        <div class="card-desc">Barrier digit is randomized each trade (0-9). This is a test bot implementation for live execution flow validation.</div>
+        <div class="card-desc">Smart bot logic from <code>bots/smartRecoveryDiffer.js</code>. Uses OTP-authenticated WebSocket connection and place orders every time a contract finishes.</div>
       </div>
     </div>
   </div>
 
+  <script src="bots/smartRecoveryDiffer.js"></script>
   <script>
     const DERIV_OAUTH_CLIENT_ID = "338udJBKn1EbT7Tc29Snv";
     const DERIV_ACCESS_TOKEN_KEY = "deriv_access_token";
@@ -285,17 +286,13 @@
     const STAKE_USD = 1;
     const SYMBOL = "R_10";
 
-    let ws = null;
     let botRunning = false;
-    let currentProposalId = null;
-    let currentBarrier = null;
-    let currentContractId = null;
-    let currentBuyPrice = STAKE_USD;
     let currentAccountId = null;
     let currentMode = "real";
     let realAccountId = null;
     let demoAccountId = null;
     let currentCurrency = "USD";
+    let botInstance = null;
 
     function $(id) { return document.getElementById(id); }
 
@@ -455,96 +452,15 @@
       });
     }
 
-    function requestProposal() {
-      if (!ws || ws.readyState !== WebSocket.OPEN || !botRunning) return;
-      currentBarrier = Math.floor(Math.random() * 10).toString();
-      ws.send(JSON.stringify({
-        proposal: 1,
-        amount: STAKE_USD,
-        basis: "stake",
-        contract_type: "DIGITDIFF",
-        currency: "USD",
-        duration: 1,
-        duration_unit: "t",
-        // Deriv Options WebSocket schema expects underlying_symbol (not symbol)
-        underlying_symbol: SYMBOL,
-        barrier: currentBarrier,
-        req_id: Date.now()
-      }));
-      setBotConnection(`Proposal requested (barrier ${currentBarrier})`);
-    }
-
-    function handleWsMessage(raw) {
-      let msg;
-      try { msg = JSON.parse(raw); } catch { return; }
-      if (msg.error) {
-        logTrade(`Error: ${msg.error.message || "Unknown error"}`, "loss");
-        setBotConnection("Error");
-        return;
-      }
-
-      if (msg.msg_type === "balance" && msg.balance) {
-        setBotBalance(msg.balance.balance, msg.balance.currency);
-        currentCurrency = msg.balance.currency || currentCurrency;
-        if (msg.balance.loginid) {
-          $("botAccountId").textContent = msg.balance.loginid;
-        }
-      }
-
-      if (!botRunning) return;
-
-      if (msg.msg_type === "proposal" && msg.proposal?.id) {
-        currentProposalId = msg.proposal.id;
-        currentBuyPrice = Number(msg.proposal.ask_price || STAKE_USD);
-        ws.send(JSON.stringify({
-          buy: currentProposalId,
-          price: currentBuyPrice,
-          req_id: Date.now()
-        }));
-        setBotConnection("Buying contract...");
-        return;
-      }
-
-      if (msg.msg_type === "buy" && msg.buy?.contract_id) {
-        currentContractId = msg.buy.contract_id;
-        $("botLastContract").textContent = String(currentContractId);
-        ws.send(JSON.stringify({
-          proposal_open_contract: 1,
-          contract_id: currentContractId,
-          subscribe: 1,
-          req_id: Date.now()
-        }));
-        setBotConnection("Contract opened");
-        return;
-      }
-
-      if (msg.msg_type === "proposal_open_contract" && msg.proposal_open_contract) {
-        const poc = msg.proposal_open_contract;
-        if (poc.is_sold) {
-          const profit = Number(poc.profit || 0);
-          const result = profit >= 0 ? "WIN" : "LOSS";
-          logTrade(
-            `${result} | Symbol ${SYMBOL} | DIGITDIFF != ${currentBarrier} | Stake $${STAKE_USD.toFixed(2)} | Profit ${profit.toFixed(2)} ${poc.currency || "USD"}`,
-            profit >= 0 ? "win" : "loss"
-          );
-          setBotConnection("Trade completed, next trade...");
-          currentContractId = null;
-          setTimeout(() => {
-            if (botRunning) requestProposal();
-          }, 250);
-        }
-      }
-    }
-
     function stopBot() {
+      if (botInstance) {
+        try { botInstance.stop("Bot stopped by user.", "info"); } catch (_) {}
+      }
+      botInstance = null;
       botRunning = false;
       $("startBotBtn").disabled = false;
       $("stopBotBtn").disabled = true;
       setBotConnection("Stopped");
-      if (ws) {
-        try { ws.close(); } catch (_) {}
-        ws = null;
-      }
     }
 
     async function startBot() {
@@ -557,39 +473,64 @@
       $("startBotBtn").disabled = true;
       $("stopBotBtn").disabled = false;
       setBotConnection("Initializing...");
-
       try {
         await loadAccountsByMode(token);
         updateAccountModeAvailability();
         currentAccountId = getCurrentModeAccountId();
         if (!currentAccountId) throw new Error(`No ${currentMode} account available for this user`);
         $("botAccountId").textContent = currentAccountId;
+
         const wsUrl = await getOtpWsUrl(token, currentAccountId);
         if (!wsUrl) throw new Error("Missing authenticated WebSocket URL");
 
-        ws = new WebSocket(wsUrl);
-        botRunning = true;
-
-        ws.onopen = () => {
-          setBotConnection("Connected");
-          logTrade(`Connected to ${currentMode.toUpperCase()} account ${currentAccountId}. Starting test bot.`);
-          ws.send(JSON.stringify({ balance: 1, subscribe: 1, req_id: Date.now() }));
-          requestProposal();
-        };
-
-        ws.onmessage = (event) => handleWsMessage(event.data);
-
-        ws.onerror = () => {
-          setBotConnection("WebSocket error");
-        };
-
-        ws.onclose = () => {
-          if (botRunning) {
-            setBotConnection("Disconnected");
-            logTrade("Socket disconnected. Bot stopped.", "loss");
-            stopBot();
+        // UI adapter required by SmartRecoveryDifferBot
+        const ui = {
+          showStatus: (text) => setBotConnection(text),
+          setRunningState: (running) => {
+            botRunning = !!running;
+            $("startBotBtn").disabled = running;
+            $("stopBotBtn").disabled = !running;
+          },
+          resetHistory: () => {
+            const log = $("tradeLog");
+            if (log) log.innerHTML = "";
+          },
+          updateRunningTime: () => {},
+          updateStats: () => {},
+          updateBalance: (balance, currency) => {
+            currentCurrency = currency || currentCurrency;
+            setBotBalance(balance, currency || "USD");
+          },
+          updateTargets: (market, displayTarget) => {
+            if ($("botTarget")) $("botTarget").textContent = displayTarget || market || "--";
+          },
+          addHistoryEntry: ({ win, profit, stake, market, digit, timestamp }) => {
+            const p = Number(profit ?? 0);
+            const s = Number(stake ?? 0);
+            const result = win ? "WIN" : "LOSS";
+            logTrade(
+              `${result} | ${market} | Digit ${digit} | Stake $${s.toFixed(2)} | Profit ${p.toFixed(2)} ${currentCurrency || "USD"}`,
+              win ? "win" : "loss"
+            );
           }
         };
+
+        botInstance = new window.SmartRecoveryDifferBot(ui, {
+          wsUrl,
+          defaults: {
+            initialStake: STAKE_USD,
+            stopLoss: 0,
+            takeProfit: 0,
+            martingaleMultiplier: 3.1
+          },
+          markets: [SYMBOL],
+          resolveAuthToken: () => token,
+          otpAuthenticated: true
+        });
+
+        logTrade(`Starting Smart Recovery Differ (${currentMode.toUpperCase()}) on ${SYMBOL}...`, "win");
+        ui.resetHistory();
+        botInstance.start({ initialStake: STAKE_USD, martingaleMultiplier: 3.1, stopLoss: 0, takeProfit: 0 });
       } catch (error) {
         stopBot();
         setNotice(`Failed to start test bot: ${error.message}`, true);
