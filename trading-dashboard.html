@@ -4,31 +4,41 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MagicBotsLab Trading Bots</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b1220;
-      --panel: #111827;
-      --line: #1f2937;
-      --text: #e5e7eb;
-      --muted: #94a3b8;
-      --accent: #22c55e;
-      --accent2: #2563eb;
+      color-scheme: dark;
+      --bg: #0f1117;
+      --panel: #171b24;
+      --panel-strong: #1f2531;
+      --panel-soft: rgba(23, 27, 36, 0.9);
+      --accent: #00d2ff;
+      --accent-2: #ff7a18;
+      --text: #f5f7ff;
+      --muted: #98a2bd;
+      --border: rgba(255,255,255,0.08);
+      --success: #24d970;
+      --danger: #ff5f6d;
+      --warning: #fcd34d;
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      min-height: 100vh;
-      font-family: Arial, sans-serif;
-      background: radial-gradient(circle at 10% 0%, #0f172a 0%, var(--bg) 45%, #020617 100%);
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at top right, rgba(0, 210, 255, 0.25), transparent 40%), var(--bg);
       color: var(--text);
+      min-height: 100vh;
     }
 
     .wrap {
-      max-width: 1080px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 24px 16px 40px;
+      padding: 24px;
+      padding-bottom: 80px;
     }
 
     .topbar {
@@ -59,15 +69,251 @@
       border-radius: 10px;
       padding: 8px 12px;
       cursor: pointer;
-      border: 1px solid #374151;
-      background: #1f2937;
-      color: #f8fafc;
-      font-weight: 700;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      font-weight: 600;
+      font-family: inherit;
     }
 
     .btn.primary {
-      border-color: rgba(37, 99, 235, 0.35);
-      background: linear-gradient(135deg, rgba(37, 99, 235, 0.9), rgba(29, 78, 216, 0.85));
+      border-color: rgba(0, 210, 255, 0.35);
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.18) 0%, rgba(0, 210, 255, 0.08) 100%);
+      color: var(--accent);
+    }
+
+    /* --- trading-bots.html: bot cards + open button --- */
+    .bots-layout {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    .bots-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      flex: 1 1 600px;
+    }
+
+    .bot-card {
+      background: var(--panel);
+      border-radius: 18px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bot-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      border: 1px solid transparent;
+      background: linear-gradient(120deg, rgba(0, 210, 255, 0.35), rgba(255, 122, 24, 0.2));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 0;
+    }
+
+    .bot-card:hover::after {
+      opacity: 1;
+    }
+
+    .bot-card-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .bot-chip {
+      display: inline-flex;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(0, 210, 255, 0.12);
+      border: 1px solid rgba(0, 210, 255, 0.25);
+      color: #00d2ff;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .bot-badges-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .bot-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: 1px solid;
+    }
+
+    .bot-badge--popular {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+    }
+
+    .bot-badge--beginner {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: rgba(34, 197, 94, 0.4);
+      color: #4ade80;
+    }
+
+    .bot-badge--fast {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: rgba(59, 130, 246, 0.4);
+      color: #60a5fa;
+    }
+
+    .bot-badge--stable {
+      background: rgba(168, 85, 247, 0.15);
+      border-color: rgba(168, 85, 247, 0.4);
+      color: #c084fc;
+    }
+
+    .bot-card h3 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .bot-card p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .bot-meta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .bot-meta li {
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .open-bot-btn {
+      margin-top: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 210, 255, 0.35);
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.18) 0%, rgba(0, 210, 255, 0.08) 100%);
+      color: #00d2ff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+      font-family: inherit;
+      box-shadow: 0 2px 8px rgba(0, 210, 255, 0.15);
+      position: relative;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .open-bot-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      z-index: -1;
+    }
+
+    .open-bot-btn:hover {
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.28) 0%, rgba(0, 210, 255, 0.14) 100%);
+      border-color: rgba(0, 210, 255, 0.6);
+      box-shadow: 0 6px 20px rgba(0, 210, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .open-bot-btn:hover::before {
+      opacity: 1;
+    }
+
+    /* --- trading-bots.html: bot detail panels --- */
+    .bot-detail-panel {
+      flex: 1 1 520px;
+      background: var(--panel-soft);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      padding: 24px;
+      min-height: 520px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .bot-detail-panel[hidden] { display: none; }
+
+    .bot-config,
+    .bot-stats {
+      background: rgba(15, 17, 23, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .bot-config h4,
+    .bot-stats h4 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .history-card {
+      background: rgba(15, 17, 23, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 560px;
+      overflow: hidden;
+    }
+
+    .history-card h4 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
     }
 
     .notice {
@@ -92,15 +338,14 @@
     }
 
     .card {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 14px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      background: var(--panel-soft);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      min-height: 160px;
+      gap: 12px;
     }
 
     .card-title {
@@ -281,179 +526,223 @@
 
     <div class="grid" id="botsGrid" style="display:none;">
 
-      <div class="card bot-list-card">
-        <div class="card-title">Smart Recovery Differ (R_10)</div>
-        <div class="pill-row">
-          <span class="pill live">Live</span>
-          <span class="pill">R_10</span>
-          <span class="pill">Digit</span>
-          <span class="pill">Stake $1</span>
-        </div>
-        <div class="card-desc">Runs smart recovery digit differ on Volatility 10 only. Normal mode uses <strong>DIGITDIFF</strong>; on loss it enters recovery using <strong>DIGITOVER</strong>/<strong>DIGITUNDER</strong> with martingale.</div>
-        <div class="actions">
-          <button class="btn primary bot-open" type="button" data-bot-key="smartRecoveryDiffer">Open Bot</button>
-        </div>
-      </div>
-
-      <div class="card bot-detail-card" id="detailConfigCard" style="display:none;">
-        <div class="card-title" id="activeBotName">Bot Configuration</div>
-        <div class="card-desc" id="activeBotDesc">Open a bot to configure it.</div>
-        <div style="display:flex; flex-direction:column; gap:10px;">
-          <div class="config-input">
-            <label for="stakeInput">Initial Stake (USD)</label>
-            <input type="number" id="stakeInput" min="0.35" step="0.01" value="1" />
-            <div class="card-desc" id="minStakeHint" style="margin-top:4px;">Minimum stake is enforced by Deriv for each contract.</div>
+      <div class="bot-card bot-list-card" id="smartRecoveryDifferCard">
+        <div class="bot-card-content">
+          <div class="bot-badges-row">
+            <span class="bot-chip">Smart Recovery</span>
+            <span class="bot-badge bot-badge--popular">Popular</span>
           </div>
-          <div class="config-input">
-            <label for="takeProfitInput">Take Profit (USD)</label>
-            <input type="number" id="takeProfitInput" min="5" step="1" value="100" />
+          <h3>Smart Recovery Differ</h3>
+          <p>Runs smart recovery digit differ. Starts with DIGITDIFF, then uses DIGITOVER/DIGITUNDER recovery with martingale.</p>
+          <ul class="bot-meta">
+            <li>Markets: Volatility 10–100</li>
+            <li>Duration: 1 tick</li>
+            <li>Stake: configurable</li>
+          </ul>
+          <button class="open-bot-btn bot-open" type="button" data-bot-key="smartRecoveryDiffer">Open Bot</button>
+        </div>
+      </div>
+
+      <div class="bot-detail-panel bot-detail-card" id="botDetailPanel" hidden>
+        <div class="bot-panel-content">
+          <div class="bot-panel-header">
+            <div>
+              <div style="font-size:16px;font-weight:700;" id="activeBotName">Bot</div>
+              <div style="font-size:13px;color:var(--muted);" id="activeBotDesc">Open a bot to view configuration, statistics, and recent trades.</div>
+            </div>
           </div>
-          <div class="config-input">
-            <label for="stopLossInput">Stop Loss (USD)</label>
-            <input type="number" id="stopLossInput" min="50" step="1" value="1000" />
+
+          <div class="bot-panel-grid" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
+            <div class="bot-column">
+              <div class="bot-config" id="botConfig">
+                <h4>Configuration</h4>
+                <div class="config-grid" style="display:grid; gap:12px;">
+                  <div class="input-group">
+                    <label for="stakeInput">Initial Stake (USD)</label>
+                    <input type="number" id="stakeInput" min="0.35" step="0.01" value="1" />
+                    <small id="minStakeHint">Minimum stake is enforced by Deriv for each contract.</small>
+                  </div>
+                  <div class="input-group">
+                    <label for="takeProfitInput">Take Profit (USD)</label>
+                    <input type="number" id="takeProfitInput" min="5" step="1" value="100" />
+                  </div>
+                  <div class="input-group">
+                    <label for="stopLossInput">Stop Loss (USD)</label>
+                    <input type="number" id="stopLossInput" min="50" step="1" value="1000" />
+                  </div>
+                  <div class="input-group" id="martingaleGroup">
+                    <label for="martingaleInput">Martingale Multiplier</label>
+                    <input type="number" id="martingaleInput" min="1" step="0.1" value="16" />
+                  </div>
+                </div>
+                <div class="config-actions" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                  <button class="open-bot-btn" type="button" id="startBotBtn" disabled>Start Bot</button>
+                  <button class="btn" type="button" id="stopBotBtn" disabled>Stop</button>
+                  <div class="bot-stat">Connection: <strong id="botConnection">Idle</strong></div>
+                </div>
+                <div class="bot-stat">Target: <strong id="botTarget">--</strong></div>
+                <div class="bot-stat">Last contract: <strong id="botLastContract">--</strong></div>
+              </div>
+            </div>
+
+            <div class="bot-column">
+              <div class="bot-stats" id="botStats">
+                <h4>Live Performance</h4>
+                <div class="bot-stat">Total profit: <strong id="botTotalProfit">$0.00</strong></div>
+                <div class="bot-stat">Total trades: <strong id="botTotalTrades">0</strong></div>
+                <div class="bot-stat">Win rate: <strong id="botWinRate">0%</strong></div>
+                <div class="bot-stat">Current stake: <strong id="botCurrentStake">$0.00</strong></div>
+                <div class="bot-stat">Consecutive losses: <strong id="botConsecutiveLosses">0</strong></div>
+                <div class="bot-stat">Running time: <strong id="botRunningTime">00:00:00</strong></div>
+              </div>
+            </div>
+
+            <div class="bot-column bot-history-column">
+              <div class="history-card">
+                <h4>Recent Trades</h4>
+                <ul class="trade-log" id="tradeLog">
+                  <li class="trade-item">No trades yet. Start the bot to begin.</li>
+                </ul>
+              </div>
+            </div>
           </div>
-          <div class="config-input" id="martingaleGroup">
-            <label for="martingaleInput">Martingale Multiplier</label>
-            <input type="number" id="martingaleInput" min="1" step="0.1" value="16" />
+        </div>
+      </div>
+
+      <div class="bot-card bot-list-card" id="allMarketsDifferCard">
+        <div class="bot-card-content">
+          <div class="bot-badges-row">
+            <span class="bot-chip">Digits Differ</span>
+            <span class="bot-badge bot-badge--beginner">Beginner</span>
           </div>
-        </div>
-        <div class="actions" style="margin-top:12px;">
-          <button class="btn primary" type="button" id="startBotBtn" disabled>Start Bot</button>
-          <button class="btn" type="button" id="stopBotBtn" disabled>Stop</button>
-        </div>
-        <div class="bot-stat">Connection: <strong id="botConnection">Idle</strong></div>
-        <div class="bot-stat">Target: <strong id="botTarget">--</strong></div>
-        <div class="bot-stat">Last contract: <strong id="botLastContract">--</strong></div>
-      </div>
-
-      <div class="card bot-detail-card" id="detailStatsCard" style="display:none;">
-        <div class="card-title">Statistics</div>
-        <div class="bot-stat">Total profit: <strong id="botTotalProfit">$0.00</strong></div>
-        <div class="bot-stat">Total trades: <strong id="botTotalTrades">0</strong></div>
-        <div class="bot-stat">Win rate: <strong id="botWinRate">0%</strong></div>
-        <div class="bot-stat">Current stake: <strong id="botCurrentStake">$0.00</strong></div>
-        <div class="bot-stat">Consecutive losses: <strong id="botConsecutiveLosses">0</strong></div>
-        <div class="bot-stat">Running time: <strong id="botRunningTime">00:00:00</strong></div>
-      </div>
-
-      <div class="card bot-detail-card" id="detailTradesCard" style="display:none;">
-        <div class="card-title">Recent Trades</div>
-        <div class="card-desc">Latest trades appear one by one as the bot executes.</div>
-        <ul class="trade-log" id="tradeLog">
-          <li class="trade-item">No trades yet. Start the bot to begin.</li>
-        </ul>
-      </div>
-
-      <div class="card bot-list-card">
-        <div class="card-title">All Markets Differ</div>
-        <div class="pill-row">
-          <span class="pill">Digit differ</span>
-          <span class="pill">DIGITDIFF</span>
-        </div>
-        <div class="card-desc">Runs across Deriv Options markets using <code>underlying_symbol</code>.</div>
-        <div class="actions">
-          <button class="btn primary bot-open" type="button" data-bot-key="allMarketsDiffer">Open Bot</button>
+          <h3>All Markets Differ</h3>
+          <p>Cycles through Volatility 10–100 markets, rotating digits per trade with recovery logic.</p>
+          <ul class="bot-meta">
+            <li>Contract: DIGITDIFF</li>
+            <li>Markets: Volatility 10–100</li>
+            <li>Duration: 1 tick</li>
+          </ul>
+          <button class="open-bot-btn bot-open" type="button" data-bot-key="allMarketsDiffer">Open Bot</button>
         </div>
       </div>
 
-      <div class="card bot-list-card">
-        <div class="card-title">Random Markets Over 0</div>
-        <div class="pill-row">
-          <span class="pill">Digit over</span>
-          <span class="pill">DIGITOVER</span>
-        </div>
-        <div class="card-desc">Randomized Over 0 sequence (OTP-authenticated WebSocket).</div>
-        <div class="actions">
-          <button class="btn primary bot-open" type="button" data-bot-key="allMarketsOver">Open Bot</button>
-        </div>
-      </div>
-
-      <div class="card bot-list-card">
-        <div class="card-title">Random Markets Under 9</div>
-        <div class="pill-row">
-          <span class="pill">Digit under</span>
-          <span class="pill">DIGITUNDER</span>
-        </div>
-        <div class="card-desc">Randomized Under 9 sequence (OTP-authenticated WebSocket).</div>
-        <div class="actions">
-          <button class="btn primary bot-open" type="button" data-bot-key="allMarketsUnder">Open Bot</button>
+      <div class="bot-card bot-list-card" id="allMarketsOverCard">
+        <div class="bot-card-content">
+          <div class="bot-badges-row">
+            <span class="bot-chip">Digits Over</span>
+            <span class="bot-badge bot-badge--fast">Fast</span>
+          </div>
+          <h3>Random Markets Over 0</h3>
+          <p>Fires Digit Over 0 contracts across Volatility 10–100, rotating markets after every trade.</p>
+          <ul class="bot-meta">
+            <li>Contract: DIGITOVER</li>
+            <li>Barrier: 0</li>
+            <li>Duration: 1 tick</li>
+          </ul>
+          <button class="open-bot-btn bot-open" type="button" data-bot-key="allMarketsOver">Open Bot</button>
         </div>
       </div>
 
-      <div class="card bot-list-card">
-        <div class="card-title">Magic Random Strategy</div>
-        <div class="pill-row">
-          <span class="pill">DIFF / UNDER / OVER</span>
-        </div>
-        <div class="card-desc">Mixes differ/under/over trades using the correct Deriv Options schema.</div>
-        <div class="actions">
-          <button class="btn primary bot-open" type="button" data-bot-key="magicRandomBot">Open Bot</button>
-        </div>
-      </div>
-
-      <div class="card bot-list-card">
-        <div class="card-title">Smart Volatility</div>
-        <div class="pill-row">
-          <span class="pill">Volatility-driven</span>
-        </div>
-        <div class="card-desc">Uses tick analysis and places CALL/PUT trades automatically.</div>
-        <div class="actions">
-          <button class="btn primary bot-open" type="button" data-bot-key="smartVolatility">Open Bot</button>
+      <div class="bot-card bot-list-card" id="allMarketsUnderCard">
+        <div class="bot-card-content">
+          <div class="bot-badges-row">
+            <span class="bot-chip">Digits Under</span>
+            <span class="bot-badge bot-badge--stable">Stable</span>
+          </div>
+          <h3>Random Markets Under 9</h3>
+          <p>Targets Digit Under 9 entries on every tick while rotating through Volatility 10–100 markets.</p>
+          <ul class="bot-meta">
+            <li>Contract: DIGITUNDER</li>
+            <li>Barrier: 9</li>
+            <li>Duration: 1 tick</li>
+          </ul>
+          <button class="open-bot-btn bot-open" type="button" data-bot-key="allMarketsUnder">Open Bot</button>
         </div>
       </div>
 
-      <div class="card bot-list-card">
-        <div class="card-title">Smart Even</div>
-        <div class="pill-row">
-          <span class="pill">Even / Odd</span>
-        </div>
-        <div class="card-desc">Even/odd strategy based on tick signals.</div>
-        <div class="actions">
-          <button class="btn primary bot-open" type="button" data-bot-key="smartEven">Open Bot</button>
+      <div class="bot-card bot-list-card" id="magicRandomBotCard">
+        <div class="bot-card-content">
+          <span class="bot-chip">Magic Random</span>
+          <h3>Magic Random Strategy</h3>
+          <p>Randomly selects between Differ, Under 9, and Over 0 trades across all markets.</p>
+          <ul class="bot-meta">
+            <li>Contracts: DIFF/UNDER/OVER</li>
+            <li>Markets: Volatility 10–100</li>
+            <li>Duration: 1 tick</li>
+          </ul>
+          <button class="open-bot-btn bot-open" type="button" data-bot-key="magicRandomBot">Open Bot</button>
         </div>
       </div>
 
-      <div class="card bot-list-card">
+      <div class="bot-card bot-list-card" id="smartVolatilityCard">
+        <div class="bot-card-content">
+          <span class="bot-chip">Volatility AI</span>
+          <h3>Smart Volatility</h3>
+          <p>Tracks tick speed and flips between CALL and PUT while auto-scaling stake and duration.</p>
+          <ul class="bot-meta">
+            <li>Contracts: CALL/PUT</li>
+            <li>Signal: ATR volatility</li>
+            <li>Duration: ticks</li>
+          </ul>
+          <button class="open-bot-btn bot-open" type="button" data-bot-key="smartVolatility">Open Bot</button>
+        </div>
+      </div>
+
+      <div class="bot-card bot-list-card" id="smartEvenCard">
+        <div class="bot-card-content">
+          <span class="bot-chip">Digits Even/Odd</span>
+          <h3>Smart Even</h3>
+          <p>Scans digit streaks and attacks DIGITEVEN/DIGITODD entries with adaptive recovery.</p>
+          <ul class="bot-meta">
+            <li>Contracts: EVEN/ODD</li>
+            <li>Market: R_50 tuned</li>
+            <li>Duration: 1 tick</li>
+          </ul>
+          <button class="open-bot-btn bot-open" type="button" data-bot-key="smartEven">Open Bot</button>
+        </div>
+      </div>
+
+      <div class="bot-card bot-list-card" id="noTouchCard">
         <div class="card-title">No Touch Sentinel</div>
         <div class="pill-row">
           <span class="pill">NOTOUCH</span>
         </div>
         <div class="card-desc">Range spike detector; places NOTOUCH contracts.</div>
         <div class="actions">
-          <button class="btn primary bot-open" type="button" data-bot-key="noTouch">Open Bot</button>
+          <button class="open-bot-btn bot-open" type="button" data-bot-key="noTouch">Open Bot</button>
         </div>
       </div>
 
-      <div class="card bot-list-card">
+      <div class="bot-card bot-list-card" id="alienRiseFallCard">
         <div class="card-title">Alien Rise/Fall</div>
         <div class="pill-row">
           <span class="pill">CALL/PUT</span>
         </div>
         <div class="card-desc">RSI + trend confirmation strategy.</div>
         <div class="actions">
-          <button class="btn primary bot-open" type="button" data-bot-key="alienRiseFall">Open Bot</button>
+          <button class="open-bot-btn bot-open" type="button" data-bot-key="alienRiseFall">Open Bot</button>
         </div>
       </div>
 
-      <div class="card bot-list-card">
+      <div class="bot-card bot-list-card" id="riseFallCard">
         <div class="card-title">Rise/Fall Pro</div>
         <div class="pill-row">
           <span class="pill">CALL/PUT</span>
         </div>
         <div class="card-desc">Momentum + pattern strategy for rise/fall.</div>
         <div class="actions">
-          <button class="btn primary bot-open" type="button" data-bot-key="riseFall">Open Bot</button>
+          <button class="open-bot-btn bot-open" type="button" data-bot-key="riseFall">Open Bot</button>
         </div>
       </div>
 
-      <div class="card bot-list-card">
+      <div class="bot-card bot-list-card" id="smartDifferCard">
         <div class="card-title">Smart Differ Pro</div>
         <div class="pill-row">
           <span class="pill">DIGITDIFF</span>
         </div>
         <div class="card-desc">Differ-based strategy using the correct Deriv Options schema.</div>
         <div class="actions">
-          <button class="btn primary bot-open" type="button" data-bot-key="smartDiffer">Open Bot</button>
+          <button class="open-bot-btn bot-open" type="button" data-bot-key="smartDiffer">Open Bot</button>
         </div>
       </div>
     </div>
@@ -517,6 +806,8 @@
       document.querySelectorAll(".bot-detail-card").forEach((el) => {
         el.style.display = "none";
       });
+      const detailPanel = $("botDetailPanel");
+      if (detailPanel) detailPanel.hidden = true;
       $("backToBotsBtn").style.display = "none";
       setNotice("Select a bot and click Open Bot.");
     }
@@ -528,6 +819,8 @@
       document.querySelectorAll(".bot-detail-card").forEach((el) => {
         el.style.display = "";
       });
+      const detailPanel = $("botDetailPanel");
+      if (detailPanel) detailPanel.hidden = false;
       $("backToBotsBtn").style.display = "";
     }
 
