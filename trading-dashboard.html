@@ -316,6 +316,108 @@
       font-weight: 600;
     }
 
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .stat-card {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 6px;
+      scroll-behavior: smooth;
+    }
+
+    .history-list::-webkit-scrollbar { width: 6px; }
+    .history-list::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 3px; }
+    .history-list::-webkit-scrollbar-thumb { background: rgba(0, 210, 255, 0.3); border-radius: 3px; }
+    .history-list::-webkit-scrollbar-thumb:hover { background: rgba(0, 210, 255, 0.5); }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+      transform: translateX(0);
+    }
+
+    .history-item.win { border-color: rgba(36, 217, 112, 0.3); }
+    .history-item.loss { border-color: rgba(255, 68, 79, 0.3); }
+
+    .history-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      color: var(--muted);
+    }
+
+    .history-profit { font-weight: 600; }
+    .history-profit.win { color: var(--success); }
+    .history-profit.loss { color: var(--danger); }
+
+    .primary-btn,
+    .secondary-btn {
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.35), rgba(0, 210, 255, 0.15));
+      border: 1px solid rgba(0, 210, 255, 0.6);
+      color: #00d2ff;
+    }
+
+    .secondary-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text);
+    }
+
+    .primary-btn:disabled,
+    .secondary-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .notice {
       background: rgba(34, 197, 94, 0.08);
       border: 1px solid rgba(34, 197, 94, 0.18);
@@ -576,8 +678,8 @@
                   </div>
                 </div>
                 <div class="config-actions" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                  <button class="open-bot-btn" type="button" id="startBotBtn" disabled>Start Bot</button>
-                  <button class="btn" type="button" id="stopBotBtn" disabled>Stop</button>
+                  <button class="primary-btn btn-liquid-glow" type="button" id="startBotBtn" disabled>Start Bot</button>
+                  <button class="secondary-btn" type="button" id="stopBotBtn" disabled>Stop Bot</button>
                   <div class="bot-stat">Connection: <strong id="botConnection">Idle</strong></div>
                 </div>
                 <div class="bot-stat">Target: <strong id="botTarget">--</strong></div>
@@ -588,21 +690,47 @@
             <div class="bot-column">
               <div class="bot-stats" id="botStats">
                 <h4>Live Performance</h4>
-                <div class="bot-stat">Total profit: <strong id="botTotalProfit">$0.00</strong></div>
-                <div class="bot-stat">Total trades: <strong id="botTotalTrades">0</strong></div>
-                <div class="bot-stat">Win rate: <strong id="botWinRate">0%</strong></div>
-                <div class="bot-stat">Current stake: <strong id="botCurrentStake">$0.00</strong></div>
-                <div class="bot-stat">Consecutive losses: <strong id="botConsecutiveLosses">0</strong></div>
-                <div class="bot-stat">Running time: <strong id="botRunningTime">00:00:00</strong></div>
+                <div class="stats-grid">
+                  <div class="stat-card">
+                    <span class="stat-label">Account Balance</span>
+                    <span class="stat-value" id="balanceValue">-</span>
+                  </div>
+                  <div class="stat-card">
+                    <span class="stat-label">Total Profit</span>
+                    <span class="stat-value" id="totalProfitValue">$0.00</span>
+                  </div>
+                  <div class="stat-card">
+                    <span class="stat-label">Total Trades</span>
+                    <span class="stat-value" id="totalTradesValue">0</span>
+                  </div>
+                  <div class="stat-card">
+                    <span class="stat-label">Win Rate</span>
+                    <span class="stat-value" id="winRateValue">0%</span>
+                  </div>
+                  <div class="stat-card">
+                    <span class="stat-label">Current Stake</span>
+                    <span class="stat-value" id="currentStakeValue">$0.00</span>
+                  </div>
+                  <div class="stat-card">
+                    <span class="stat-label">Consecutive Losses</span>
+                    <span class="stat-value" id="consecutiveLossesValue">0</span>
+                  </div>
+                  <div class="stat-card">
+                    <span class="stat-label">Market / Digit</span>
+                    <span class="stat-value" id="targetValue">-</span>
+                  </div>
+                  <div class="stat-card">
+                    <span class="stat-label">Running Time</span>
+                    <span class="stat-value" id="runningTimeValue">00:00:00</span>
+                  </div>
+                </div>
               </div>
             </div>
 
             <div class="bot-column bot-history-column">
               <div class="history-card">
                 <h4>Recent Trades</h4>
-                <ul class="trade-log" id="tradeLog">
-                  <li class="trade-item">No trades yet. Start the bot to begin.</li>
-                </ul>
+                <div class="history-list" id="historyList"></div>
               </div>
             </div>
           </div>
@@ -885,19 +1013,8 @@
       $("accountBtnBalance").textContent = text;
     }
 
-    function logTrade(message, type = "") {
-      const log = $("tradeLog");
-      if (!log) return;
-      if (log.children.length === 1 && log.children[0].textContent.includes("No trades yet")) {
-        log.innerHTML = "";
-      }
-      const item = document.createElement("li");
-      item.className = `trade-item ${type}`.trim();
-      item.textContent = `${new Date().toLocaleTimeString()} - ${message}`;
-      log.prepend(item);
-      while (log.children.length > 25) {
-        log.removeChild(log.lastChild);
-      }
+    function logTrade() {
+      // Kept for backwards-compat; history is rendered via renderTradeLogFor()
     }
 
     async function loadAccountsByMode(token) {
@@ -1058,30 +1175,44 @@
     }
 
     function renderTradeLogFor(botKey) {
-      const log = $("tradeLog");
-      if (!log) return;
+      const list = $("historyList");
+      if (!list) return;
       const state = botStates[botKey];
       const modeKey = currentMode === "demo" ? "demo" : "real";
       const history = state?.modes?.[modeKey]?.history;
       if (!state || !Array.isArray(history) || history.length === 0) {
-        log.innerHTML = `<li class="trade-item">No trades yet. Start the bot to begin.</li>`;
+        list.innerHTML = `<div class="history-item"><div class="history-meta">No trades yet. Start the bot to begin.</div><div class="history-profit">—</div></div>`;
         return;
       }
 
       const limit = 25;
       const items = history.slice(0, limit);
-      log.innerHTML = "";
+      list.innerHTML = "";
       items.forEach((entry) => {
-        const li = document.createElement("li");
-        li.className = `trade-item ${entry.win ? "win" : "loss"}`.trim();
-        const p = Number(entry.profit ?? 0);
-        const s = Number(entry.stake ?? 0);
+        const item = document.createElement("div");
+        item.className = `history-item ${entry.win ? "win" : "loss"}`.trim();
+
+        const meta = document.createElement("div");
+        meta.className = "history-meta";
+        const time = document.createElement("div");
+        time.textContent = new Date(entry.timestamp || Date.now()).toLocaleTimeString();
+        const info = document.createElement("div");
         const market = entry.market || "--";
         const digit = entry.digit ?? "-";
+        const stake = Number(entry.stake ?? 0);
+        info.textContent = `${market} · Digit ${digit} · Stake $${stake.toFixed(2)}`;
+        meta.appendChild(time);
+        meta.appendChild(info);
+
+        const profit = document.createElement("div");
+        const p = Number(entry.profit ?? 0);
         const currency = entry.currency || currentCurrency || "USD";
-        const result = entry.win ? "WIN" : "LOSS";
-        li.textContent = `${new Date(entry.timestamp || Date.now()).toLocaleTimeString()} - ${result} | ${market} | Digit ${digit} | Stake $${s.toFixed(2)} | Profit ${p.toFixed(2)} ${currency}`;
-        log.appendChild(li);
+        profit.className = `history-profit ${entry.win ? "win" : "loss"}`.trim();
+        profit.textContent = `${p.toFixed(2)} ${currency}`;
+
+        item.appendChild(meta);
+        item.appendChild(profit);
+        list.appendChild(item);
       });
     }
 
@@ -1091,28 +1222,26 @@
       const modeKey = currentMode === "demo" ? "demo" : "real";
       const stats = state.modes?.[modeKey]?.stats;
       if (!stats) {
-        $("botBalance").textContent = "--";
-        $("botTarget").textContent = "--";
-        $("botLastContract").textContent = "--";
-        $("botTotalProfit").textContent = "$0.00";
-        $("botTotalTrades").textContent = "0";
-        $("botWinRate").textContent = "0%";
-        $("botCurrentStake").textContent = "$0.00";
-        $("botConsecutiveLosses").textContent = "0";
-        $("botRunningTime").textContent = "00:00:00";
+        $("balanceValue").textContent = "-";
+        $("totalProfitValue").textContent = "$0.00";
+        $("totalTradesValue").textContent = "0";
+        $("winRateValue").textContent = "0%";
+        $("currentStakeValue").textContent = "$0.00";
+        $("consecutiveLossesValue").textContent = "0";
+        $("targetValue").textContent = "-";
+        $("runningTimeValue").textContent = "00:00:00";
         return;
       }
 
       const currency = stats.currency || currentCurrency || "USD";
-      $("botBalance").textContent = stats.balance !== undefined ? `${Number(stats.balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency}` : "--";
-      $("botTarget").textContent = stats.market !== undefined ? `${stats.market}${stats.digit !== undefined ? ` / ${stats.digit}` : ""}` : "--";
-      $("botLastContract").textContent = state.modes?.[modeKey]?.lastContract || "--";
-      $("botTotalProfit").textContent = formatMoney(stats.totalProfit ?? 0);
-      $("botTotalTrades").textContent = String(stats.totalTrades ?? 0);
-      $("botWinRate").textContent = stats.winRate !== undefined ? `${stats.winRate}%`.replace("%%", "%") : "0%";
-      $("botCurrentStake").textContent = formatMoney(stats.currentStake ?? 0);
-      $("botConsecutiveLosses").textContent = String(stats.consecutiveLosses ?? 0);
-      $("botRunningTime").textContent = stats.runningTime || "00:00:00";
+      $("balanceValue").textContent = stats.balance !== undefined ? `${Number(stats.balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency}` : "-";
+      $("totalProfitValue").textContent = formatMoney(stats.totalProfit ?? 0);
+      $("totalTradesValue").textContent = String(stats.totalTrades ?? 0);
+      $("winRateValue").textContent = stats.winRate !== undefined ? `${stats.winRate}%`.replace("%%", "%") : "0%";
+      $("currentStakeValue").textContent = formatMoney(stats.currentStake ?? 0);
+      $("consecutiveLossesValue").textContent = String(stats.consecutiveLosses ?? 0);
+      $("targetValue").textContent = stats.market !== undefined ? `${stats.market}${stats.digit !== undefined ? ` / ${stats.digit}` : ""}` : "-";
+      $("runningTimeValue").textContent = stats.runningTime || "00:00:00";
     }
 
     function setMartingaleVisibility(botKey) {
@@ -1264,7 +1393,7 @@
             const s = ensureBotState(thisBotKey);
             const m = s?.modes?.[thisMode];
             if (m && m.stats) m.stats.runningTime = runningTime;
-            if (activeBotKey === thisBotKey) $("botRunningTime").textContent = runningTime || "00:00:00";
+            if (activeBotKey === thisBotKey) $("runningTimeValue").textContent = runningTime || "00:00:00";
           },
           updateStats: (stats) => {
             const s = ensureBotState(thisBotKey);
@@ -1272,14 +1401,14 @@
             if (m) m.stats = stats || m.stats;
             if (activeBotKey === thisBotKey && stats) {
               const currency = stats.currency || currentCurrency || "USD";
-              $("botBalance").textContent = `${Number(stats.balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency}`;
-              $("botTarget").textContent = stats.market ? `${stats.market} / ${stats.digit}` : "--";
-              $("botTotalProfit").textContent = formatMoney(stats.totalProfit ?? 0);
-              $("botTotalTrades").textContent = String(stats.totalTrades ?? 0);
-              $("botWinRate").textContent = stats.winRate !== undefined ? `${stats.winRate}%`.replace("%%", "%") : "0%";
-              $("botCurrentStake").textContent = formatMoney(stats.currentStake ?? 0);
-              $("botConsecutiveLosses").textContent = String(stats.consecutiveLosses ?? 0);
-              $("botRunningTime").textContent = stats.runningTime || "00:00:00";
+              $("balanceValue").textContent = `${Number(stats.balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency}`;
+              $("totalProfitValue").textContent = formatMoney(stats.totalProfit ?? 0);
+              $("totalTradesValue").textContent = String(stats.totalTrades ?? 0);
+              $("winRateValue").textContent = stats.winRate !== undefined ? `${stats.winRate}%`.replace("%%", "%") : "0%";
+              $("currentStakeValue").textContent = formatMoney(stats.currentStake ?? 0);
+              $("consecutiveLossesValue").textContent = String(stats.consecutiveLosses ?? 0);
+              $("targetValue").textContent = stats.market ? `${stats.market} / ${stats.digit}` : "-";
+              $("runningTimeValue").textContent = stats.runningTime || "00:00:00";
             }
           },
           updateBalance: (balance, currency) => {
@@ -1294,7 +1423,7 @@
             setBotBalance(balance, currency || "USD");
           },
           updateTargets: (market, displayTarget) => {
-            if ($("botTarget")) $("botTarget").textContent = displayTarget || market || "--";
+            if ($("targetValue")) $("targetValue").textContent = displayTarget || market || "-";
           },
           addHistoryEntry: ({ win, profit, stake, market, digit, timestamp }) => {
             const s = ensureBotState(thisBotKey);
@@ -1314,8 +1443,6 @@
             while (m.history.length > 25) m.history.pop();
 
             if (activeBotKey === thisBotKey) {
-              const p = Number(profit ?? 0);
-              const st = Number(stake ?? 0);
               const result = entry.win ? "WIN" : "LOSS";
               if ($("botLastContract")) {
                 $("botLastContract").textContent = `${result} | ${market || "--"} | Digit ${digit ?? "-"}`;
@@ -1323,10 +1450,7 @@
               if (m) {
                 m.lastContract = `${result} | ${market || "--"} | Digit ${digit ?? "-"}`;
               }
-              logTrade(
-                `${result} | ${market || "--"} | Digit ${digit ?? "-"} | Stake $${st.toFixed(2)} | Profit ${p.toFixed(2)} ${entry.currency}`,
-                entry.win ? "win" : "loss"
-              );
+              renderTradeLogFor(thisBotKey);
             }
           }
         };
