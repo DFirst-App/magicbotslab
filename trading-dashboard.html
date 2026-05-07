@@ -250,8 +250,8 @@
         <div class="bot-stat">Target: <strong id="botTarget">--</strong></div>
         <div class="bot-stat">Last contract: <strong id="botLastContract">--</strong></div>
         <div class="actions">
-          <button class="btn primary" type="button" id="startBotBtn">Start Smart Recovery Differ</button>
-          <button class="btn" type="button" id="stopBotBtn" disabled>Stop</button>
+          <button class="btn primary bot-start" type="button" data-bot-key="smartRecoveryDiffer">Start Smart Recovery Differ</button>
+          <button class="btn bot-stop" type="button" data-bot-key="smartRecoveryDiffer" disabled>Stop</button>
         </div>
       </div>
 
@@ -264,20 +264,141 @@
       </div>
 
       <div class="card">
-        <div class="card-title">Bot Configuration</div>
+        <div class="card-title">All Markets Differ</div>
         <div class="pill-row">
-          <span class="pill">Markets: R_10 only</span>
-          <span class="pill">Normal: DIGITDIFF</span>
-          <span class="pill">Recovery: DIGITOVER / DIGITUNDER</span>
-          <span class="pill">Duration: 1 tick</span>
-          <span class="pill">Initial stake: $1.00</span>
+          <span class="pill">Digit differ</span>
+          <span class="pill">DIGITDIFF</span>
         </div>
-        <div class="card-desc">Smart bot logic from <code>bots/smartRecoveryDiffer.js</code>. Uses OTP-authenticated WebSocket connection and place orders every time a contract finishes.</div>
+        <div class="card-desc">Runs across Deriv Options markets using <code>underlying_symbol</code>.</div>
+        <div class="actions">
+          <button class="btn primary bot-start" type="button" data-bot-key="allMarketsDiffer">Start</button>
+          <button class="btn bot-stop" type="button" data-bot-key="allMarketsDiffer" disabled>Stop</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Random Markets Over 0</div>
+        <div class="pill-row">
+          <span class="pill">Digit over</span>
+          <span class="pill">DIGITOVER</span>
+        </div>
+        <div class="card-desc">Randomized Over 0 sequence (OTP-authenticated WebSocket).</div>
+        <div class="actions">
+          <button class="btn primary bot-start" type="button" data-bot-key="allMarketsOver">Start</button>
+          <button class="btn bot-stop" type="button" data-bot-key="allMarketsOver" disabled>Stop</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Random Markets Under 9</div>
+        <div class="pill-row">
+          <span class="pill">Digit under</span>
+          <span class="pill">DIGITUNDER</span>
+        </div>
+        <div class="card-desc">Randomized Under 9 sequence (OTP-authenticated WebSocket).</div>
+        <div class="actions">
+          <button class="btn primary bot-start" type="button" data-bot-key="allMarketsUnder">Start</button>
+          <button class="btn bot-stop" type="button" data-bot-key="allMarketsUnder" disabled>Stop</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Magic Random Strategy</div>
+        <div class="pill-row">
+          <span class="pill">DIFF / UNDER / OVER</span>
+        </div>
+        <div class="card-desc">Mixes differ/under/over trades using the correct Deriv Options schema.</div>
+        <div class="actions">
+          <button class="btn primary bot-start" type="button" data-bot-key="magicRandomBot">Start</button>
+          <button class="btn bot-stop" type="button" data-bot-key="magicRandomBot" disabled>Stop</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Smart Volatility</div>
+        <div class="pill-row">
+          <span class="pill">Volatility-driven</span>
+        </div>
+        <div class="card-desc">Uses tick analysis and places CALL/PUT trades automatically.</div>
+        <div class="actions">
+          <button class="btn primary bot-start" type="button" data-bot-key="smartVolatility">Start</button>
+          <button class="btn bot-stop" type="button" data-bot-key="smartVolatility" disabled>Stop</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Smart Even</div>
+        <div class="pill-row">
+          <span class="pill">Even / Odd</span>
+        </div>
+        <div class="card-desc">Even/odd strategy based on tick signals.</div>
+        <div class="actions">
+          <button class="btn primary bot-start" type="button" data-bot-key="smartEven">Start</button>
+          <button class="btn bot-stop" type="button" data-bot-key="smartEven" disabled>Stop</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">No Touch Sentinel</div>
+        <div class="pill-row">
+          <span class="pill">NOTOUCH</span>
+        </div>
+        <div class="card-desc">Range spike detector; places NOTOUCH contracts.</div>
+        <div class="actions">
+          <button class="btn primary bot-start" type="button" data-bot-key="noTouch">Start</button>
+          <button class="btn bot-stop" type="button" data-bot-key="noTouch" disabled>Stop</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Alien Rise/Fall</div>
+        <div class="pill-row">
+          <span class="pill">CALL/PUT</span>
+        </div>
+        <div class="card-desc">RSI + trend confirmation strategy.</div>
+        <div class="actions">
+          <button class="btn primary bot-start" type="button" data-bot-key="alienRiseFall">Start</button>
+          <button class="btn bot-stop" type="button" data-bot-key="alienRiseFall" disabled>Stop</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Rise/Fall Pro</div>
+        <div class="pill-row">
+          <span class="pill">CALL/PUT</span>
+        </div>
+        <div class="card-desc">Momentum + pattern strategy for rise/fall.</div>
+        <div class="actions">
+          <button class="btn primary bot-start" type="button" data-bot-key="riseFall">Start</button>
+          <button class="btn bot-stop" type="button" data-bot-key="riseFall" disabled>Stop</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Smart Differ Pro</div>
+        <div class="pill-row">
+          <span class="pill">DIGITDIFF</span>
+        </div>
+        <div class="card-desc">Differ-based strategy using the correct Deriv Options schema.</div>
+        <div class="actions">
+          <button class="btn primary bot-start" type="button" data-bot-key="smartDiffer">Start</button>
+          <button class="btn bot-stop" type="button" data-bot-key="smartDiffer" disabled>Stop</button>
+        </div>
       </div>
     </div>
   </div>
 
   <script src="bots/smartRecoveryDiffer.js"></script>
+  <script src="bots/allMarketsDiffer.js"></script>
+  <script src="bots/allMarketsOver.js"></script>
+  <script src="bots/allMarketsUnder.js"></script>
+  <script src="bots/magicRandomBot.js"></script>
+  <script src="bots/smartVolatility.js"></script>
+  <script src="bots/smartEven.js"></script>
+  <script src="bots/noTouch.js"></script>
+  <script src="bots/alienRiseFall.js"></script>
+  <script src="bots/riseFall.js"></script>
+  <script src="bots/smartDifferBot.js"></script>
   <script>
     const DERIV_OAUTH_CLIENT_ID = "338udJBKn1EbT7Tc29Snv";
     const DERIV_ACCESS_TOKEN_KEY = "deriv_access_token";
@@ -293,6 +414,7 @@
     let demoAccountId = null;
     let currentCurrency = "USD";
     let botInstance = null;
+    let activeBotKey = null;
 
     function $(id) { return document.getElementById(id); }
 
@@ -308,6 +430,20 @@
 
     function showBotsGrid(show) {
       $("botsGrid").style.display = show ? "" : "none";
+    }
+
+    function setControlsForRunning(running) {
+      const startButtons = Array.from(document.querySelectorAll(".bot-start"));
+      const stopButtons = Array.from(document.querySelectorAll(".bot-stop"));
+
+      startButtons.forEach((btn) => {
+        btn.disabled = !!running;
+      });
+
+      stopButtons.forEach((btn) => {
+        const key = btn.dataset.botKey;
+        btn.disabled = !(running && key === activeBotKey);
+      });
     }
 
     function updateMeta(text) {
@@ -458,22 +594,44 @@
       }
       botInstance = null;
       botRunning = false;
-      $("startBotBtn").disabled = false;
-      $("stopBotBtn").disabled = true;
+      activeBotKey = null;
+      setControlsForRunning(false);
       setBotConnection("Stopped");
     }
 
-    async function startBot() {
+    async function startBot(botKey) {
+      const botDef = botKey && botKey.trim ? botKey.trim() : botKey;
+      if (!botDef) return;
+      if (botRunning) return;
+
       const token = getToken();
       if (!token) {
         setNotice("Missing access token. Reconnect your Deriv account.", true);
         return;
       }
 
-      $("startBotBtn").disabled = true;
-      $("stopBotBtn").disabled = false;
+      activeBotKey = botDef;
+      botRunning = true;
+      setControlsForRunning(true);
       setBotConnection("Initializing...");
       try {
+        const BOT_DEFS = {
+          smartRecoveryDiffer: { classRef: window.SmartRecoveryDifferBot, martingale: 3.1, markets: [SYMBOL] },
+          allMarketsDiffer: { classRef: window.AllMarketsDifferBot, martingale: 16, markets: [SYMBOL] },
+          allMarketsOver: { classRef: window.AllMarketsOverBot, martingale: 16, markets: [SYMBOL] },
+          allMarketsUnder: { classRef: window.AllMarketsUnderBot, martingale: 16, markets: [SYMBOL] },
+          magicRandomBot: { classRef: window.MagicRandomBot, martingale: 16, markets: [SYMBOL] },
+          smartVolatility: { classRef: window.SmartVolatilityBot, martingale: 16, markets: [SYMBOL] },
+          smartEven: { classRef: window.SmartEvenBot, martingale: 3.1, markets: [SYMBOL] },
+          noTouch: { classRef: window.NoTouchBot, martingale: 16, markets: [SYMBOL] },
+          alienRiseFall: { classRef: window.AlienRiseFallBot, martingale: 3.1, markets: [SYMBOL] },
+          riseFall: { classRef: window.RiseFallBot, martingale: 3.1, markets: [SYMBOL] },
+          smartDiffer: { classRef: window.SmartDifferBot, martingale: 16, markets: [SYMBOL] }
+        };
+
+        const def = BOT_DEFS[botDef];
+        if (!def || !def.classRef) throw new Error(`Unknown bot key: ${botDef}`);
+
         await loadAccountsByMode(token);
         updateAccountModeAvailability();
         currentAccountId = getCurrentModeAccountId();
@@ -488,8 +646,7 @@
           showStatus: (text) => setBotConnection(text),
           setRunningState: (running) => {
             botRunning = !!running;
-            $("startBotBtn").disabled = running;
-            $("stopBotBtn").disabled = !running;
+            setControlsForRunning(botRunning);
           },
           resetHistory: () => {
             const log = $("tradeLog");
@@ -509,28 +666,33 @@
             const s = Number(stake ?? 0);
             const result = win ? "WIN" : "LOSS";
             logTrade(
-              `${result} | ${market} | Digit ${digit} | Stake $${s.toFixed(2)} | Profit ${p.toFixed(2)} ${currentCurrency || "USD"}`,
+              `${result} | ${market || "--"} | Digit ${digit ?? "-"} | Stake $${s.toFixed(2)} | Profit ${p.toFixed(2)} ${currentCurrency || "USD"}`,
               win ? "win" : "loss"
             );
           }
         };
 
-        botInstance = new window.SmartRecoveryDifferBot(ui, {
+        botInstance = new def.classRef(ui, {
           wsUrl,
           defaults: {
             initialStake: STAKE_USD,
             stopLoss: 0,
             takeProfit: 0,
-            martingaleMultiplier: 3.1
+            martingaleMultiplier: def.martingale
           },
-          markets: [SYMBOL],
+          markets: def.markets,
           resolveAuthToken: () => token,
           otpAuthenticated: true
         });
 
-        logTrade(`Starting Smart Recovery Differ (${currentMode.toUpperCase()}) on ${SYMBOL}...`, "win");
+        logTrade(`Starting ${botDef} (${currentMode.toUpperCase()}) on ${SYMBOL}...`, "win");
         ui.resetHistory();
-        botInstance.start({ initialStake: STAKE_USD, martingaleMultiplier: 3.1, stopLoss: 0, takeProfit: 0 });
+        botInstance.start({
+          initialStake: STAKE_USD,
+          martingaleMultiplier: def.martingale,
+          stopLoss: 0,
+          takeProfit: 0
+        });
       } catch (error) {
         stopBot();
         setNotice(`Failed to start test bot: ${error.message}`, true);
@@ -545,8 +707,12 @@
       window.location.href = "index.html";
     });
 
-    $("startBotBtn").addEventListener("click", startBot);
-    $("stopBotBtn").addEventListener("click", stopBot);
+    document.querySelectorAll(".bot-start").forEach((btn) => {
+      btn.addEventListener("click", () => startBot(btn.dataset.botKey));
+    });
+    document.querySelectorAll(".bot-stop").forEach((btn) => {
+      btn.addEventListener("click", stopBot);
+    });
     $("realModeBtn").addEventListener("click", () => {
       if (botRunning) return;
       setMode("real");
