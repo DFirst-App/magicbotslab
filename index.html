@@ -3,71 +3,291 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MagicBotsLab Landing</title>
+  <title>MagicBotsLab | Automated Trading Bots</title>
   <style>
+    :root {
+      --bg: #080d1a;
+      --panel: #0f172a;
+      --panel-2: #111c34;
+      --line: rgba(148, 163, 184, 0.22);
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #2563eb;
+      --accent-2: #38bdf8;
+      --ok: #22c55e;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      font-family: Arial, sans-serif;
-      background: #0b1220;
-      color: #e5e7eb;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 20%, rgba(56, 189, 248, 0.16), transparent 38%),
+        radial-gradient(circle at 85% 5%, rgba(37, 99, 235, 0.2), transparent 34%),
+        var(--bg);
     }
 
-    .card {
-      width: min(420px, 92vw);
+    .page {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 28px 18px 48px;
+    }
+
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: linear-gradient(160deg, rgba(15, 23, 42, 0.95), rgba(17, 28, 52, 0.9));
       padding: 28px;
+      display: grid;
+      gap: 26px;
+      grid-template-columns: 1.3fr 1fr;
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.4);
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.6;
+      max-width: 680px;
+    }
+
+    .badges {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge {
+      border: 1px solid var(--line);
+      background: rgba(15, 23, 42, 0.85);
+      color: #dbeafe;
+      padding: 7px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .connect-card {
+      border: 1px solid var(--line);
+      background: rgba(15, 23, 42, 0.9);
       border-radius: 16px;
-      background: #111827;
-      border: 1px solid #1f2937;
-      text-align: center;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 12px;
+      min-height: 220px;
     }
 
-    h1 {
-      margin: 0 0 12px;
-      font-size: 24px;
+    .connect-title {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 700;
     }
 
-    p {
-      margin: 0 0 20px;
-      color: #9ca3af;
+    .connect-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .connect-btn {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1px solid rgba(147, 197, 253, 0.45);
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      cursor: pointer;
     }
 
     .status {
-      margin-top: 14px;
       min-height: 20px;
       font-size: 13px;
       color: #93c5fd;
     }
 
-    .status.error {
-      color: #fca5a5;
+    .status.error { color: #fca5a5; }
+    .status.success { color: #86efac; }
+
+    .section {
+      margin-top: 20px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.85);
+      padding: 20px;
     }
 
-    .status.success {
-      color: #86efac;
+    .section h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      letter-spacing: -0.01em;
     }
 
-    .connect-btn {
-      width: 100%;
-      padding: 12px 16px;
-      border: 0;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 700;
-      color: #ffffff;
-      background: #2563eb;
-      cursor: pointer;
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .feature {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      background: linear-gradient(165deg, rgba(17, 28, 52, 0.78), rgba(15, 23, 42, 0.82));
+    }
+
+    .feature h3 {
+      margin: 0 0 7px;
+      font-size: 15px;
+      color: #dbeafe;
+    }
+
+    .feature p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      background: rgba(17, 28, 52, 0.72);
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--ok);
+      font-size: 17px;
+      margin-bottom: 4px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .disclaimer-section {
+      margin-top: 22px;
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+    }
+
+    .disclaimer {
+      border: 1px solid var(--line);
+      background: rgba(15, 23, 42, 0.75);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .disclaimer-title {
+      margin-bottom: 8px;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      font-weight: 800;
+      color: #cbd5e1;
+    }
+
+    .disclaimer p {
+      margin: 0;
+      color: #9ca3af;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 920px) {
+      .hero { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .feature-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <main class="card">
-    <h1>MagicBotsLab</h1>
-    <p>Landing page</p>
-    <button type="button" class="connect-btn" id="connectBtn">Connect Account</button>
-    <div class="status" id="statusText"></div>
+  <main class="page">
+    <section class="hero">
+      <div>
+        <h1>MagicBotsLab automated trading ecosystem</h1>
+        <p>Deploy free Deriv bots, download MT5 bots, and run fully automated strategies with a modern dashboard built for continuous 24/7 market activity.</p>
+        <div class="badges">
+          <span class="badge">Free Deriv Bots</span>
+          <span class="badge">MT5 Bots Download</span>
+          <span class="badge">Fully Automated Trading</span>
+          <span class="badge">24/7 Trading</span>
+        </div>
+      </div>
+      <div class="connect-card">
+        <h2 class="connect-title">Connect with Deriv</h2>
+        <p class="connect-copy">Securely connect your account to access bot dashboards, real-time balances, and automated execution workflows.</p>
+        <button type="button" class="connect-btn" id="connectBtn">Connect Account</button>
+        <div class="status" id="statusText"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>What you get</h2>
+      <div class="feature-grid">
+        <article class="feature">
+          <h3>MT5 bots available for download</h3>
+          <p>Access curated MT5 bot packs and deploy them quickly across supported market workflows.</p>
+        </article>
+        <article class="feature">
+          <h3>Free Deriv bots</h3>
+          <p>Use bot strategies optimized for Deriv contract flows and real-time execution feedback.</p>
+        </article>
+        <article class="feature">
+          <h3>Fully automated trading bots</h3>
+          <p>Run configured bots with take profit and stop loss logic and clean performance tracking.</p>
+        </article>
+        <article class="feature">
+          <h3>24/7 trading operations</h3>
+          <p>Keep strategies active around the clock with live updates and account-aware controls.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Platform highlights</h2>
+      <div class="stats">
+        <div class="stat"><strong>24/7</strong><span>Automation</span></div>
+        <div class="stat"><strong>Real-Time</strong><span>Monitoring</span></div>
+        <div class="stat"><strong>Multi-Bot</strong><span>Support</span></div>
+        <div class="stat"><strong>Secure</strong><span>OAuth Connect</span></div>
+      </div>
+    </section>
+
+    <div class="disclaimer-section" id="disclaimerSection">
+      <div class="disclaimer">
+        <div class="disclaimer-title">DISCLAIMER</div>
+        <p>Deriv offers complex derivatives, such as options and contracts for difference ("CFDs"). These products may not be suitable for all clients, and trading them puts you at risk. Please make sure that you understand the following risks before trading Deriv products: a) you may lose some or all of the money you invest in the trade, b) if your trade involves currency conversion, exchange rates will affect your profit and loss. You should never trade with borrowed money or with money that you cannot afford to lose.</p>
+      </div>
+    </div>
   </main>
   <script>
     const DERIV_OAUTH_CLIENT_ID = "338udJBKn1EbT7Tc29Snv";

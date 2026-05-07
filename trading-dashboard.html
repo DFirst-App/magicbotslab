@@ -56,8 +56,11 @@
     }
 
     .brand-title {
-      font-size: 18px;
-      font-weight: 800;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
     }
 
     .brand-subtitle {
@@ -657,7 +660,7 @@
             </div>
             <div class="mode-toggle" aria-label="Account mode">
               <button class="mode-btn active" id="realModeBtn" type="button">Real</button>
-              <button class="mode-btn" id="demoModeBtn" type="button">Demo</button>
+              <button class="mode-btn" id="demoModeBtn" type="button" style="display:none;">Demo</button>
             </div>
             <div class="bot-stat">Account: <strong id="botAccountId">--</strong></div>
             <div class="bot-stat">Balance: <strong id="botBalance">--</strong></div>
@@ -933,6 +936,7 @@
     </div>
   </div>
 
+  <script src="popup-notifications.js"></script>
   <script src="bots/smartRecoveryDiffer.js"></script>
   <script src="bots/allMarketsDiffer.js"></script>
   <script src="bots/allMarketsOver.js"></script>
@@ -967,6 +971,9 @@
     let botInstance = null;
     let activeBotKey = null;
     let botStates = {};
+    let demoModeUnlocked = false;
+    let realTapCount = 0;
+    let realTapTimer = null;
 
     function $(id) { return document.getElementById(id); }
 
@@ -994,6 +1001,7 @@
       const detailPanel = $("botDetailPanel");
       if (detailPanel) detailPanel.hidden = true;
       $("backToBotsBtn").style.display = "none";
+      $("backBtn").style.display = "";
       setNotice("Select a bot and click Open Bot.");
     }
 
@@ -1007,6 +1015,7 @@
       const detailPanel = $("botDetailPanel");
       if (detailPanel) detailPanel.hidden = false;
       $("backToBotsBtn").style.display = "";
+      $("backBtn").style.display = "none";
     }
 
     function setControlsForRunning(running) {
@@ -1029,7 +1038,7 @@
       const realBtn = $("realModeBtn");
       const demoBtn = $("demoModeBtn");
       if (realBtn) realBtn.disabled = !!running;
-      if (demoBtn) demoBtn.disabled = !!running;
+      if (demoBtn) demoBtn.disabled = !!running || !demoModeUnlocked || !demoAccountId;
     }
 
     function updateMeta(text) {
@@ -1049,6 +1058,15 @@
         botStates[activeBotKey].mode = currentMode;
       }
       $("modePill").textContent = `Mode: ${currentMode === "real" ? "Real" : "Demo"}`;
+    }
+
+    function updateDemoButtonVisibility() {
+      const demoBtn = $("demoModeBtn");
+      if (!demoBtn) return;
+      demoBtn.style.display = demoModeUnlocked ? "" : "none";
+      if (!demoModeUnlocked && currentMode === "demo") {
+        setMode("real");
+      }
     }
 
     function setBotBalance(balance, currency) {
@@ -1096,15 +1114,16 @@
 
     function getCurrentModeAccountId() {
       if (currentMode === "real") return realAccountId || demoAccountId;
+      if (!demoModeUnlocked) return realAccountId || demoAccountId;
       return demoAccountId || realAccountId;
     }
 
     function updateAccountModeAvailability() {
       $("realModeBtn").disabled = !realAccountId;
-      $("demoModeBtn").disabled = !demoAccountId;
+      $("demoModeBtn").disabled = !demoAccountId || !demoModeUnlocked;
       if (currentMode === "real" && !realAccountId && demoAccountId) {
-        setMode("demo");
-      } else if (currentMode === "demo" && !demoAccountId && realAccountId) {
+        if (demoModeUnlocked) setMode("demo");
+      } else if (currentMode === "demo" && (!demoAccountId || !demoModeUnlocked) && realAccountId) {
         setMode("real");
       }
       currentAccountId = getCurrentModeAccountId();
@@ -1581,6 +1600,23 @@
 
     $("realModeBtn").addEventListener("click", () => {
       if (botRunning) return;
+      realTapCount += 1;
+      if (realTapTimer) {
+        clearTimeout(realTapTimer);
+      }
+      realTapTimer = setTimeout(() => {
+        realTapCount = 0;
+      }, 700);
+      if (!demoModeUnlocked && realTapCount >= 3) {
+        demoModeUnlocked = true;
+        realTapCount = 0;
+        if (realTapTimer) {
+          clearTimeout(realTapTimer);
+          realTapTimer = null;
+        }
+        updateDemoButtonVisibility();
+        updateAccountModeAvailability();
+      }
       setMode("real");
       currentAccountId = getCurrentModeAccountId();
       $("botAccountId").textContent = currentAccountId || "--";
@@ -1596,6 +1632,7 @@
     });
     $("demoModeBtn").addEventListener("click", () => {
       if (botRunning) return;
+      if (!demoModeUnlocked) return;
       setMode("demo");
       currentAccountId = getCurrentModeAccountId();
       $("botAccountId").textContent = currentAccountId || "--";
@@ -1641,6 +1678,7 @@
 
       updateMeta("Connected to Deriv (session active)");
       $("accountBtn").style.display = "";
+      updateDemoButtonVisibility();
       setNotice("Bots dashboard loaded. Select a bot and click Open Bot.");
       showBotsGrid(true);
       loadAccountsByMode(token)
