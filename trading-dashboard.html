@@ -1509,23 +1509,13 @@
             const s = ensureBotState(thisBotKey);
             const m = s?.modes?.[thisMode];
             if (m && m.stats) m.stats.runningTime = runningTime;
-            if (activeBotKey === thisBotKey) $("runningTimeValue").textContent = runningTime || "00:00:00";
+            if (activeBotKey === thisBotKey) renderStatsFor(thisBotKey);
           },
           updateStats: (stats) => {
             const s = ensureBotState(thisBotKey);
             const m = s?.modes?.[thisMode];
             if (m) m.stats = stats || m.stats;
-            if (activeBotKey === thisBotKey && stats) {
-              const currency = stats.currency || currentCurrency || "USD";
-              $("balanceValue").textContent = `${Number(stats.balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency}`;
-              $("totalProfitValue").textContent = formatMoney(stats.totalProfit ?? 0);
-              $("totalTradesValue").textContent = String(stats.totalTrades ?? 0);
-              $("winRateValue").textContent = stats.winRate !== undefined ? `${stats.winRate}%`.replace("%%", "%") : "0%";
-              $("currentStakeValue").textContent = formatMoney(stats.currentStake ?? 0);
-              $("consecutiveLossesValue").textContent = String(stats.consecutiveLosses ?? 0);
-              $("targetValue").textContent = stats.market ? `${stats.market} / ${stats.digit}` : "-";
-              $("runningTimeValue").textContent = stats.runningTime || "00:00:00";
-            }
+            if (activeBotKey === thisBotKey) renderStatsFor(thisBotKey);
           },
           updateBalance: (balance, currency) => {
             currentCurrency = currency || currentCurrency;
