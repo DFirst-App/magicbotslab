@@ -282,20 +282,20 @@
         <div class="value small" id="platform">--</div>
       </div>
       <div class="card">
-        <h3>Country</h3>
-        <div class="value small" id="country">--</div>
+        <h3>MT5 Access</h3>
+        <div class="value small" id="mt5Access">--</div>
       </div>
       <div class="card">
-        <h3>Leverage</h3>
-        <div class="value small" id="leverage">--</div>
+        <h3>MT5 Login</h3>
+        <div class="value small" id="mt5Login">--</div>
       </div>
       <div class="card">
         <h3>Account Status</h3>
         <div class="value small" id="accountStatus">--</div>
       </div>
       <div class="card">
-        <h3>Account Created</h3>
-        <div class="value small" id="accountCreated">--</div>
+        <h3>MT5 Server</h3>
+        <div class="value small" id="mt5Server">--</div>
       </div>
     </div>
 
@@ -376,6 +376,23 @@
       for (const acc of (accounts || [])) {
         const value = resolveValue(acc, keys, "");
         if (String(value).trim()) return value;
+      }
+      return fallback;
+    }
+
+    function resolveMt5Value(account, accounts, keys, fallback = "Not linked") {
+      const fromAccount = resolveValue(account, keys, "");
+      if (String(fromAccount).trim()) return fromAccount;
+      const fromAll = resolveFromAccounts(accounts, keys, "");
+      if (String(fromAll).trim()) return fromAll;
+
+      const nested = account?.mt5 || account?.mt5_account || account?.meta?.mt5 || null;
+      if (nested && typeof nested === "object") {
+        for (const key of keys) {
+          if (nested[key] !== undefined && nested[key] !== null && String(nested[key]).trim()) {
+            return nested[key];
+          }
+        }
       }
       return fallback;
     }
@@ -514,17 +531,6 @@
       return fallback;
     }
 
-    function formatDate(value) {
-      if (!value || value === "--") return "Not provided by Deriv";
-      const numeric = Number(value);
-      const millis = Number.isFinite(numeric) && numeric > 0
-        ? (numeric < 10_000_000_000 ? numeric * 1000 : numeric)
-        : NaN;
-      const date = Number.isFinite(millis) ? new Date(millis) : new Date(value);
-      if (Number.isNaN(date.getTime())) return normalizeDisplayValue(value, "Not provided by Deriv");
-      return date.toLocaleString();
-    }
-
     async function loadDashboard() {
       const token = await getValidAccessToken();
       if (!token) {
@@ -555,11 +561,10 @@
         const accountType = accountDisplayType(account);
         const accountCategory = isRealAccount(account) ? "Real" : "Demo";
         const platform = resolveValue(account, ["platform", "account_type", "type"], resolveFromAccounts(accounts, ["platform", "account_type", "type"], "Deriv Options"));
-        const country = resolveValue(account, ["country", "residence", "country_code"], resolveFromAccounts(accounts, ["country", "residence", "country_code"], "Not provided by Deriv"));
-        const leverageRaw = resolveValue(account, ["leverage", "max_leverage"], resolveFromAccounts(accounts, ["leverage", "max_leverage"], ""));
-        const leverage = String(leverageRaw).trim() ? leverageRaw : "Not provided for this account type";
+        const mt5Login = resolveMt5Value(account, accounts, ["mt5_login", "mt5_loginid", "login_mt5", "login"]);
+        const mt5Server = resolveMt5Value(account, accounts, ["mt5_server", "server", "mt5_server_name"]);
+        const mt5Access = String(mt5Login).trim() && String(mt5Login).trim().toLowerCase() !== "not linked" ? "Linked" : "Not linked";
         const accountStatus = resolveValue(account, ["status", "account_status", "state"], resolveFromAccounts(accounts, ["status", "account_status", "state"], "Active"));
-        const accountCreated = formatDate(resolveValue(account, ["created_at", "created", "created_time"], resolveFromAccounts(accounts, ["created_at", "created", "created_time"], "")));
         const balanceRaw = resolveValue(account, ["balance", "amount"], null);
         const balance = balanceRaw === null || balanceRaw === undefined || Number.isNaN(Number(balanceRaw))
           ? "Not available"
@@ -571,10 +576,10 @@
         setField("accountType", accountType);
         setField("accountCategory", accountCategory);
         setField("platform", platform);
-        setField("country", country);
-        setField("leverage", leverage);
+        setField("mt5Access", mt5Access);
+        setField("mt5Login", mt5Login);
         setField("accountStatus", accountStatus);
-        setField("accountCreated", accountCreated);
+        setField("mt5Server", mt5Server);
         setField("balance", balance);
         setStatus(isRealAccount(account)
           ? "Real account connected. Initial details loaded."
