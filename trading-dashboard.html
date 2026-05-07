@@ -231,6 +231,24 @@
 
     <div class="grid" id="botsGrid" style="display:none;">
       <div class="card">
+        <div class="card-title">Account & Mode</div>
+        <div class="pill-row">
+          <span class="pill live" id="connectionPill">Live</span>
+          <span class="pill" id="modePill">Mode: Real</span>
+        </div>
+        <div class="mode-toggle" aria-label="Account mode">
+          <button class="mode-btn active" id="realModeBtn" type="button">Real</button>
+          <button class="mode-btn" id="demoModeBtn" type="button">Demo</button>
+        </div>
+        <div class="bot-stat">Mode: <strong id="botMode">Real</strong></div>
+        <div class="bot-stat">Account: <strong id="botAccountId">--</strong></div>
+        <div class="bot-stat">Connection: <strong id="botConnection">Idle</strong></div>
+        <div class="bot-stat">Balance: <strong id="botBalance">--</strong></div>
+        <div class="bot-stat">Target: <strong id="botTarget">--</strong></div>
+        <div class="bot-stat">Last contract: <strong id="botLastContract">--</strong></div>
+      </div>
+
+      <div class="card">
         <div class="card-title">Smart Recovery Differ (R_10)</div>
         <div class="pill-row">
           <span class="pill live">Live</span>
@@ -238,17 +256,7 @@
           <span class="pill">Digit</span>
           <span class="pill">Stake $1</span>
         </div>
-        <div class="mode-toggle" aria-label="Account mode">
-          <button class="mode-btn active" id="realModeBtn" type="button">Real</button>
-          <button class="mode-btn" id="demoModeBtn" type="button">Demo</button>
-        </div>
         <div class="card-desc">Runs smart recovery digit differ on Volatility 10 only. Normal mode uses <strong>DIGITDIFF</strong>; on loss it enters recovery using <strong>DIGITOVER</strong>/<strong>DIGITUNDER</strong> with martingale.</div>
-        <div class="bot-stat">Mode: <strong id="botMode">Real</strong></div>
-        <div class="bot-stat">Account: <strong id="botAccountId">--</strong></div>
-        <div class="bot-stat">Connection: <strong id="botConnection">Idle</strong></div>
-        <div class="bot-stat">Balance: <strong id="botBalance">--</strong></div>
-        <div class="bot-stat">Target: <strong id="botTarget">--</strong></div>
-        <div class="bot-stat">Last contract: <strong id="botLastContract">--</strong></div>
         <div class="actions">
           <button class="btn primary bot-start" type="button" data-bot-key="smartRecoveryDiffer">Start Smart Recovery Differ</button>
           <button class="btn bot-stop" type="button" data-bot-key="smartRecoveryDiffer" disabled>Stop</button>
@@ -647,6 +655,8 @@
           setRunningState: (running) => {
             botRunning = !!running;
             setControlsForRunning(botRunning);
+            if ($("realModeBtn")) $("realModeBtn").disabled = botRunning || !realAccountId;
+            if ($("demoModeBtn")) $("demoModeBtn").disabled = botRunning || !demoAccountId;
           },
           resetHistory: () => {
             const log = $("tradeLog");
@@ -665,6 +675,9 @@
             const p = Number(profit ?? 0);
             const s = Number(stake ?? 0);
             const result = win ? "WIN" : "LOSS";
+            if ($("botLastContract")) {
+              $("botLastContract").textContent = `${result} | ${market || "--"} | Digit ${digit ?? "-"}`;
+            }
             logTrade(
               `${result} | ${market || "--"} | Digit ${digit ?? "-"} | Stake $${s.toFixed(2)} | Profit ${p.toFixed(2)} ${currentCurrency || "USD"}`,
               win ? "win" : "loss"
