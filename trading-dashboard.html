@@ -279,6 +279,7 @@
     }
 
     .bot-detail-panel[hidden] { display: none; }
+    .bot-detail-card { grid-column: 1 / -1; }
 
     .bot-config,
     .bot-stats {
@@ -523,6 +524,29 @@
       color: rgba(254, 202, 202, 0.95);
     }
 
+    .bot-panel-content {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .bot-panel-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .bot-panel-grid {
+      display: grid;
+      gap: 20px;
+      width: 100%;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .bot-column { min-width: 0; }
+    .bot-history-column { display: flex; flex-direction: column; }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -572,47 +596,6 @@
       line-height: 1.35;
     }
 
-    .config-input {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      padding: 10px 12px;
-      border: 1px solid rgba(148, 163, 184, 0.22);
-      border-radius: 12px;
-      background: rgba(148, 163, 184, 0.06);
-    }
-
-    .config-input label {
-      font-size: 12px;
-      font-weight: 800;
-      color: rgba(226, 232, 240, 0.95);
-    }
-
-    .config-input input {
-      padding: 8px 10px;
-      font-size: 13px;
-      border-radius: 10px;
-      border: 1px solid rgba(55, 65, 81, 1);
-      background: rgba(15, 23, 42, 0.35);
-      color: #f8fafc;
-      outline: none;
-    }
-
-    .config-input input:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .actions {
-      margin-top: auto;
-      display: flex;
-      gap: 8px;
-    }
-
-    .actions .btn {
-      flex: 1;
-    }
-
     .bot-stat {
       font-size: 12px;
       color: var(--muted);
@@ -645,37 +628,9 @@
       color: #ffffff;
     }
 
-    .trade-log {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      max-height: 300px;
-      overflow: auto;
-    }
-
-    .trade-item {
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      background: rgba(15, 23, 42, 0.45);
-      border-radius: 10px;
-      padding: 8px 10px;
-      font-size: 12px;
-      color: #cbd5e1;
-      line-height: 1.35;
-    }
-
-    .trade-item.win {
-      border-color: rgba(34, 197, 94, 0.45);
-    }
-
-    .trade-item.loss {
-      border-color: rgba(239, 68, 68, 0.45);
-    }
-
     @media (max-width: 900px) {
       .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .bot-panel-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 620px) {
       .grid { grid-template-columns: 1fr; }
@@ -744,7 +699,7 @@
             </div>
           </div>
 
-          <div class="bot-panel-grid" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
+          <div class="bot-panel-grid">
             <div class="bot-column">
               <div class="bot-config" id="botConfig">
                 <h4>Configuration</h4>
