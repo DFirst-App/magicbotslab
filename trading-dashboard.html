@@ -145,6 +145,44 @@
       flex: 1;
     }
 
+    .bot-stat {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .bot-stat strong {
+      color: #e2e8f0;
+    }
+
+    .trade-log {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 300px;
+      overflow: auto;
+    }
+
+    .trade-item {
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      background: rgba(15, 23, 42, 0.45);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 12px;
+      color: #cbd5e1;
+      line-height: 1.35;
+    }
+
+    .trade-item.win {
+      border-color: rgba(34, 197, 94, 0.45);
+    }
+
+    .trade-item.loss {
+      border-color: rgba(239, 68, 68, 0.45);
+    }
+
     @media (max-width: 900px) {
       .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
@@ -170,52 +208,61 @@
 
     <div class="grid" id="botsGrid" style="display:none;">
       <div class="card">
-        <div class="card-title">Smart Recovery Differ</div>
+        <div class="card-title">Test Bot: Digit Differ (R_10)</div>
         <div class="pill-row">
           <span class="pill live">Live</span>
-          <span class="pill">Volatility</span>
+          <span class="pill">R_10</span>
           <span class="pill">Digit</span>
+          <span class="pill">Stake $1</span>
         </div>
-        <div class="card-desc">Auto-executes digit strategies with recovery logic and risk controls.</div>
+        <div class="card-desc">Runs real trades using your OAuth connection: DIGITDIFF on Volatility 10 only, with fixed initial stake of USD 1.</div>
+        <div class="bot-stat">Connection: <strong id="botConnection">Idle</strong></div>
+        <div class="bot-stat">Balance: <strong id="botBalance">--</strong></div>
+        <div class="bot-stat">Last contract: <strong id="botLastContract">--</strong></div>
         <div class="actions">
-          <button class="btn primary" type="button" disabled>Open</button>
-          <button class="btn" type="button" disabled>Settings</button>
+          <button class="btn primary" type="button" id="startBotBtn">Start Test Bot</button>
+          <button class="btn" type="button" id="stopBotBtn" disabled>Stop</button>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-title">Magic Random Strategy</div>
-        <div class="pill-row">
-          <span class="pill live">Live</span>
-          <span class="pill">Volatility</span>
-          <span class="pill">Randomized</span>
-        </div>
-        <div class="card-desc">Rotates symbols and strategies to spread risk and capture opportunities.</div>
-        <div class="actions">
-          <button class="btn primary" type="button" disabled>Open</button>
-          <button class="btn" type="button" disabled>Settings</button>
-        </div>
+        <div class="card-title">Recent Trades</div>
+        <div class="card-desc">Latest trades appear one by one as the bot executes.</div>
+        <ul class="trade-log" id="tradeLog">
+          <li class="trade-item">No trades yet. Start the bot to begin.</li>
+        </ul>
       </div>
 
       <div class="card">
-        <div class="card-title">Smart Volatility</div>
+        <div class="card-title">Bot Configuration</div>
         <div class="pill-row">
-          <span class="pill live">Live</span>
-          <span class="pill">Calls/Puts</span>
-          <span class="pill">Signals</span>
+          <span class="pill">Contract: DIGITDIFF</span>
+          <span class="pill">Symbol: R_10</span>
+          <span class="pill">Duration: 1 tick</span>
+          <span class="pill">Basis: Stake</span>
+          <span class="pill">Currency: USD</span>
+          <span class="pill">Stake: 1.00</span>
         </div>
-        <div class="card-desc">Signal-driven call/put bot with live monitoring and performance stats.</div>
-        <div class="actions">
-          <button class="btn primary" type="button" disabled>Open</button>
-          <button class="btn" type="button" disabled>Settings</button>
-        </div>
+        <div class="card-desc">Barrier digit is randomized each trade (0-9). This is a test bot implementation for live execution flow validation.</div>
       </div>
     </div>
   </div>
 
   <script>
+    const DERIV_OAUTH_CLIENT_ID = "338udJBKn1EbT7Tc29Snv";
     const DERIV_ACCESS_TOKEN_KEY = "deriv_access_token";
-    const DERIV_OAUTH_SESSION_KEY = "deriv_oauth_session";
+    const ACCOUNTS_ENDPOINT = "https://api.derivws.com/trading/v1/options/accounts";
+    const OTP_ENDPOINT_BASE = "https://api.derivws.com/trading/v1/options/accounts";
+    const STAKE_USD = 1;
+    const SYMBOL = "R_10";
+
+    let ws = null;
+    let botRunning = false;
+    let currentProposalId = null;
+    let currentBarrier = null;
+    let currentContractId = null;
+    let currentBuyPrice = STAKE_USD;
+    let currentAccountId = null;
 
     function $(id) { return document.getElementById(id); }
 
@@ -237,6 +284,197 @@
       $("connectionMeta").textContent = text;
     }
 
+    function setBotConnection(text) {
+      $("botConnection").textContent = text;
+    }
+
+    function setBotBalance(balance, currency) {
+      if (balance === undefined || balance === null || Number.isNaN(Number(balance))) return;
+      $("botBalance").textContent = `${Number(balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency || "USD"}`;
+    }
+
+    function logTrade(message, type = "") {
+      const log = $("tradeLog");
+      if (!log) return;
+      if (log.children.length === 1 && log.children[0].textContent.includes("No trades yet")) {
+        log.innerHTML = "";
+      }
+      const item = document.createElement("li");
+      item.className = `trade-item ${type}`.trim();
+      item.textContent = `${new Date().toLocaleTimeString()} - ${message}`;
+      log.prepend(item);
+      while (log.children.length > 25) {
+        log.removeChild(log.lastChild);
+      }
+    }
+
+    async function getPreferredAccountId(token) {
+      const response = await fetch(ACCOUNTS_ENDPOINT, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Deriv-App-ID": DERIV_OAUTH_CLIENT_ID
+        }
+      });
+      if (!response.ok) throw new Error(`Accounts fetch failed (${response.status})`);
+      const payload = await response.json();
+      const accounts = Array.isArray(payload.accounts)
+        ? payload.accounts
+        : (Array.isArray(payload.data) ? payload.data : []);
+      if (!accounts.length) throw new Error("No Deriv accounts returned");
+      const real = accounts.find((a) => {
+        const t = String(a?.account_type || a?.type || "").toLowerCase();
+        const id = String(a?.account_id || a?.loginid || "");
+        return t.includes("real") || id.startsWith("CR");
+      });
+      const chosen = real || accounts[0];
+      return chosen.account_id || chosen.loginid || chosen.id;
+    }
+
+    async function getOtpWsUrl(token, accountId) {
+      const response = await fetch(`${OTP_ENDPOINT_BASE}/${accountId}/otp`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Deriv-App-ID": DERIV_OAUTH_CLIENT_ID
+        }
+      });
+      if (!response.ok) throw new Error(`OTP fetch failed (${response.status})`);
+      const payload = await response.json();
+      return payload?.data?.url || payload?.url;
+    }
+
+    function requestProposal() {
+      if (!ws || ws.readyState !== WebSocket.OPEN || !botRunning) return;
+      currentBarrier = Math.floor(Math.random() * 10).toString();
+      ws.send(JSON.stringify({
+        proposal: 1,
+        amount: STAKE_USD,
+        basis: "stake",
+        contract_type: "DIGITDIFF",
+        currency: "USD",
+        duration: 1,
+        duration_unit: "t",
+        symbol: SYMBOL,
+        barrier: currentBarrier,
+        req_id: Date.now()
+      }));
+      setBotConnection(`Proposal requested (barrier ${currentBarrier})`);
+    }
+
+    function handleWsMessage(raw) {
+      let msg;
+      try { msg = JSON.parse(raw); } catch { return; }
+      if (msg.error) {
+        logTrade(`Error: ${msg.error.message || "Unknown error"}`, "loss");
+        setBotConnection("Error");
+        return;
+      }
+
+      if (msg.msg_type === "balance" && msg.balance) {
+        setBotBalance(msg.balance.balance, msg.balance.currency);
+      }
+
+      if (!botRunning) return;
+
+      if (msg.msg_type === "proposal" && msg.proposal?.id) {
+        currentProposalId = msg.proposal.id;
+        currentBuyPrice = Number(msg.proposal.ask_price || STAKE_USD);
+        ws.send(JSON.stringify({
+          buy: currentProposalId,
+          price: currentBuyPrice,
+          req_id: Date.now()
+        }));
+        setBotConnection("Buying contract...");
+        return;
+      }
+
+      if (msg.msg_type === "buy" && msg.buy?.contract_id) {
+        currentContractId = msg.buy.contract_id;
+        $("botLastContract").textContent = String(currentContractId);
+        ws.send(JSON.stringify({
+          proposal_open_contract: 1,
+          contract_id: currentContractId,
+          subscribe: 1,
+          req_id: Date.now()
+        }));
+        setBotConnection("Contract opened");
+        return;
+      }
+
+      if (msg.msg_type === "proposal_open_contract" && msg.proposal_open_contract) {
+        const poc = msg.proposal_open_contract;
+        if (poc.is_sold) {
+          const profit = Number(poc.profit || 0);
+          const result = profit >= 0 ? "WIN" : "LOSS";
+          logTrade(
+            `${result} | Symbol ${SYMBOL} | DIGITDIFF != ${currentBarrier} | Stake $${STAKE_USD.toFixed(2)} | Profit ${profit.toFixed(2)} ${poc.currency || "USD"}`,
+            profit >= 0 ? "win" : "loss"
+          );
+          setBotConnection("Trade completed, next trade...");
+          currentContractId = null;
+          setTimeout(() => {
+            if (botRunning) requestProposal();
+          }, 1200);
+        }
+      }
+    }
+
+    function stopBot() {
+      botRunning = false;
+      $("startBotBtn").disabled = false;
+      $("stopBotBtn").disabled = true;
+      setBotConnection("Stopped");
+      if (ws) {
+        try { ws.close(); } catch (_) {}
+        ws = null;
+      }
+    }
+
+    async function startBot() {
+      const token = getToken();
+      if (!token) {
+        setNotice("Missing access token. Reconnect your Deriv account.", true);
+        return;
+      }
+
+      $("startBotBtn").disabled = true;
+      $("stopBotBtn").disabled = false;
+      setBotConnection("Initializing...");
+
+      try {
+        currentAccountId = await getPreferredAccountId(token);
+        const wsUrl = await getOtpWsUrl(token, currentAccountId);
+        if (!wsUrl) throw new Error("Missing authenticated WebSocket URL");
+
+        ws = new WebSocket(wsUrl);
+        botRunning = true;
+
+        ws.onopen = () => {
+          setBotConnection("Connected");
+          logTrade(`Connected to account ${currentAccountId}. Starting test bot.`);
+          ws.send(JSON.stringify({ balance: 1, subscribe: 1, req_id: Date.now() }));
+          requestProposal();
+        };
+
+        ws.onmessage = (event) => handleWsMessage(event.data);
+
+        ws.onerror = () => {
+          setBotConnection("WebSocket error");
+        };
+
+        ws.onclose = () => {
+          if (botRunning) {
+            setBotConnection("Disconnected");
+            logTrade("Socket disconnected. Bot stopped.", "loss");
+            stopBot();
+          }
+        };
+      } catch (error) {
+        stopBot();
+        setNotice(`Failed to start test bot: ${error.message}`, true);
+      }
+    }
+
     $("backBtn").addEventListener("click", () => {
       window.location.href = "dashboard.html";
     });
@@ -244,6 +482,9 @@
     $("connectBtn").addEventListener("click", () => {
       window.location.href = "index.html";
     });
+
+    $("startBotBtn").addEventListener("click", startBot);
+    $("stopBotBtn").addEventListener("click", stopBot);
 
     (function init() {
       const token = getToken();
