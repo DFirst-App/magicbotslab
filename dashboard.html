@@ -249,7 +249,7 @@
 
     <section class="overview">
       <div class="overview-main">
-        <div class="eyebrow">Account Holder</div>
+        <div class="eyebrow">Account Holder ID</div>
         <h2 class="name" id="fullName">Loading...</h2>
         <div class="account-type" id="accountType">--</div>
       </div>
@@ -322,11 +322,20 @@
       $("statusText").textContent = message || "";
     }
 
+    function normalizeDisplayValue(value, fallback = "Not available") {
+      if (value === undefined || value === null) return fallback;
+      const text = String(value).trim();
+      if (!text || text === "--" || text.toLowerCase() === "null" || text.toLowerCase() === "undefined") {
+        return fallback;
+      }
+      return text;
+    }
+
     function setField(id, value) {
       const el = $(id);
-      if (el) el.textContent = value ?? "--";
+      if (el) el.textContent = normalizeDisplayValue(value);
       if (id === "connectionState") {
-        setField("connectionStateMirror", value ?? "--");
+        setField("connectionStateMirror", value);
       }
     }
 
@@ -363,21 +372,12 @@
       return real || accounts[0];
     }
 
-    function deriveDisplayName(accounts, preferredAccount) {
-      const fromPreferred = resolveValue(preferredAccount, ["full_name", "fullname", "name", "owner_name", "display_name"], "");
-      if (String(fromPreferred).trim()) return String(fromPreferred).trim();
-
-      const withName = (accounts || []).find((acc) => {
-        const n = resolveValue(acc, ["full_name", "fullname", "name", "owner_name", "display_name"], "");
-        return String(n).trim().length > 0;
-      });
-      if (withName) {
-        return String(resolveValue(withName, ["full_name", "fullname", "name", "owner_name", "display_name"], "Connected User")).trim();
+    function resolveFromAccounts(accounts, keys, fallback = "Not available") {
+      for (const acc of (accounts || [])) {
+        const value = resolveValue(acc, keys, "");
+        if (String(value).trim()) return value;
       }
-
-      const loginId = resolveValue(preferredAccount, ["account_id", "loginid", "id"], "");
-      if (String(loginId).trim()) return `Connected User (${loginId})`;
-      return "Connected User";
+      return fallback;
     }
 
     function accountDisplayType(account) {
@@ -515,13 +515,13 @@
     }
 
     function formatDate(value) {
-      if (!value || value === "--") return "--";
+      if (!value || value === "--") return "Not provided by Deriv";
       const numeric = Number(value);
       const millis = Number.isFinite(numeric) && numeric > 0
         ? (numeric < 10_000_000_000 ? numeric * 1000 : numeric)
         : NaN;
       const date = Number.isFinite(millis) ? new Date(millis) : new Date(value);
-      if (Number.isNaN(date.getTime())) return String(value);
+      if (Number.isNaN(date.getTime())) return normalizeDisplayValue(value, "Not provided by Deriv");
       return date.toLocaleString();
     }
 
@@ -549,19 +549,20 @@
         const account = choosePreferredAccount(accounts) || {};
         selectedRealAccountId = resolveValue(account, ["account_id", "loginid", "id"], null);
 
-        const fullName = deriveDisplayName(accounts, account);
-        const accountId = resolveValue(account, ["account_id", "loginid", "id"]);
-        const currency = resolveValue(account, ["currency"]);
+        const accountId = resolveValue(account, ["account_id", "loginid", "id"], "");
+        const fullName = normalizeDisplayValue(accountId, "Connected Account");
+        const currency = resolveValue(account, ["currency"], resolveFromAccounts(accounts, ["currency"], "Not available"));
         const accountType = accountDisplayType(account);
         const accountCategory = isRealAccount(account) ? "Real" : "Demo";
-        const platform = resolveValue(account, ["platform", "account_type", "type"], "--");
-        const country = resolveValue(account, ["country", "residence", "country_code"], "--");
-        const leverage = resolveValue(account, ["leverage", "max_leverage"], "--");
-        const accountStatus = resolveValue(account, ["status", "account_status", "state"], "--");
-        const accountCreated = formatDate(resolveValue(account, ["created_at", "created", "created_time"], "--"));
+        const platform = resolveValue(account, ["platform", "account_type", "type"], resolveFromAccounts(accounts, ["platform", "account_type", "type"], "Deriv Options"));
+        const country = resolveValue(account, ["country", "residence", "country_code"], resolveFromAccounts(accounts, ["country", "residence", "country_code"], "Not provided by Deriv"));
+        const leverageRaw = resolveValue(account, ["leverage", "max_leverage"], resolveFromAccounts(accounts, ["leverage", "max_leverage"], ""));
+        const leverage = String(leverageRaw).trim() ? leverageRaw : "Not provided for this account type";
+        const accountStatus = resolveValue(account, ["status", "account_status", "state"], resolveFromAccounts(accounts, ["status", "account_status", "state"], "Active"));
+        const accountCreated = formatDate(resolveValue(account, ["created_at", "created", "created_time"], resolveFromAccounts(accounts, ["created_at", "created", "created_time"], "")));
         const balanceRaw = resolveValue(account, ["balance", "amount"], null);
-        const balance = balanceRaw === null
-          ? "--"
+        const balance = balanceRaw === null || balanceRaw === undefined || Number.isNaN(Number(balanceRaw))
+          ? "Not available"
           : `${Number(balanceRaw).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency !== "--" ? currency : ""}`.trim();
 
         setField("fullName", fullName);
