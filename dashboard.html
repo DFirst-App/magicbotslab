@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MagicBotsLab Dashboard</title>
+  <title>Magic Bots Lab Dashboard</title>
   <style>
     :root {
       --bg: #060b18;
@@ -238,8 +238,8 @@
   <div class="wrap">
     <div class="topbar">
       <div>
-        <h1 class="brand-title">MagicBotsLab Dashboard</h1>
-        <div class="brand-sub">Connected account overview</div>
+        <h1 class="brand-title">Magic Bots Lab Dashboard</h1>
+        <div class="brand-sub">Connected account profile</div>
       </div>
       <div class="topbar-actions">
         <button class="primary-btn" id="tradingBotsBtn" type="button">Trading Bots</button>
@@ -272,6 +272,30 @@
       <div class="card">
         <h3>Connection Quality</h3>
         <div class="value small ok" id="connectionStateMirror">Live</div>
+      </div>
+      <div class="card">
+        <h3>Account Category</h3>
+        <div class="value small" id="accountCategory">--</div>
+      </div>
+      <div class="card">
+        <h3>Platform</h3>
+        <div class="value small" id="platform">--</div>
+      </div>
+      <div class="card">
+        <h3>Country</h3>
+        <div class="value small" id="country">--</div>
+      </div>
+      <div class="card">
+        <h3>Leverage</h3>
+        <div class="value small" id="leverage">--</div>
+      </div>
+      <div class="card">
+        <h3>Account Status</h3>
+        <div class="value small" id="accountStatus">--</div>
+      </div>
+      <div class="card">
+        <h3>Account Created</h3>
+        <div class="value small" id="accountCreated">--</div>
       </div>
     </div>
 
@@ -337,6 +361,23 @@
       if (!accounts.length) return null;
       const real = accounts.find(isRealAccount);
       return real || accounts[0];
+    }
+
+    function deriveDisplayName(accounts, preferredAccount) {
+      const fromPreferred = resolveValue(preferredAccount, ["full_name", "fullname", "name", "owner_name", "display_name"], "");
+      if (String(fromPreferred).trim()) return String(fromPreferred).trim();
+
+      const withName = (accounts || []).find((acc) => {
+        const n = resolveValue(acc, ["full_name", "fullname", "name", "owner_name", "display_name"], "");
+        return String(n).trim().length > 0;
+      });
+      if (withName) {
+        return String(resolveValue(withName, ["full_name", "fullname", "name", "owner_name", "display_name"], "Connected User")).trim();
+      }
+
+      const loginId = resolveValue(preferredAccount, ["account_id", "loginid", "id"], "");
+      if (String(loginId).trim()) return `Connected User (${loginId})`;
+      return "Connected User";
     }
 
     function accountDisplayType(account) {
@@ -473,6 +514,17 @@
       return fallback;
     }
 
+    function formatDate(value) {
+      if (!value || value === "--") return "--";
+      const numeric = Number(value);
+      const millis = Number.isFinite(numeric) && numeric > 0
+        ? (numeric < 10_000_000_000 ? numeric * 1000 : numeric)
+        : NaN;
+      const date = Number.isFinite(millis) ? new Date(millis) : new Date(value);
+      if (Number.isNaN(date.getTime())) return String(value);
+      return date.toLocaleString();
+    }
+
     async function loadDashboard() {
       const token = await getValidAccessToken();
       if (!token) {
@@ -497,10 +549,16 @@
         const account = choosePreferredAccount(accounts) || {};
         selectedRealAccountId = resolveValue(account, ["account_id", "loginid", "id"], null);
 
-        const fullName = resolveValue(account, ["full_name", "fullname", "name", "owner_name", "display_name"], "--");
+        const fullName = deriveDisplayName(accounts, account);
         const accountId = resolveValue(account, ["account_id", "loginid", "id"]);
         const currency = resolveValue(account, ["currency"]);
         const accountType = accountDisplayType(account);
+        const accountCategory = isRealAccount(account) ? "Real" : "Demo";
+        const platform = resolveValue(account, ["platform", "account_type", "type"], "--");
+        const country = resolveValue(account, ["country", "residence", "country_code"], "--");
+        const leverage = resolveValue(account, ["leverage", "max_leverage"], "--");
+        const accountStatus = resolveValue(account, ["status", "account_status", "state"], "--");
+        const accountCreated = formatDate(resolveValue(account, ["created_at", "created", "created_time"], "--"));
         const balanceRaw = resolveValue(account, ["balance", "amount"], null);
         const balance = balanceRaw === null
           ? "--"
@@ -510,6 +568,12 @@
         setField("accountId", accountId);
         setField("currency", currency);
         setField("accountType", accountType);
+        setField("accountCategory", accountCategory);
+        setField("platform", platform);
+        setField("country", country);
+        setField("leverage", leverage);
+        setField("accountStatus", accountStatus);
+        setField("accountCreated", accountCreated);
         setField("balance", balance);
         setStatus(isRealAccount(account)
           ? "Real account connected. Initial details loaded."
