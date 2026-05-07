@@ -154,6 +154,29 @@
       color: #e2e8f0;
     }
 
+    .mode-toggle {
+      display: inline-flex;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 2px;
+    }
+
+    .mode-btn {
+      border: 0;
+      background: transparent;
+      color: #cbd5e1;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px 10px;
+      cursor: pointer;
+    }
+
+    .mode-btn.active {
+      background: rgba(37, 99, 235, 0.25);
+      color: #ffffff;
+    }
+
     .trade-log {
       list-style: none;
       margin: 0;
@@ -215,7 +238,13 @@
           <span class="pill">Digit</span>
           <span class="pill">Stake $1</span>
         </div>
+        <div class="mode-toggle" aria-label="Account mode">
+          <button class="mode-btn active" id="realModeBtn" type="button">Real</button>
+          <button class="mode-btn" id="demoModeBtn" type="button">Demo</button>
+        </div>
         <div class="card-desc">Runs real trades using your OAuth connection: DIGITDIFF on Volatility 10 only, with fixed initial stake of USD 1.</div>
+        <div class="bot-stat">Mode: <strong id="botMode">Real</strong></div>
+        <div class="bot-stat">Account: <strong id="botAccountId">--</strong></div>
         <div class="bot-stat">Connection: <strong id="botConnection">Idle</strong></div>
         <div class="bot-stat">Balance: <strong id="botBalance">--</strong></div>
         <div class="bot-stat">Last contract: <strong id="botLastContract">--</strong></div>
@@ -263,6 +292,10 @@
     let currentContractId = null;
     let currentBuyPrice = STAKE_USD;
     let currentAccountId = null;
+    let currentMode = "real";
+    let realAccountId = null;
+    let demoAccountId = null;
+    let currentCurrency = "USD";
 
     function $(id) { return document.getElementById(id); }
 
@@ -288,6 +321,13 @@
       $("botConnection").textContent = text;
     }
 
+    function setMode(mode) {
+      currentMode = mode === "demo" ? "demo" : "real";
+      $("botMode").textContent = currentMode === "real" ? "Real" : "Demo";
+      $("realModeBtn").classList.toggle("active", currentMode === "real");
+      $("demoModeBtn").classList.toggle("active", currentMode === "demo");
+    }
+
     function setBotBalance(balance, currency) {
       if (balance === undefined || balance === null || Number.isNaN(Number(balance))) return;
       $("botBalance").textContent = `${Number(balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency || "USD"}`;
@@ -308,7 +348,7 @@
       }
     }
 
-    async function getPreferredAccountId(token) {
+    async function loadAccountsByMode(token) {
       const response = await fetch(ACCOUNTS_ENDPOINT, {
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -326,8 +366,35 @@
         const id = String(a?.account_id || a?.loginid || "");
         return t.includes("real") || id.startsWith("CR");
       });
-      const chosen = real || accounts[0];
-      return chosen.account_id || chosen.loginid || chosen.id;
+      const demo = accounts.find((a) => {
+        const t = String(a?.account_type || a?.type || "").toLowerCase();
+        const id = String(a?.account_id || a?.loginid || "");
+        return t.includes("demo") || t.includes("virtual") || id.startsWith("VRTC");
+      });
+
+      realAccountId = real ? (real.account_id || real.loginid || real.id) : null;
+      demoAccountId = demo ? (demo.account_id || demo.loginid || demo.id) : null;
+
+      // Use currency hint from selected-mode account if available
+      const selected = currentMode === "real" ? (real || accounts[0]) : (demo || accounts[0]);
+      currentCurrency = selected?.currency || "USD";
+    }
+
+    function getCurrentModeAccountId() {
+      if (currentMode === "real") return realAccountId || demoAccountId;
+      return demoAccountId || realAccountId;
+    }
+
+    function updateAccountModeAvailability() {
+      $("realModeBtn").disabled = !realAccountId;
+      $("demoModeBtn").disabled = !demoAccountId;
+      if (currentMode === "real" && !realAccountId && demoAccountId) {
+        setMode("demo");
+      } else if (currentMode === "demo" && !demoAccountId && realAccountId) {
+        setMode("real");
+      }
+      currentAccountId = getCurrentModeAccountId();
+      $("botAccountId").textContent = currentAccountId || "--";
     }
 
     async function getOtpWsUrl(token, accountId) {
@@ -341,6 +408,51 @@
       if (!response.ok) throw new Error(`OTP fetch failed (${response.status})`);
       const payload = await response.json();
       return payload?.data?.url || payload?.url;
+    }
+
+    async function fetchModeBalancePreview(token, accountId) {
+      if (!accountId) return;
+      const wsUrl = await getOtpWsUrl(token, accountId);
+      if (!wsUrl) return;
+
+      await new Promise((resolve) => {
+        let done = false;
+        const tempWs = new WebSocket(wsUrl);
+        const finish = () => {
+          if (done) return;
+          done = true;
+          try { tempWs.close(); } catch (_) {}
+          resolve();
+        };
+
+        const timer = setTimeout(finish, 4500);
+
+        tempWs.onopen = () => {
+          tempWs.send(JSON.stringify({ balance: 1, req_id: Date.now() }));
+        };
+        tempWs.onmessage = (event) => {
+          try {
+            const msg = JSON.parse(event.data);
+            if (msg.msg_type === "balance" && msg.balance) {
+              setBotBalance(msg.balance.balance, msg.balance.currency);
+              currentCurrency = msg.balance.currency || currentCurrency;
+              if (msg.balance.loginid) {
+                $("botAccountId").textContent = msg.balance.loginid;
+              }
+              clearTimeout(timer);
+              finish();
+            }
+          } catch (_) {}
+        };
+        tempWs.onerror = () => {
+          clearTimeout(timer);
+          finish();
+        };
+        tempWs.onclose = () => {
+          clearTimeout(timer);
+          finish();
+        };
+      });
     }
 
     function requestProposal() {
@@ -373,6 +485,10 @@
 
       if (msg.msg_type === "balance" && msg.balance) {
         setBotBalance(msg.balance.balance, msg.balance.currency);
+        currentCurrency = msg.balance.currency || currentCurrency;
+        if (msg.balance.loginid) {
+          $("botAccountId").textContent = msg.balance.loginid;
+        }
       }
 
       if (!botRunning) return;
@@ -443,7 +559,11 @@
       setBotConnection("Initializing...");
 
       try {
-        currentAccountId = await getPreferredAccountId(token);
+        await loadAccountsByMode(token);
+        updateAccountModeAvailability();
+        currentAccountId = getCurrentModeAccountId();
+        if (!currentAccountId) throw new Error(`No ${currentMode} account available for this user`);
+        $("botAccountId").textContent = currentAccountId;
         const wsUrl = await getOtpWsUrl(token, currentAccountId);
         if (!wsUrl) throw new Error("Missing authenticated WebSocket URL");
 
@@ -452,7 +572,7 @@
 
         ws.onopen = () => {
           setBotConnection("Connected");
-          logTrade(`Connected to account ${currentAccountId}. Starting test bot.`);
+          logTrade(`Connected to ${currentMode.toUpperCase()} account ${currentAccountId}. Starting test bot.`);
           ws.send(JSON.stringify({ balance: 1, subscribe: 1, req_id: Date.now() }));
           requestProposal();
         };
@@ -486,6 +606,26 @@
 
     $("startBotBtn").addEventListener("click", startBot);
     $("stopBotBtn").addEventListener("click", stopBot);
+    $("realModeBtn").addEventListener("click", () => {
+      if (botRunning) return;
+      setMode("real");
+      currentAccountId = getCurrentModeAccountId();
+      $("botAccountId").textContent = currentAccountId || "--";
+      const token = getToken();
+      if (token && currentAccountId) {
+        fetchModeBalancePreview(token, currentAccountId).catch(() => {});
+      }
+    });
+    $("demoModeBtn").addEventListener("click", () => {
+      if (botRunning) return;
+      setMode("demo");
+      currentAccountId = getCurrentModeAccountId();
+      $("botAccountId").textContent = currentAccountId || "--";
+      const token = getToken();
+      if (token && currentAccountId) {
+        fetchModeBalancePreview(token, currentAccountId).catch(() => {});
+      }
+    });
 
     (function init() {
       const token = getToken();
@@ -498,8 +638,21 @@
       }
 
       updateMeta("Connected to Deriv (session active)");
-      setNotice("Bots dashboard loaded. (Bot actions will be enabled when bot execution UI is added.)");
+      setNotice("Bots dashboard loaded. Select Real or Demo mode, then start the bot.");
       showBotsGrid(true);
+      loadAccountsByMode(token)
+        .then(() => {
+          updateAccountModeAvailability();
+          setBotConnection("Idle");
+          if (currentAccountId) {
+            fetchModeBalancePreview(token, currentAccountId).catch(() => {
+              $("botBalance").textContent = "--";
+            });
+          }
+        })
+        .catch(() => {
+          setNotice("Connected, but failed to load account mode details.", true);
+        });
     })();
   </script>
 </body>
