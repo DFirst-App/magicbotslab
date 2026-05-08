@@ -79,6 +79,19 @@
       display: inline-block;
     }
 
+    .menu {
+      display: none;
+    }
+
+    .menu a {
+      color: rgba(226, 232, 240, 0.88);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
     .ghost-btn {
       border: 0;
       border-radius: 999px;
@@ -271,6 +284,7 @@
 
     @media (max-width: 920px) {
       .landing { padding: 20px 18px 28px; }
+      .menu { display: none; }
       .hero-copy { margin-top: 60px; }
       .hero-copy h1 { font-size: clamp(32px, 12vw, 48px); }
       .hero-copy p { font-size: 15px; }
