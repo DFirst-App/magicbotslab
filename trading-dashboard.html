@@ -1883,14 +1883,13 @@
     $("stopBotBtn").addEventListener("click", stopBot);
 
     $("realModeBtn").addEventListener("click", () => {
-      if (botRunning) return;
       realTapCount += 1;
       if (realTapTimer) {
         clearTimeout(realTapTimer);
       }
       realTapTimer = setTimeout(() => {
         realTapCount = 0;
-      }, 700);
+      }, 1200);
       if (!demoModeUnlocked && realTapCount >= 3) {
         demoModeUnlocked = true;
         realTapCount = 0;
@@ -1900,6 +1899,12 @@
         }
         updateDemoButtonVisibility();
         updateAccountModeAvailability();
+        const menu = $("accountMenu");
+        if (menu) menu.style.display = "";
+      }
+
+      if (botRunning) {
+        return;
       }
       setMode("real");
       currentAccountId = getCurrentModeAccountId();
