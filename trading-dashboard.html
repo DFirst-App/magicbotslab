@@ -631,6 +631,16 @@
       color: #ffffff;
     }
 
+    #accountBtnMode {
+      color: #22c55e;
+      font-weight: 800;
+    }
+
+    #accountBtnBalance {
+      color: #7dd3fc;
+      font-weight: 700;
+    }
+
     .deposit-popup-overlay,
     .low-balance-recommend-overlay {
       position: fixed;
@@ -1209,6 +1219,7 @@
     function setMode(mode) {
       currentMode = mode === "demo" ? "demo" : "real";
       $("accountBtnMode").textContent = currentMode === "real" ? "Real" : "Demo";
+      $("accountBtnMode").style.color = currentMode === "real" ? "#22c55e" : "#cbd5e1";
       $("realModeBtn").classList.toggle("active", currentMode === "real");
       $("demoModeBtn").classList.toggle("active", currentMode === "demo");
       if (activeBotKey && botStates[activeBotKey]) {
@@ -1869,6 +1880,9 @@
       const menu = $("accountMenu");
       menu.style.display = menu.style.display === "none" || !menu.style.display ? "" : "none";
     });
+    $("accountMenu").addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
 
     document.addEventListener("click", () => {
       const menu = $("accountMenu");
@@ -1882,7 +1896,8 @@
     $("startBotBtn").addEventListener("click", startBot);
     $("stopBotBtn").addEventListener("click", stopBot);
 
-    $("realModeBtn").addEventListener("click", () => {
+    $("realModeBtn").addEventListener("click", (e) => {
+      e.stopPropagation();
       realTapCount += 1;
       if (realTapTimer) {
         clearTimeout(realTapTimer);
@@ -1906,7 +1921,11 @@
       if (botRunning) {
         return;
       }
+      if (currentMode === "demo") {
+        demoModeUnlocked = false;
+      }
       setMode("real");
+      updateDemoButtonVisibility();
       currentAccountId = getCurrentModeAccountId();
       $("botAccountId").textContent = currentAccountId || "--";
       const token = getToken();
@@ -1919,7 +1938,8 @@
       }
       setControlsForRunning(false);
     });
-    $("demoModeBtn").addEventListener("click", () => {
+    $("demoModeBtn").addEventListener("click", (e) => {
+      e.stopPropagation();
       if (botRunning) return;
       if (!demoModeUnlocked) return;
       setMode("demo");
