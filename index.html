@@ -3,26 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MagicBotsLab | Automated Trading Bots</title>
-  <meta name="description" content="MagicBotsLab offers free Deriv bots, MT5 bots available for download, and fully automated 24/7 trading workflows." />
+  <title>Magic Bots Lab | Automated Trading Bots</title>
+  <meta name="description" content="Magic Bots Lab offers free Deriv bots, free MT5 bots, and fully automated 24/7 trading workflows." />
   <meta name="keywords" content="magicbotslab, magic bots, free deriv bots, free mt5 bots, mt5 bots download, fully automated trading bots, 24/7 trading" />
   <meta name="robots" content="index,follow" />
-  <meta name="author" content="MagicBotsLab" />
+  <meta name="author" content="Magic Bots Lab" />
   <link rel="canonical" href="https://magicbotslab.com/" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="MagicBotsLab | Automated Trading Bots" />
+  <meta property="og:title" content="Magic Bots Lab | Automated Trading Bots" />
   <meta property="og:description" content="Free Deriv bots, MT5 bot downloads, and automated trading tools built for continuous performance." />
   <meta property="og:url" content="https://magicbotslab.com/" />
   <meta property="og:image" content="https://magicbotslab.com/favicon.svg" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="MagicBotsLab | Automated Trading Bots" />
+  <meta name="twitter:title" content="Magic Bots Lab | Automated Trading Bots" />
   <meta name="twitter:description" content="Free Deriv bots, MT5 bot downloads, and 24/7 automated trading workflows." />
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "MagicBotsLab",
+      "name": "Magic Bots Lab",
       "url": "https://magicbotslab.com/",
       "description": "Free Deriv bots, MT5 bots available for download, and fully automated 24/7 trading workflows."
     }
@@ -43,13 +43,13 @@
       position: relative;
       overflow: hidden;
       background:
-        radial-gradient(circle at 14% 55%, rgba(99, 102, 241, 0.35), transparent 25%),
-        radial-gradient(circle at 74% 48%, rgba(244, 63, 94, 0.28), transparent 34%),
-        linear-gradient(180deg, #010614 0%, #020a1f 45%, #020617 100%);
+        radial-gradient(circle at 14% 55%, rgba(255, 255, 255, 0.12), transparent 25%),
+        radial-gradient(circle at 74% 48%, rgba(255, 255, 255, 0.10), transparent 34%),
+        linear-gradient(180deg, #000 0%, #050510 45%, #000 100%);
       padding: 28px 42px 36px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-start;
     }
 
     .top-nav {
@@ -80,11 +80,7 @@
     }
 
     .menu {
-      display: flex;
-      align-items: center;
-      gap: 30px;
-      margin-left: auto;
-      margin-right: 24px;
+      display: none;
     }
 
     .menu a {
@@ -97,13 +93,17 @@
     }
 
     .ghost-btn {
-      border: 2px solid rgba(226, 232, 240, 0.75);
+      border: 0;
       border-radius: 999px;
-      background: transparent;
-      color: #e2e8f0;
-      padding: 9px 18px;
-      font-size: 28px;
+      background: linear-gradient(135deg, #2563eb, #0ea5e9);
+      color: #ffffff;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
       cursor: pointer;
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.25);
     }
 
     .hero-copy {
@@ -146,10 +146,10 @@
       bottom: 115px;
       height: 320px;
       background:
-        radial-gradient(ellipse at 14% 58%, rgba(99, 102, 241, 0.65), transparent 40%),
-        radial-gradient(ellipse at 38% 63%, rgba(168, 85, 247, 0.45), transparent 45%),
-        radial-gradient(ellipse at 62% 53%, rgba(244, 63, 94, 0.55), transparent 44%),
-        radial-gradient(ellipse at 86% 60%, rgba(249, 115, 22, 0.42), transparent 42%);
+        radial-gradient(ellipse at 14% 58%, rgba(255, 255, 255, 0.32), transparent 40%),
+        radial-gradient(ellipse at 38% 63%, rgba(255, 255, 255, 0.22), transparent 45%),
+        radial-gradient(ellipse at 62% 53%, rgba(255, 255, 255, 0.26), transparent 44%),
+        radial-gradient(ellipse at 86% 60%, rgba(255, 255, 255, 0.18), transparent 42%);
       filter: blur(28px);
       opacity: 0.95;
       pointer-events: none;
@@ -162,9 +162,9 @@
       bottom: 155px;
       height: 180px;
       border-radius: 90px;
-      border: 1px solid rgba(251, 113, 133, 0.35);
-      border-top-color: rgba(244, 114, 182, 0.55);
-      border-bottom-color: rgba(251, 146, 60, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-top-color: rgba(255, 255, 255, 0.45);
+      border-bottom-color: rgba(255, 255, 255, 0.25);
       transform: skewX(-18deg);
       opacity: 0.55;
       pointer-events: none;
@@ -175,7 +175,7 @@
       width: 64px;
       height: 64px;
       border-radius: 999px;
-      background: radial-gradient(circle at 30% 30%, #f43f5e, #6366f1);
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.25));
       opacity: 0.62;
       pointer-events: none;
     }
@@ -185,33 +185,101 @@
     .dot.c { bottom: 124px; left: 16%; width: 84px; height: 84px; }
     .dot.d { bottom: 158px; right: 30%; width: 92px; height: 92px; }
 
+    .features {
+      position: relative;
+      z-index: 2;
+      margin-top: 38px;
+      max-width: 980px;
+      width: 100%;
+    }
+
+    .features h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.92);
+      letter-spacing: -0.01em;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .feature-card {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(6px);
+      padding: 16px;
+    }
+
+    .feature-card h3 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    .feature-card p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.78);
+    }
+
+    .disclaimer-section {
+      position: relative;
+      z-index: 2;
+      margin-top: 14px;
+      max-width: 980px;
+      width: 100%;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(0, 0, 0, 0.35);
+      padding: 16px;
+    }
+
+    .disclaimer-title {
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-size: 12px;
+      margin-bottom: 10px;
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    .disclaimer p {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.78);
+    }
+
     .bottom-bar {
       position: relative;
       z-index: 2;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       margin-top: auto;
       padding-top: 20px;
     }
 
     .cta-btn {
-      border: 2px solid rgba(226, 232, 240, 0.78);
+      border: 0;
+      background: linear-gradient(135deg, #2563eb, #0ea5e9);
       border-radius: 999px;
-      background: transparent;
-      color: #f8fafc;
-      padding: 10px 26px;
-      font-size: 26px;
-      letter-spacing: 0.04em;
-      text-transform: lowercase;
+      color: #ffffff;
+      padding: 14px 30px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
       cursor: pointer;
-    }
-
-    .footer-dots {
-      color: rgba(226, 232, 240, 0.65);
-      font-size: 24px;
-      letter-spacing: 8px;
-      user-select: none;
+      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.25);
     }
 
     @media (max-width: 920px) {
@@ -221,8 +289,9 @@
       .hero-copy h1 { font-size: clamp(32px, 12vw, 48px); }
       .hero-copy p { font-size: 15px; }
       .wave, .wave-line { bottom: 130px; }
-      .cta-btn, .ghost-btn { font-size: 18px; }
-      .footer-dots { font-size: 16px; letter-spacing: 4px; }
+      .cta-btn { font-size: 14px; padding: 12px 22px; }
+      .ghost-btn { font-size: 12px; padding: 10px 14px; }
+      .feature-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -231,21 +300,44 @@
     <nav class="top-nav">
       <div class="logo">
         <span class="logo-mark"></span>
-        <span>MagicBotsLab</span>
+        <span>Magic Bots Lab</span>
       </div>
-      <div class="menu">
-        <a href="#home">Home</a>
-        <a href="#about">About Us</a>
-        <a href="#gallery">Gallery</a>
-        <a href="#contact">Contact Us</a>
-      </div>
-      <button type="button" class="ghost-btn connect-trigger" id="startBtn">learn more</button>
+      <button type="button" class="ghost-btn connect-trigger" id="startBtn">Start</button>
     </nav>
 
     <section class="hero-copy">
-      <h1>Landing Page</h1>
-      <p>Connect your Deriv account to run MagicBotsLab automations, access MT5 bot downloads, and manage fully automated trading systems from one control dashboard.</p>
+      <h1>Automated Trading Bots</h1>
+      <p>Connect your Deriv account to run Magic Bots Lab automations, access MT5 bot downloads, and manage fully automated trading systems from one control dashboard.</p>
       <div class="status" id="statusText"></div>
+    </section>
+
+    <section class="features">
+      <h2>What you get</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>Free Trading Bots</h3>
+          <p>Run free bots with take profit and stop loss logic, live performance tracking, and 24/7 automated trading.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Free Deriv Bots</h3>
+          <p>Use free Deriv strategies designed for contract flows and real-time execution.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Secure</h3>
+          <p>Connect safely using Deriv OAuth so only you can access and control your dashboard.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Free MT5 Bots</h3>
+          <p>Download MT5 bots and set them up quickly for faster deployment and better workflow.</p>
+        </div>
+      </div>
+
+      <div class="disclaimer-section" id="disclaimerSection">
+        <div class="disclaimer-title">DISCLAIMER</div>
+        <div class="disclaimer">
+          <p>Deriv offers complex derivatives, such as options and contracts for difference ("CFDs"). These products may not be suitable for all clients, and trading them puts you at risk. Please make sure that you understand the following risks before trading Deriv products: a) you may lose some or all of the money you invest in the trade, b) if your trade involves currency conversion, exchange rates will affect your profit and loss. You should never trade with borrowed money or with money that you cannot afford to lose.</p>
+        </div>
+      </div>
     </section>
 
     <div class="wave"></div>
@@ -256,8 +348,7 @@
     <span class="dot d"></span>
 
     <div class="bottom-bar">
-      <button type="button" class="cta-btn connect-trigger" id="connectBtn">sign up</button>
-      <div class="footer-dots">.............</div>
+      <button type="button" class="cta-btn connect-trigger" id="connectBtn">Connect</button>
     </div>
   </main>
   <script>
@@ -325,8 +416,8 @@
       } catch (error) {
         setStatus("Unable to start OAuth flow. Please try again.", "error");
         triggers.forEach((btn) => { btn.disabled = false; });
-        if (connectBtn) connectBtn.textContent = "sign up";
-        if (startBtn) startBtn.textContent = "learn more";
+        if (connectBtn) connectBtn.textContent = "Connect";
+        if (startBtn) startBtn.textContent = "Start";
       }
     }
 
