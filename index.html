@@ -50,6 +50,7 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
+      align-items: center;
     }
 
     .top-nav {
@@ -58,6 +59,7 @@
       justify-content: space-between;
       gap: 22px;
       z-index: 2;
+      width: 100%;
     }
 
     .logo {
@@ -109,24 +111,28 @@
     .hero-copy {
       position: relative;
       z-index: 2;
-      max-width: 760px;
-      margin-top: 90px;
+      max-width: 980px;
+      width: 100%;
+      margin-top: 34px;
+      text-align: center;
     }
 
     .hero-copy h1 {
       margin: 0;
-      font-size: clamp(46px, 8vw, 72px);
-      line-height: 1.05;
+      font-size: clamp(36px, 5vw, 56px);
+      line-height: 1.08;
       letter-spacing: 0.01em;
-      color: #f1f5f9;
+      color: #e0f2fe;
     }
 
     .hero-copy p {
       margin: 14px 0 0;
-      max-width: 680px;
-      font-size: 18px;
+      max-width: 900px;
+      font-size: 16px;
       line-height: 1.55;
-      color: rgba(203, 213, 225, 0.85);
+      color: rgba(226, 232, 240, 0.9);
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .status {
@@ -134,6 +140,22 @@
       min-height: 20px;
       font-size: 14px;
       color: #7dd3fc;
+      text-align: center;
+    }
+
+    .hero-connect {
+      margin-top: 14px;
+      border: 0;
+      background: linear-gradient(135deg, #2563eb, #0ea5e9);
+      border-radius: 999px;
+      color: #fff;
+      padding: 13px 30px;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.25);
     }
 
     .status.error { color: #fca5a5; }
@@ -188,7 +210,7 @@
     .features {
       position: relative;
       z-index: 2;
-      margin-top: 38px;
+      margin-top: 18px;
       max-width: 980px;
       width: 100%;
     }
@@ -196,8 +218,9 @@
     .features h2 {
       margin: 0 0 12px;
       font-size: 18px;
-      color: rgba(255, 255, 255, 0.92);
+      color: #bfdbfe;
       letter-spacing: -0.01em;
+      text-align: center;
     }
 
     .feature-grid {
@@ -220,7 +243,7 @@
       font-weight: 900;
       letter-spacing: 0.10em;
       text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.92);
+      color: #dbeafe;
     }
 
     .feature-card p {
@@ -248,7 +271,7 @@
       text-transform: uppercase;
       font-size: 12px;
       margin-bottom: 10px;
-      color: rgba(255, 255, 255, 0.92);
+      color: #bfdbfe;
     }
 
     .disclaimer p {
@@ -258,39 +281,15 @@
       color: rgba(255, 255, 255, 0.78);
     }
 
-    .bottom-bar {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: auto;
-      padding-top: 20px;
-    }
-
-    .cta-btn {
-      border: 0;
-      background: linear-gradient(135deg, #2563eb, #0ea5e9);
-      border-radius: 999px;
-      color: #ffffff;
-      padding: 14px 30px;
-      font-size: 16px;
-      font-weight: 900;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      cursor: pointer;
-      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.25);
-    }
-
     @media (max-width: 920px) {
       .landing { padding: 20px 18px 28px; }
       .menu { display: none; }
-      .hero-copy { margin-top: 60px; }
+      .hero-copy { margin-top: 28px; }
       .hero-copy h1 { font-size: clamp(32px, 12vw, 48px); }
       .hero-copy p { font-size: 15px; }
       .wave, .wave-line { bottom: 130px; }
-      .cta-btn { font-size: 14px; padding: 12px 22px; }
       .ghost-btn { font-size: 12px; padding: 10px 14px; }
+      .hero-connect { font-size: 14px; padding: 12px 22px; }
       .feature-grid { grid-template-columns: 1fr; }
     }
   </style>
@@ -309,6 +308,7 @@
       <h1>Automated Trading Bots</h1>
       <p>Connect your Deriv account to run Magic Bots Lab automations, access MT5 bot downloads, and manage fully automated trading systems from one control dashboard.</p>
       <div class="status" id="statusText"></div>
+      <button type="button" class="hero-connect connect-trigger" id="connectBtn">Connect</button>
     </section>
 
     <section class="features">
@@ -347,9 +347,6 @@
     <span class="dot c"></span>
     <span class="dot d"></span>
 
-    <div class="bottom-bar">
-      <button type="button" class="cta-btn connect-trigger" id="connectBtn">Connect</button>
-    </div>
   </main>
   <script>
     const DERIV_OAUTH_CLIENT_ID = "338udJBKn1EbT7Tc29Snv";
