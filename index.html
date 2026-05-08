@@ -29,144 +29,157 @@
   </script>
   <style>
     :root {
-      --bg: #080d1a;
-      --panel: #0f172a;
-      --panel-2: #111c34;
-      --line: rgba(148, 163, 184, 0.22);
-      --text: #e5e7eb;
-      --muted: #94a3b8;
-      --accent: #2563eb;
-      --accent-2: #38bdf8;
+      --bg-0: #030612;
+      --bg-1: #071330;
+      --text: #eef2ff;
+      --muted: #9fb0d3;
+      --line: rgba(165, 180, 252, 0.25);
+      --chip-a: #8b5cf6;
+      --chip-b: #ec4899;
+      --chip-c: #f97316;
+      --chip-d: #06b6d4;
       --ok: #22c55e;
     }
 
     * { box-sizing: border-box; }
+
+    html, body { width: 100%; }
 
     body {
       margin: 0;
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 15% 20%, rgba(56, 189, 248, 0.16), transparent 38%),
-        radial-gradient(circle at 85% 5%, rgba(37, 99, 235, 0.2), transparent 34%),
-        var(--bg);
+        radial-gradient(circle at 15% 16%, rgba(139, 92, 246, 0.22), transparent 28%),
+        radial-gradient(circle at 78% 30%, rgba(249, 115, 22, 0.2), transparent 32%),
+        linear-gradient(150deg, #020512 0%, #040a1f 40%, #020816 100%);
+      overflow-x: hidden;
     }
 
     .page {
       width: 100%;
-      max-width: none;
-      margin: 0;
-      padding: 24px 24px 48px;
+      min-height: 100vh;
+      padding: 26px 34px 56px;
+      position: relative;
+    }
+
+    .wave-glow {
+      position: absolute;
+      pointer-events: none;
+      filter: blur(0.2px);
+      opacity: 0.9;
+    }
+
+    .wave-glow.one {
+      left: -4vw;
+      top: 30vh;
+      width: 42vw;
+      height: 24vh;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.55), transparent 52%),
+        linear-gradient(90deg, rgba(99, 102, 241, 0.6), rgba(236, 72, 153, 0.55), rgba(6, 182, 212, 0.5));
+      clip-path: polygon(0 35%, 8% 20%, 18% 30%, 30% 58%, 45% 70%, 63% 42%, 77% 28%, 100% 45%, 100% 70%, 0 70%);
+    }
+
+    .wave-glow.two {
+      right: -8vw;
+      top: 19vh;
+      width: 54vw;
+      height: 33vh;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 55% 50%, rgba(251, 113, 133, 0.45), transparent 58%),
+        linear-gradient(90deg, rgba(244, 63, 94, 0.56), rgba(249, 115, 22, 0.58), rgba(20, 184, 166, 0.52));
+      clip-path: polygon(0 50%, 10% 28%, 25% 22%, 38% 42%, 50% 65%, 63% 55%, 77% 34%, 100% 26%, 100% 65%, 0 70%);
+    }
+
+    .hero {
+      position: relative;
+      z-index: 2;
+      min-height: 74vh;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
     }
 
     .header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      justify-content: space-between;
+      gap: 18px;
     }
 
     .brand {
-      font-size: 14px;
-      letter-spacing: 0.08em;
+      font-size: 13px;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: #cbd5e1;
+      color: #dbe4ff;
+      font-weight: 700;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      color: #c6d2f3;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
       font-weight: 700;
     }
 
     .start-btn {
-      border: 1px solid rgba(147, 197, 253, 0.45);
-      background: linear-gradient(135deg, rgba(37, 99, 235, 0.92), rgba(56, 189, 248, 0.9));
-      color: #fff;
-      border-radius: 10px;
-      padding: 10px 16px;
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      border: 1px solid rgba(226, 232, 255, 0.7);
+      background: transparent;
+      color: #ffffff;
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
     }
 
-    .hero {
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      border-radius: 18px;
-      background: linear-gradient(160deg, rgba(15, 23, 42, 0.88), rgba(12, 18, 35, 0.82));
-      padding: 22px;
+    .hero-body {
+      margin-top: 8vh;
       display: grid;
       gap: 20px;
-      grid-template-columns: 1.3fr 1fr;
-      box-shadow: 0 16px 44px rgba(0, 0, 0, 0.34);
+      justify-items: center;
+      text-align: center;
     }
 
-    .hero h1 {
+    .title {
       margin: 0;
-      font-family: "Segoe UI Semibold", "Inter", "Segoe UI", system-ui, sans-serif;
-      font-size: clamp(21px, 3.2vw, 31px);
-      line-height: 1.16;
-      letter-spacing: -0.015em;
-    }
-
-    .hero p {
-      margin: 12px 0 0;
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1.6;
-      max-width: 680px;
-    }
-
-    .badges {
-      margin-top: 18px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .badge {
-      border: 1px solid var(--line);
-      background: rgba(15, 23, 42, 0.85);
-      color: #dbeafe;
-      padding: 7px 11px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
+      font-size: clamp(38px, 8vw, 74px);
+      line-height: 0.98;
+      letter-spacing: -0.03em;
       text-transform: uppercase;
+      font-weight: 800;
+      background: linear-gradient(90deg, #e5e7ff 8%, #c7d2fe 40%, #f0abfc 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-wrap: balance;
     }
 
-    .connect-card {
-      border: 1px solid var(--line);
-      background: rgba(15, 23, 42, 0.9);
-      border-radius: 16px;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 12px;
-      min-height: 220px;
-    }
-
-    .connect-title {
-      margin: 0;
-      font-size: 17px;
-      font-weight: 700;
-    }
-
-    .connect-copy {
+    .lead {
       margin: 0;
       color: var(--muted);
-      font-size: 14px;
-      line-height: 1.5;
+      max-width: 900px;
+      font-size: 15px;
+      line-height: 1.7;
     }
 
     .connect-btn {
-      width: 100%;
-      padding: 13px 16px;
-      border: 1px solid rgba(147, 197, 253, 0.45);
-      border-radius: 12px;
+      margin-top: 8px;
+      border: 1px solid rgba(147, 197, 253, 0.55);
+      border-radius: 999px;
+      padding: 13px 28px;
       font-size: 15px;
       font-weight: 700;
-      color: #ffffff;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.92), rgba(14, 165, 233, 0.9));
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
       cursor: pointer;
     }
 
@@ -179,173 +192,164 @@
     .status.error { color: #fca5a5; }
     .status.success { color: #86efac; }
 
-    .section {
-      margin-top: 20px;
+    .badges {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      max-width: 980px;
+    }
+
+    .badge {
       border: 1px solid var(--line);
-      border-radius: 16px;
-      background: rgba(15, 23, 42, 0.85);
-      padding: 20px;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #fff;
+      backdrop-filter: blur(4px);
+    }
+
+    .badge.a { background: linear-gradient(135deg, rgba(139, 92, 246, 0.34), rgba(236, 72, 153, 0.3)); }
+    .badge.b { background: linear-gradient(135deg, rgba(249, 115, 22, 0.34), rgba(236, 72, 153, 0.3)); }
+    .badge.c { background: linear-gradient(135deg, rgba(6, 182, 212, 0.36), rgba(59, 130, 246, 0.32)); }
+    .badge.d { background: linear-gradient(135deg, rgba(34, 197, 94, 0.34), rgba(14, 165, 233, 0.3)); }
+
+    .section {
+      position: relative;
+      z-index: 2;
+      margin-top: 28px;
+      border: 1px solid rgba(165, 180, 252, 0.2);
+      border-radius: 18px;
+      background: linear-gradient(170deg, rgba(9, 18, 43, 0.86), rgba(6, 13, 33, 0.84));
+      padding: 24px;
     }
 
     .section h2 {
       margin: 0 0 14px;
-      font-size: 18px;
+      font-size: 20px;
       letter-spacing: -0.01em;
     }
 
     .feature-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
       gap: 12px;
     }
 
     .feature {
-      border: 1px solid var(--line);
+      border: 1px solid rgba(148, 163, 184, 0.24);
       border-radius: 12px;
-      padding: 14px;
-      background: linear-gradient(165deg, rgba(17, 28, 52, 0.78), rgba(15, 23, 42, 0.82));
+      padding: 15px;
+      background: linear-gradient(165deg, rgba(17, 28, 52, 0.8), rgba(9, 15, 33, 0.78));
     }
 
     .feature h3 {
-      margin: 0 0 7px;
+      margin: 0 0 8px;
       font-size: 15px;
       color: #dbeafe;
     }
 
     .feature p {
       margin: 0;
-      color: var(--muted);
+      color: #9fb0d3;
       font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .stat {
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 12px;
-      text-align: center;
-      background: rgba(17, 28, 52, 0.72);
-    }
-
-    .stat strong {
-      display: block;
-      color: var(--ok);
-      font-size: 17px;
-      margin-bottom: 4px;
-    }
-
-    .stat span {
-      color: var(--muted);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      line-height: 1.55;
     }
 
     .disclaimer-section {
-      margin-top: 22px;
-      border-top: 1px solid var(--line);
-      padding-top: 16px;
-    }
-
-    .disclaimer {
-      border: 1px solid var(--line);
-      background: rgba(15, 23, 42, 0.75);
-      border-radius: 12px;
-      padding: 14px;
+      margin-top: 24px;
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      background: rgba(9, 15, 33, 0.84);
+      padding: 18px;
     }
 
     .disclaimer-title {
-      margin-bottom: 8px;
+      margin-bottom: 9px;
       font-size: 12px;
       letter-spacing: 0.12em;
       font-weight: 800;
-      color: #cbd5e1;
+      color: #d1daef;
+      text-transform: uppercase;
     }
 
     .disclaimer p {
       margin: 0;
-      color: #9ca3af;
+      color: #9aa9c8;
       font-size: 12px;
-      line-height: 1.6;
+      line-height: 1.65;
     }
 
-    @media (max-width: 920px) {
-      .hero { grid-template-columns: 1fr; }
-      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .feature-grid { grid-template-columns: 1fr; }
+    @media (max-width: 900px) {
+      .page { padding: 20px 16px 42px; }
+      .nav { display: none; }
+      .hero-body { margin-top: 6vh; }
+      .lead { font-size: 14px; }
+      .section { padding: 18px; }
     }
   </style>
 </head>
 <body>
   <main class="page">
-    <header class="header">
-      <div class="brand">MagicBotsLab</div>
-      <button type="button" class="start-btn connect-trigger" id="startBtn">Start</button>
-    </header>
+    <div class="wave-glow one"></div>
+    <div class="wave-glow two"></div>
 
     <section class="hero">
-      <div>
-        <h1>MagicBotsLab automated trading ecosystem</h1>
-        <p>Deploy free Deriv bots, download MT5 bots, and run fully automated strategies with a modern dashboard built for continuous 24/7 market activity.</p>
-        <div class="badges">
-          <span class="badge">Free Deriv Bots</span>
-          <span class="badge">MT5 Bots Download</span>
-          <span class="badge">Fully Automated Trading</span>
-          <span class="badge">24/7 Trading</span>
-        </div>
-      </div>
-      <div class="connect-card">
-        <h2 class="connect-title">Connect with Deriv</h2>
-        <p class="connect-copy">Securely connect your account to access bot dashboards, real-time balances, and automated execution workflows.</p>
+      <header class="header">
+      <div class="brand">Magic Bots Lab</div>
+      <nav class="nav" aria-label="Top navigation">
+        <span>Home</span>
+        <span>Bots</span>
+        <span>MT5</span>
+        <span>Contact</span>
+      </nav>
+      <button type="button" class="start-btn connect-trigger" id="startBtn">Start</button>
+      </header>
+
+      <div class="hero-body">
+        <h1 class="title">Magic Bots Lab</h1>
+        <p class="lead">Modern automated trading workspace for Deriv and MT5 users. Connect once, manage bots clearly, and operate with clean professional tooling built for daily and 24/7 workflows.</p>
         <button type="button" class="connect-btn connect-trigger" id="connectBtn">Connect Account</button>
         <div class="status" id="statusText"></div>
+        <div class="badges">
+          <span class="badge a">FREE Deriv Bots</span>
+          <span class="badge b">MT5 Bots Download</span>
+          <span class="badge c">Fully Automated Trading</span>
+          <span class="badge d">24/7 Trading</span>
+        </div>
       </div>
     </section>
 
     <section class="section">
-      <h2>What you get</h2>
+      <h2>Trading Features</h2>
       <div class="feature-grid">
         <article class="feature">
-          <h3>MT5 bots available for download</h3>
-          <p>Access curated MT5 bot packs and deploy them quickly across supported market workflows.</p>
+          <h3>Free Deriv bot strategies</h3>
+          <p>Run ready strategies with clean controls, live tracking, and account-connected execution.</p>
         </article>
         <article class="feature">
-          <h3>Free Deriv bots</h3>
-          <p>Use bot strategies optimized for Deriv contract flows and real-time execution feedback.</p>
+          <h3>MT5 bot downloads</h3>
+          <p>Get MT5-ready bot packs and deploy them quickly for your preferred market workflow.</p>
         </article>
         <article class="feature">
-          <h3>Fully automated trading bots</h3>
-          <p>Run configured bots with take profit and stop loss logic and clean performance tracking.</p>
+          <h3>Fully automated trading</h3>
+          <p>Keep operations automated with take profit, stop loss, and continuous runtime visibility.</p>
         </article>
         <article class="feature">
-          <h3>24/7 trading operations</h3>
-          <p>Keep strategies active around the clock with live updates and account-aware controls.</p>
+          <h3>24/7 runtime support</h3>
+          <p>Designed for around-the-clock bot operation with real-time status and balance awareness.</p>
         </article>
       </div>
     </section>
 
-    <section class="section">
-      <h2>Platform highlights</h2>
-      <div class="stats">
-        <div class="stat"><strong>24/7</strong><span>Automation</span></div>
-        <div class="stat"><strong>Real-Time</strong><span>Monitoring</span></div>
-        <div class="stat"><strong>Multi-Bot</strong><span>Support</span></div>
-        <div class="stat"><strong>Secure</strong><span>OAuth Connect</span></div>
-      </div>
+    <section class="disclaimer-section" id="disclaimerSection">
+      <div class="disclaimer-title">Disclaimer</div>
+      <p>Deriv offers complex derivatives, such as options and contracts for difference ("CFDs"). These products may not be suitable for all clients, and trading them puts you at risk. Please make sure that you understand the following risks before trading Deriv products: a) you may lose some or all of the money you invest in the trade, b) if your trade involves currency conversion, exchange rates will affect your profit and loss. You should never trade with borrowed money or with money that you cannot afford to lose.</p>
     </section>
-
-    <div class="disclaimer-section" id="disclaimerSection">
-      <div class="disclaimer">
-        <div class="disclaimer-title">DISCLAIMER</div>
-        <p>Deriv offers complex derivatives, such as options and contracts for difference ("CFDs"). These products may not be suitable for all clients, and trading them puts you at risk. Please make sure that you understand the following risks before trading Deriv products: a) you may lose some or all of the money you invest in the trade, b) if your trade involves currency conversion, exchange rates will affect your profit and loss. You should never trade with borrowed money or with money that you cannot afford to lose.</p>
-      </div>
-    </div>
   </main>
   <script>
     const DERIV_OAUTH_CLIENT_ID = "338udJBKn1EbT7Tc29Snv";
