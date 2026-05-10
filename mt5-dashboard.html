@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MT5 Bots · Magic Bots Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0f1117;
+      --panel: #171b24;
+      --text: #f5f7ff;
+      --muted: #98a2bd;
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #00d2ff;
+      --warning-border: rgba(251, 191, 36, 0.35);
+      --warning-bg: rgba(15, 23, 42, 0.65);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 24px;
+      padding-bottom: 64px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .brand-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .brand-subtitle {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn {
+      border-radius: 10px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      font-weight: 600;
+      font-family: inherit;
+      font-size: 13px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn.primary {
+      border-color: rgba(0, 210, 255, 0.35);
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.18) 0%, rgba(0, 210, 255, 0.08) 100%);
+      color: var(--accent);
+    }
+
+    .notice-badge {
+      border-radius: 16px;
+      border: 1px solid var(--warning-border);
+      background: var(--warning-bg);
+      backdrop-filter: blur(8px);
+      padding: 22px 22px 20px;
+      margin-bottom: 28px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+    }
+
+    .notice-badge h2 {
+      margin: 0 0 10px;
+      font-size: clamp(17px, 3vw, 21px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fef3c7;
+    }
+
+    .notice-badge .lead {
+      margin: 0 0 14px;
+      font-size: 14px;
+      line-height: 1.65;
+      color: rgba(226, 232, 240, 0.92);
+    }
+
+    .notice-badge ul {
+      margin: 0;
+      padding-left: 1.15rem;
+      color: rgba(226, 232, 240, 0.88);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .notice-badge li {
+      margin-bottom: 8px;
+    }
+
+    .notice-badge li:last-child {
+      margin-bottom: 0;
+    }
+
+    .section-title {
+      margin: 0 0 10px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .meanwhile {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 28px;
+    }
+
+    .meanwhile p {
+      margin: 0 0 16px;
+      font-size: 14px;
+      line-height: 1.65;
+      color: rgba(245, 247, 255, 0.9);
+    }
+
+    .meanwhile .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-cta {
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .notify-block {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+    }
+
+    .notify-block > p {
+      margin: 0 0 14px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .waitlist-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+      max-width: 360px;
+    }
+
+    .waitlist-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: 1px solid;
+    }
+
+    .whatsapp-btn {
+      background: rgba(37, 211, 102, 0.1);
+      border-color: rgba(37, 211, 102, 0.3);
+      color: #25d366;
+    }
+
+    .whatsapp-btn:hover {
+      background: rgba(37, 211, 102, 0.2);
+      border-color: rgba(37, 211, 102, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .telegram-btn {
+      background: rgba(0, 136, 204, 0.1);
+      border-color: rgba(0, 136, 204, 0.3);
+      color: #0088cc;
+    }
+
+    .telegram-btn:hover {
+      background: rgba(0, 136, 204, 0.2);
+      border-color: rgba(0, 136, 204, 0.5);
+      transform: translateY(-2px);
+    }
+
+    @media (min-width: 520px) {
+      .waitlist-buttons {
+        flex-direction: row;
+        flex-wrap: wrap;
+        max-width: none;
+      }
+
+      .waitlist-btn {
+        flex: 1 1 auto;
+        min-width: 160px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-title">Magic Bots Lab</div>
+        <div class="brand-subtitle">MT5 Bots · Coming soon</div>
+      </div>
+      <div class="top-actions">
+        <a class="btn" href="dashboard.html">Dashboard</a>
+        <a class="btn primary" href="trading-dashboard.html">Deriv bots</a>
+      </div>
+    </header>
+
+    <div class="notice-badge" role="region" aria-label="MT5 release note">
+      <h2>High‑performance MT5 bots are on the way</h2>
+      <p class="lead">
+        We’re in the final stretch of testing and packaging: soon you’ll be able to download professional MT5 bots from Magic Bots Lab—
+        <strong>100% free</strong>, built for hands‑off execution and clearer trade management.
+      </p>
+      <p class="section-title">What we’re shipping</p>
+      <ul>
+        <li><strong>Free downloads</strong> — no paywall; our MT5 line stays accessible to the community.</li>
+        <li><strong>Full automation</strong> — strategies tuned for round‑the‑clock operation with disciplined entries and exits.</li>
+        <li><strong>Trade management</strong> — sizing, risk boundaries, and monitoring aligned with real accounts—not toys.</li>
+        <li><strong>Quality bar</strong> — we’re stress‑testing on live‑like conditions so releases don’t waste your time.</li>
+      </ul>
+    </div>
+
+    <section class="meanwhile" aria-labelledby="meanwhile-title">
+      <p id="meanwhile-title">
+        <strong>While you wait:</strong> Our Deriv bots are live today—powerful, fully automated workflows on Deriv’s platform.
+        Connect from the main dashboard and start from the trading hub whenever you’re ready.
+      </p>
+      <div class="cta-row">
+        <a class="btn primary btn-cta" href="trading-dashboard.html">Open Deriv trading bots</a>
+        <a class="btn" href="dashboard.html">Back to account dashboard</a>
+      </div>
+    </section>
+
+    <section class="notify-block" aria-labelledby="notify-heading">
+      <p class="section-title" id="notify-heading">Stay first in line</p>
+      <p>
+        Join WhatsApp or Telegram and we’ll announce MT5 drops, download links, and updates the moment they’re ready—no spam, just release news.
+      </p>
+      <div class="waitlist-buttons">
+        <a href="https://whatsapp.com/channel/0029Vb6sxFG9xVJWbyIwL110" target="_blank" rel="noopener noreferrer" class="waitlist-btn whatsapp-btn">
+          Join WhatsApp
+        </a>
+        <a href="https://t.me/magicabofficialchannel" target="_blank" rel="noopener noreferrer" class="waitlist-btn telegram-btn">
+          Join Telegram
+        </a>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

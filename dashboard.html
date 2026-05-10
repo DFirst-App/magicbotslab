@@ -6,7 +6,7 @@
   <title>Magic Bots Lab Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,500;0,9..40,600;0,9..40,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg: #020617;
@@ -97,22 +97,39 @@
       box-shadow: 0 4px 14px rgba(154, 52, 18, 0.35);
     }
 
+    .brand-block {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .brand-kicker {
+      margin: 0;
+      font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
     .brand-title {
       margin: 0;
-      font-size: clamp(22px, 4vw, 32px);
-      line-height: 1.12;
-      letter-spacing: -0.03em;
-      font-weight: 800;
-      color: #e2e8f0;
+      font-family: "DM Sans", "Plus Jakarta Sans", system-ui, sans-serif;
+      font-size: clamp(17px, 2.6vw, 21px);
+      line-height: 1.15;
+      letter-spacing: -0.04em;
+      font-weight: 600;
+      color: #f8fafc;
     }
 
     .brand-sub {
-      margin-top: 8px;
+      margin-top: 5px;
       color: var(--muted);
-      font-size: 12px;
-      letter-spacing: 0.12em;
+      font-size: 11px;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      font-weight: 700;
+      font-weight: 600;
     }
 
     .primary-btn {
@@ -138,6 +155,7 @@
     .primary-btn__badges {
       display: inline-flex;
       align-items: center;
+      flex-wrap: nowrap;
       gap: 6px;
     }
 
@@ -150,6 +168,7 @@
       border-radius: 6px;
       border: 1px solid var(--border);
       line-height: 1;
+      flex-shrink: 0;
     }
 
     .bot-badge--deriv {
@@ -240,23 +259,36 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 9px 14px;
-      border-radius: 10px;
-      font-size: 12px;
+      min-height: 42px;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 13px;
       font-weight: 700;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       font-family: inherit;
       cursor: pointer;
-      border: 1px solid rgba(125, 211, 252, 0.45);
-      background: rgba(56, 189, 248, 0.2);
-      color: #e0f7ff;
-      box-shadow: 0 4px 14px rgba(14, 165, 233, 0.22);
-      transition: transform 0.12s ease, box-shadow 0.12s ease;
+      border: 1px solid rgba(14, 165, 233, 0.85);
+      background: #0284c7;
+      color: #ffffff;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        0 4px 0 #0369a1,
+        0 10px 24px rgba(14, 165, 233, 0.35);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
     }
 
     .start-trading-btn:hover {
       transform: translateY(-1px);
-      background: rgba(56, 189, 248, 0.28);
+      filter: brightness(1.05);
+    }
+
+    .start-trading-btn:active {
+      transform: translateY(1px);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 2px 0 #0369a1,
+        0 6px 16px rgba(14, 165, 233, 0.3);
     }
 
     .balance-label {
@@ -419,7 +451,67 @@
         grid-template-columns: 1fr;
       }
       .primary-btn {
+        flex-wrap: nowrap;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .wrap {
+        padding: 12px 14px 44px;
+      }
+
+      .topbar {
+        margin-bottom: 14px;
+        padding-bottom: 12px;
+        gap: 10px;
+      }
+
+      .brand-kicker {
+        font-size: 9px;
+        letter-spacing: 0.12em;
+      }
+
+      .brand-title {
+        font-size: 15px;
+      }
+
+      .brand-sub {
+        font-size: 9px;
+        margin-top: 3px;
+        letter-spacing: 0.08em;
+      }
+
+      .topbar-actions {
+        gap: 6px;
         flex-wrap: wrap;
+      }
+
+      .primary-btn {
+        padding: 6px 9px;
+        font-size: 11px;
+        gap: 6px;
+        border-radius: 10px;
+      }
+
+      .primary-btn__badges {
+        gap: 4px;
+      }
+
+      .bot-badge {
+        font-size: 8px;
+        padding: 3px 6px;
+        border-radius: 5px;
+      }
+
+      .logout-btn {
+        padding: 6px 10px;
+        font-size: 11px;
+      }
+
+      .start-trading-btn {
+        min-height: 38px;
+        padding: 10px 16px;
+        font-size: 11px;
       }
     }
   </style>
@@ -427,8 +519,9 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div>
-        <h1 class="brand-title">Magic Bots Lab Dashboard</h1>
+      <div class="brand-block">
+        <p class="brand-kicker">Magic Bots Lab</p>
+        <h1 class="brand-title">Dashboard</h1>
         <div class="brand-sub">Connected account profile</div>
       </div>
       <div class="topbar-actions">
