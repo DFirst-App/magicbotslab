@@ -4,14 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Magic Bots Lab Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #060b18;
-      --text: #e6edf7;
-      --muted: #8fa3c0;
-      --accent: #22c55e;
-      --accent2: #3b82f6;
-      --soft: rgba(255, 255, 255, 0.05);
+      --bg: #020617;
+      --surface: #0f172a;
+      --surface-elevated: #1e293b;
+      --border: rgba(148, 163, 184, 0.14);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #34d399;
+      --accent2: #38bdf8;
+      --ring: rgba(56, 189, 248, 0.35);
     }
 
     * { box-sizing: border-box; }
@@ -19,130 +25,222 @@
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background:
-        radial-gradient(circle at 8% 8%, rgba(59, 130, 246, 0.18), transparent 36%),
-        radial-gradient(circle at 90% 0%, rgba(34, 197, 94, 0.14), transparent 36%),
-        var(--bg);
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      font-feature-settings: "tnum" 1;
+      background-color: var(--bg);
       color: var(--text);
+      -webkit-font-smoothing: antialiased;
     }
 
     .wrap {
       width: 100%;
-      max-width: none;
-      margin: 0;
-      padding: 24px 24px 48px;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 28px 22px 56px;
     }
 
     .topbar {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 18px;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 28px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--border);
     }
 
     .topbar-actions {
       display: inline-flex;
+      flex-wrap: wrap;
       align-items: center;
+      justify-content: flex-end;
       gap: 10px;
+    }
+
+    .fund-actions {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .fund-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .fund-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .fund-btn--deposit {
+      background: #065f46;
+      color: #ecfdf5;
+      border-color: rgba(52, 211, 153, 0.45);
+      box-shadow: 0 4px 14px rgba(6, 95, 70, 0.35);
+    }
+
+    .fund-btn--withdraw {
+      background: #9a3412;
+      color: #fff7ed;
+      border-color: rgba(251, 146, 60, 0.45);
+      box-shadow: 0 4px 14px rgba(154, 52, 18, 0.35);
     }
 
     .brand-title {
       margin: 0;
-      font-size: clamp(20px, 4vw, 30px);
-      line-height: 1.1;
-      letter-spacing: -0.02em;
+      font-size: clamp(22px, 4vw, 32px);
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+      color: #e2e8f0;
     }
 
     .brand-sub {
-      margin-top: 6px;
+      margin-top: 8px;
       color: var(--muted);
-      font-size: 13px;
-      letter-spacing: 0.06em;
+      font-size: 12px;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       font-weight: 700;
     }
 
     .primary-btn {
-      border: 0;
-      background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(29, 78, 216, 0.95));
-      color: #ffffff;
-      border-radius: 12px;
-      padding: 10px 14px;
-      cursor: pointer;
-      font-weight: 700;
-      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.3);
-    }
-
-    .logout-btn {
-      border: 0;
-      background: rgba(148, 163, 184, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      background: var(--surface-elevated);
       color: #f8fafc;
       border-radius: 12px;
       padding: 10px 14px;
       cursor: pointer;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 13px;
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.6), 0 8px 20px rgba(0, 0, 0, 0.35);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .primary-btn__label {
+      white-space: nowrap;
+    }
+
+    .primary-btn__badges {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .bot-badge {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      line-height: 1;
+    }
+
+    .bot-badge--deriv {
+      background: rgba(56, 189, 248, 0.15);
+      color: #7dd3fc;
+    }
+
+    .bot-badge--mt5 {
+      background: rgba(167, 139, 250, 0.15);
+      color: #ddd6fe;
+    }
+
+    .logout-btn {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: #e2e8f0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 13px;
     }
 
     .overview {
-      margin-bottom: 20px;
+      margin-bottom: 22px;
       display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 14px;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 16px;
     }
 
     .overview-main {
-      padding: 18px 0 8px;
+      padding: 20px 22px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
     }
 
     .overview-main .eyebrow {
       color: var(--muted);
-      font-size: 12px;
+      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.14em;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .overview-main .name {
-      font-size: clamp(22px, 4vw, 34px);
+      font-size: clamp(22px, 4vw, 32px);
       font-weight: 800;
       line-height: 1.15;
       margin: 0;
       word-break: break-word;
+      letter-spacing: -0.02em;
     }
 
     .overview-main .account-type {
-      margin-top: 8px;
+      margin-top: 10px;
       color: var(--muted);
       font-size: 14px;
+      font-weight: 500;
     }
 
     .balance-panel {
-      background: linear-gradient(155deg, rgba(59, 130, 246, 0.24), rgba(15, 23, 42, 0.2));
-      border-radius: 18px;
-      padding: 18px;
-      backdrop-filter: blur(6px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px;
       min-height: 150px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.5);
     }
 
     .balance-label {
-      color: #cbd5e1;
-      font-size: 12px;
-      letter-spacing: 0.07em;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       font-weight: 700;
     }
 
     .balance-value {
-      font-size: clamp(26px, 5vw, 38px);
+      font-size: clamp(26px, 5vw, 36px);
       font-weight: 800;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.03em;
       word-break: break-word;
+      color: #f8fafc;
+      font-variant-numeric: tabular-nums;
     }
 
     .live-pill {
@@ -150,55 +248,63 @@
       width: fit-content;
       align-items: center;
       gap: 8px;
-      background: rgba(34, 197, 94, 0.18);
-      color: #bbf7d0;
+      background: rgba(52, 211, 153, 0.12);
+      color: #a7f3d0;
+      border: 1px solid rgba(52, 211, 153, 0.28);
       border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 12px;
+      padding: 6px 11px;
+      font-size: 11px;
       font-weight: 700;
       margin-top: 2px;
+      letter-spacing: 0.02em;
     }
 
     .live-dot {
       width: 7px;
       height: 7px;
       border-radius: 999px;
-      background: #22c55e;
-      box-shadow: 0 0 12px rgba(34, 197, 94, 0.7);
+      background: var(--accent);
+      box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.35);
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
+      gap: 12px;
     }
 
     .card {
-      background: linear-gradient(165deg, rgba(15, 23, 42, 0.55), rgba(15, 23, 42, 0.35));
-      border-radius: 16px;
-      padding: 16px;
-      backdrop-filter: blur(4px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 92px;
     }
 
     .card h3 {
-      margin: 0 0 12px;
-      font-size: 12px;
+      margin: 0;
+      font-size: 10px;
       color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 0.07em;
+      letter-spacing: 0.14em;
       font-weight: 700;
     }
 
     .value {
-      font-size: 24px;
-      font-weight: 800;
+      font-size: 18px;
+      font-weight: 700;
       color: #f8fafc;
       word-break: break-word;
       letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.35;
     }
 
     .value.small {
-      font-size: 17px;
+      font-size: 15px;
       font-weight: 600;
     }
 
@@ -207,12 +313,14 @@
     }
 
     .status {
-      margin-top: 16px;
+      margin-top: 18px;
       font-size: 13px;
       color: var(--muted);
-      background: rgba(148, 163, 184, 0.08);
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 10px 12px;
+      padding: 12px 14px;
+      line-height: 1.5;
     }
 
     @media (max-width: 900px) {
@@ -227,10 +335,16 @@
     @media (max-width: 640px) {
       .topbar {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
+      }
+      .topbar-actions {
+        justify-content: flex-start;
       }
       .grid {
         grid-template-columns: 1fr;
+      }
+      .primary-btn {
+        flex-wrap: wrap;
       }
     }
   </style>
@@ -243,7 +357,17 @@
         <div class="brand-sub">Connected account profile</div>
       </div>
       <div class="topbar-actions">
-        <button class="primary-btn" id="tradingBotsBtn" type="button">Trading Bots</button>
+        <div class="fund-actions">
+          <a class="fund-btn fund-btn--deposit" href="https://track.deriv.com/_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk/1/?redirect=https%3A%2F%2Fhome.deriv.com%2Fdashboard%2Fdeposit%3Ffrom%3Dhome" target="_blank" rel="noopener noreferrer sponsored">Deposit</a>
+          <a class="fund-btn fund-btn--withdraw" href="https://track.deriv.com/_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk/1/?redirect=https%3A%2F%2Fhome.deriv.com%2Fdashboard%2Fwithdraw%3Ffrom%3Dhome" target="_blank" rel="noopener noreferrer sponsored">Withdraw</a>
+        </div>
+        <button class="primary-btn" id="tradingBotsBtn" type="button">
+          <span class="primary-btn__label">Trading Bots</span>
+          <span class="primary-btn__badges">
+            <span class="bot-badge bot-badge--deriv">Deriv</span>
+            <span class="bot-badge bot-badge--mt5">MT5</span>
+          </span>
+        </button>
         <button class="logout-btn" id="logoutBtn" type="button">Disconnect</button>
       </div>
     </div>
