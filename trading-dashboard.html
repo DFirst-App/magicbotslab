@@ -86,16 +86,34 @@
       color: var(--accent);
     }
 
-    .btn-mt5-mini {
-      font-size: 11px;
-      padding: 5px 10px;
-      font-weight: 600;
-      border-radius: 8px;
-      text-decoration: none;
+    /* Compact pill style aligned with dashboard Deposit / Withdraw */
+    .fund-nav-btn {
       display: inline-flex;
       align-items: center;
-      line-height: 1.2;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
       white-space: nowrap;
+      font-family: inherit;
+      line-height: 1.2;
+    }
+
+    .fund-nav-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .fund-nav-btn--mt5 {
+      background: #5b21b6;
+      color: #f5f3ff;
+      border-color: rgba(167, 139, 250, 0.45);
+      box-shadow: 0 4px 14px rgba(91, 33, 182, 0.35);
     }
 
     /* --- trading-bots.html: bot cards + open button --- */
@@ -787,7 +805,7 @@
         <div class="brand-subtitle" id="connectionMeta">Checking connection…</div>
       </div>
       <div style="display:flex; gap:10px; align-items:center;">
-        <a class="btn btn-mt5-mini" href="mt5-dashboard.html">MT5 Bots</a>
+        <a class="fund-nav-btn fund-nav-btn--mt5" href="mt5-dashboard.html">MT5 Bots</a>
         <div style="position:relative;">
           <button class="btn" id="accountBtn" type="button" style="display:none;">
             <span id="accountBtnMode">Real</span> · <span id="accountBtnBalance">--</span>
