@@ -34,9 +34,9 @@
 
     .wrap {
       width: 100%;
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 28px 22px 56px;
+      max-width: none;
+      margin: 0;
+      padding: 24px 24px 56px;
     }
 
     .topbar {
@@ -221,9 +221,42 @@
       min-height: 150px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
       gap: 10px;
       box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.5);
+    }
+
+    .balance-actions {
+      margin-top: 6px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 10px;
+    }
+
+    .start-trading-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      font-family: inherit;
+      cursor: pointer;
+      border: 1px solid rgba(125, 211, 252, 0.45);
+      background: rgba(56, 189, 248, 0.2);
+      color: #e0f7ff;
+      box-shadow: 0 4px 14px rgba(14, 165, 233, 0.22);
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .start-trading-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(56, 189, 248, 0.28);
     }
 
     .balance-label {
@@ -323,6 +356,48 @@
       line-height: 1.5;
     }
 
+    .dash-footer {
+      margin-top: 28px;
+      padding-top: 22px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .social-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .social-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .social-btn--whatsapp {
+      background: #166534;
+      color: #ecfdf5;
+      border-color: rgba(74, 222, 128, 0.45);
+      box-shadow: 0 4px 14px rgba(22, 101, 52, 0.35);
+    }
+
+    .social-btn--telegram {
+      background: #075985;
+      color: #e0f2fe;
+      border-color: rgba(56, 189, 248, 0.45);
+      box-shadow: 0 4px 14px rgba(7, 89, 133, 0.35);
+    }
+
     @media (max-width: 900px) {
       .overview {
         grid-template-columns: 1fr;
@@ -357,10 +432,6 @@
         <div class="brand-sub">Connected account profile</div>
       </div>
       <div class="topbar-actions">
-        <div class="fund-actions">
-          <a class="fund-btn fund-btn--deposit" href="https://track.deriv.com/_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk/1/?redirect=https%3A%2F%2Fhome.deriv.com%2Fdashboard%2Fdeposit%3Ffrom%3Dhome" target="_blank" rel="noopener noreferrer sponsored">Deposit</a>
-          <a class="fund-btn fund-btn--withdraw" href="https://track.deriv.com/_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk/1/?redirect=https%3A%2F%2Fhome.deriv.com%2Fdashboard%2Fwithdraw%3Ffrom%3Dhome" target="_blank" rel="noopener noreferrer sponsored">Withdraw</a>
-        </div>
         <button class="primary-btn" id="tradingBotsBtn" type="button">
           <span class="primary-btn__label">Trading Bots</span>
           <span class="primary-btn__badges">
@@ -382,6 +453,13 @@
         <div class="balance-label">Live Balance</div>
         <div class="balance-value" id="balance">--</div>
         <div class="live-pill"><span class="live-dot"></span><span id="connectionState">Connected</span></div>
+        <div class="balance-actions">
+          <div class="fund-actions">
+            <a class="fund-btn fund-btn--deposit" href="https://track.deriv.com/_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk/1/?redirect=https%3A%2F%2Fhome.deriv.com%2Fdashboard%2Fdeposit%3Ffrom%3Dhome" target="_blank" rel="noopener noreferrer sponsored">Deposit</a>
+            <a class="fund-btn fund-btn--withdraw" href="https://track.deriv.com/_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk/1/?redirect=https%3A%2F%2Fhome.deriv.com%2Fdashboard%2Fwithdraw%3Ffrom%3Dhome" target="_blank" rel="noopener noreferrer sponsored">Withdraw</a>
+          </div>
+          <button class="start-trading-btn" id="startTradingBtn" type="button">Start trading</button>
+        </div>
       </div>
     </section>
 
@@ -425,6 +503,11 @@
     </div>
 
     <div class="status" id="statusText"></div>
+
+    <footer class="dash-footer">
+      <a class="social-btn social-btn--whatsapp" href="https://whatsapp.com/channel/0029Vb6sxFG9xVJWbyIwL110" target="_blank" rel="noopener noreferrer">Join WhatsApp</a>
+      <a class="social-btn social-btn--telegram" href="https://t.me/magicabofficialchannel" target="_blank" rel="noopener noreferrer">Join Telegram</a>
+    </footer>
   </div>
 
   <script>
@@ -732,6 +815,10 @@
     });
 
     $("tradingBotsBtn").addEventListener("click", () => {
+      window.location.href = "trading-dashboard.html";
+    });
+
+    $("startTradingBtn").addEventListener("click", () => {
       window.location.href = "trading-dashboard.html";
     });
 
