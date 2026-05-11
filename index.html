@@ -11,23 +11,25 @@
   <meta name="theme-color" content="#020617" />
   <meta name="googlebot" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
   <link rel="canonical" href="https://magicbotslab.com/" />
+  <!-- Raster favicons first: search engines rasterize PNG/ICO more reliably than SVG text -->
+  <link rel="icon" href="https://magicbotslab.com/favicon-48.png" type="image/png" sizes="48x48" />
+  <link rel="icon" href="https://magicbotslab.com/favicon-32.png" type="image/png" sizes="32x32" />
   <link rel="icon" href="https://magicbotslab.com/favicon.svg" type="image/svg+xml" sizes="any" />
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="48x48" />
-  <link rel="shortcut icon" href="https://magicbotslab.com/favicon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="https://magicbotslab.com/favicon.svg" />
+  <link rel="shortcut icon" href="https://magicbotslab.com/favicon-48.png" type="image/png" />
+  <link rel="apple-touch-icon" href="https://magicbotslab.com/apple-touch-icon.png" sizes="180x180" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="en_US" />
   <meta property="og:site_name" content="Magic Bots Lab" />
   <meta property="og:title" content="Magic Bots Lab | Automated Trading Bots" />
   <meta property="og:description" content="Magic Bots Lab offers free Deriv bots, free MT5 bots, and fully automated 24/7 trading workflows. Explore forex trading, gold trading, crypto trading, Bitcoin, AI trading bots, AI signals, risk management, secure Deriv OAuth connection, and binary options automation." />
   <meta property="og:url" content="https://magicbotslab.com/" />
-  <meta property="og:image" content="https://magicbotslab.com/favicon.svg" />
-  <meta property="og:image:type" content="image/svg+xml" />
+  <meta property="og:image" content="https://magicbotslab.com/favicon-48.png" />
+  <meta property="og:image:type" content="image/png" />
   <meta property="og:image:alt" content="Magic Bots Lab logo" />
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Magic Bots Lab | Automated Trading Bots" />
   <meta name="twitter:description" content="Magic Bots Lab offers free Deriv bots, free MT5 bots, and fully automated 24/7 trading workflows. Explore forex trading, gold trading, crypto trading, Bitcoin, AI trading bots, AI signals, risk management, secure Deriv OAuth connection, and binary options automation." />
-  <meta name="twitter:image" content="https://magicbotslab.com/favicon.svg" />
+  <meta name="twitter:image" content="https://magicbotslab.com/favicon-48.png" />
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -41,7 +43,7 @@
         "url": "https://magicbotslab.com/",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://magicbotslab.com/favicon.svg"
+          "url": "https://magicbotslab.com/favicon-48.png"
         }
       }
     }
@@ -52,7 +54,7 @@
       "@type": "Organization",
       "name": "Magic Bots Lab",
       "url": "https://magicbotslab.com/",
-      "logo": "https://magicbotslab.com/favicon.svg"
+      "logo": "https://magicbotslab.com/favicon-48.png"
     }
   </script>
   <style>
@@ -90,39 +92,43 @@
       width: 100%;
     }
 
-    .landing-social-icons {
-      position: relative;
-      z-index: 2;
+    .hero-cta-row {
+      margin-top: 14px;
       display: flex;
-      justify-content: center;
+      flex-wrap: wrap;
       align-items: center;
-      gap: 12px;
-      margin-top: 10px;
+      justify-content: center;
+      gap: 10px 12px;
       width: 100%;
-      max-width: 640px;
+    }
+
+    .hero-social-icons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .landing-social-icon {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border-radius: 12px;
+      border-radius: 10px;
       overflow: hidden;
       line-height: 0;
       text-decoration: none;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.32);
       transition: transform 0.12s ease, box-shadow 0.12s ease;
     }
 
     .landing-social-icon:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.38);
     }
 
     .landing-social-icon img {
       display: block;
-      width: 36px;
-      height: 36px;
+      width: 28px;
+      height: 28px;
       object-fit: cover;
     }
 
@@ -277,7 +283,7 @@
     }
 
     .hero-connect {
-      margin-top: 14px;
+      margin-top: 0;
       border: 0;
       background: linear-gradient(135deg, #2563eb, #0ea5e9);
       border-radius: 999px;
@@ -426,7 +432,7 @@
       .feature-grid { grid-template-columns: 1fr; }
       .landing-badge { margin-top: 10px; padding: 9px 12px; }
       .landing-badge__text { font-size: 11px; }
-      .landing-social-icon img { width: 30px; height: 30px; }
+      .landing-social-icon img { width: 26px; height: 26px; }
     }
   </style>
 </head>
@@ -448,20 +454,21 @@
       <p class="landing-badge__hint"><strong>Log out of your old Deriv account</strong> before signing up, <strong>or use a new browser</strong>—so you do not clash with an existing Deriv login.</p>
     </div>
 
-    <div class="landing-social-icons" aria-label="Community updates">
-      <a class="landing-social-icon" href="https://whatsapp.com/channel/0029Vb6sxFG9xVJWbyIwL110" target="_blank" rel="noopener noreferrer" title="WhatsApp channel">
-        <img src="social-whatsapp.png" width="36" height="36" alt="WhatsApp" loading="lazy" decoding="async" />
-      </a>
-      <a class="landing-social-icon" href="https://t.me/magicabofficialchannel" target="_blank" rel="noopener noreferrer" title="Telegram channel">
-        <img src="social-telegram.png" width="36" height="36" alt="Telegram" loading="lazy" decoding="async" />
-      </a>
-    </div>
-
     <section class="hero-copy">
       <h1>Automated Trading Bots</h1>
       <p>Connect your Deriv account to run Magic Bots Lab automations, access MT5 bot downloads, and manage fully automated trading systems from one control dashboard.</p>
       <div class="status" id="statusText"></div>
-      <button type="button" class="hero-connect connect-trigger" id="connectBtn">Connect</button>
+      <div class="hero-cta-row">
+        <button type="button" class="hero-connect connect-trigger" id="connectBtn">Connect</button>
+        <div class="hero-social-icons" aria-label="Community updates">
+          <a class="landing-social-icon" href="https://whatsapp.com/channel/0029Vb6sxFG9xVJWbyIwL110" target="_blank" rel="noopener noreferrer" title="WhatsApp channel">
+            <img src="social-whatsapp.png" width="28" height="28" alt="WhatsApp" loading="lazy" decoding="async" />
+          </a>
+          <a class="landing-social-icon" href="https://t.me/magicabofficialchannel" target="_blank" rel="noopener noreferrer" title="Telegram channel">
+            <img src="social-telegram.png" width="28" height="28" alt="Telegram" loading="lazy" decoding="async" />
+          </a>
+        </div>
+      </div>
     </section>
 
     <section class="features">
