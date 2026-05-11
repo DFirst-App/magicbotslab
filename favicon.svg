@@ -1,10 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="MagicBotsLab S icon">
   <title>Magic Bots Lab</title>
-  <desc>White circle with blue letter S — Magic Bots Lab favicon</desc>
-  <!-- White circular background -->
+  <desc>White circle with blue letter S ? Magic Bots Lab favicon</desc>
   <circle cx="32" cy="32" r="30" fill="#ffffff"/>
   <circle cx="32" cy="32" r="30" fill="none" stroke="#e5e7eb" stroke-width="1"/>
-
-  <!-- Blue capital S: rounded sans-serif, darker blue (unchanged visual) -->
-  <text x="32" y="50" font-family="system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="52" font-weight="bold" fill="#1e3a8a" text-anchor="middle">S</text>
+  <path fill="#1e3a8a" d="M74 477 362 505Q388 360 467.5 292.0Q547 224 682 224Q825 224 897.5 284.5Q970 345 970 426Q970 478 939.5 514.5Q909 551 833 578Q781 596 596 642Q358 701 262 787Q127 908 127 1082Q127 1194 190.5 1291.5Q254 1389 373.5 1440.0Q493 1491 662 1491Q938 1491 1077.5 1370.0Q1217 1249 1224 1047L928 1034Q909 1147 846.5 1196.5Q784 1246 659 1246Q530 1246 457 1193Q410 1159 410 1102Q410 1050 454 1013Q510 966 726.0 915.0Q942 864 1045.5 809.5Q1149 755 1207.5 660.5Q1266 566 1266 427Q1266 301 1196.0 191.0Q1126 81 998.0 27.5Q870 -26 679 -26Q401 -26 252.0 102.5Q103 231 74 477Z" transform="translate(14.9883 2.9258) scale(0.025391)"/>
 </svg>
