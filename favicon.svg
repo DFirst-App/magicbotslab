@@ -5,6 +5,6 @@
   <circle cx="32" cy="32" r="30" fill="#ffffff"/>
   <circle cx="32" cy="32" r="30" fill="none" stroke="#e5e7eb" stroke-width="1"/>
 
-  <!-- Blue capital S: rounded sans-serif, darker blue (unchanged visual) -->
-  <text x="32" y="50" font-family="system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="52" font-weight="bold" fill="#1e3a8a" text-anchor="middle">S</text>
+  <!-- Blue capital S (path-based so search engines can rasterize reliably) -->
+  <path x="0" y="0" fill="#1e3a8a" d="M98 55V375Q185 302 287.0 265.5Q389 229 493 229Q554 229 599.5 240.0Q645 251 675.5 270.5Q706 290 721.0 316.5Q736 343 736 374Q736 416 712.0 449.0Q688 482 646.5 510.0Q605 538 548.0 564.0Q491 590 425 617Q257 687 174.5 788.0Q92 889 92 1032Q92 1144 137.0 1224.5Q182 1305 259.5 1357.0Q337 1409 439.0 1433.5Q541 1458 655 1458Q767 1458 853.5 1444.5Q940 1431 1013 1403V1104Q977 1129 934.5 1148.0Q892 1167 847.0 1179.5Q802 1192 757.5 1198.0Q713 1204 673 1204Q618 1204 573.0 1193.5Q528 1183 497.0 1164.0Q466 1145 449.0 1118.5Q432 1092 432 1059Q432 1023 451.0 994.5Q470 966 505.0 940.5Q540 915 590.0 890.5Q640 866 703 840Q789 804 857.5 763.5Q926 723 975.0 672.0Q1024 621 1050.0 555.5Q1076 490 1076 403Q1076 283 1030.5 201.5Q985 120 907.0 69.5Q829 19 725.5 -3.0Q622 -25 507 -25Q389 -25 282.5 -5.0Q176 15 98 55Z" transform="translate(17.1719 -6.1133) scale(0.025391)"/>
 </svg>
