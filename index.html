@@ -12,6 +12,7 @@
   <meta name="googlebot" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
   <link rel="canonical" href="https://magicbotslab.com/" />
   <link rel="icon" href="https://magicbotslab.com/favicon.svg" type="image/svg+xml" sizes="any" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="48x48" />
   <link rel="shortcut icon" href="https://magicbotslab.com/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="https://magicbotslab.com/favicon.svg" />
   <meta property="og:type" content="website" />
@@ -89,44 +90,40 @@
       width: 100%;
     }
 
-    .top-nav-cluster {
+    .landing-social-icons {
+      position: relative;
+      z-index: 2;
       display: flex;
+      justify-content: center;
       align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
+      gap: 12px;
+      margin-top: 10px;
+      width: 100%;
+      max-width: 640px;
     }
 
-    .landing-social-link {
+    .landing-social-icon {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      border-radius: 12px;
+      overflow: hidden;
+      line-height: 0;
       text-decoration: none;
-      border: 1px solid;
-      line-height: 1.15;
-      transition: transform 0.12s ease, filter 0.12s ease;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
     }
 
-    .landing-social-link:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.08);
+    .landing-social-icon:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
     }
 
-    .landing-social-link--wa {
-      background: rgba(37, 211, 102, 0.1);
-      border-color: rgba(37, 211, 102, 0.32);
-      color: #4ade80;
-    }
-
-    .landing-social-link--tg {
-      background: rgba(0, 136, 204, 0.1);
-      border-color: rgba(0, 136, 204, 0.32);
-      color: #38bdf8;
+    .landing-social-icon img {
+      display: block;
+      width: 36px;
+      height: 36px;
+      object-fit: cover;
     }
 
     .logo {
@@ -429,6 +426,7 @@
       .feature-grid { grid-template-columns: 1fr; }
       .landing-badge { margin-top: 10px; padding: 9px 12px; }
       .landing-badge__text { font-size: 11px; }
+      .landing-social-icon img { width: 30px; height: 30px; }
     }
   </style>
 </head>
@@ -439,11 +437,7 @@
         <span class="logo-mark"></span>
         <span>Magic Bots Lab</span>
       </div>
-      <div class="top-nav-cluster">
-        <a class="landing-social-link landing-social-link--wa" href="https://whatsapp.com/channel/0029Vb6sxFG9xVJWbyIwL110" target="_blank" rel="noopener noreferrer" title="WhatsApp">WA</a>
-        <a class="landing-social-link landing-social-link--tg" href="https://t.me/magicabofficialchannel" target="_blank" rel="noopener noreferrer" title="Telegram">TG</a>
-        <button type="button" class="ghost-btn connect-trigger" id="startBtn">Start</button>
-      </div>
+      <button type="button" class="ghost-btn connect-trigger" id="startBtn">Start</button>
     </nav>
 
     <div class="landing-badge" role="note">
@@ -451,7 +445,16 @@
         <p class="landing-badge__text">Most Deriv accounts created before <strong>1&nbsp;May&nbsp;2026</strong> may not connect—our bots use Deriv’s newer dashboard. If you can’t connect, create a new Deriv account with a <strong>new email</strong>.</p>
         <a class="landing-badge__cta" href="https://track.deriv.com/_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk/1/" target="_blank" rel="noopener noreferrer">Create account</a>
       </div>
-      <p class="landing-badge__hint">Log out from Deriv first, or open this page in a new/private browser—to avoid signup conflicts.</p>
+      <p class="landing-badge__hint"><strong>Log out of your old Deriv account</strong> before signing up, <strong>or use a new browser</strong>—so you do not clash with an existing Deriv login.</p>
+    </div>
+
+    <div class="landing-social-icons" aria-label="Community updates">
+      <a class="landing-social-icon" href="https://whatsapp.com/channel/0029Vb6sxFG9xVJWbyIwL110" target="_blank" rel="noopener noreferrer" title="WhatsApp channel">
+        <img src="social-whatsapp.png" width="36" height="36" alt="WhatsApp" loading="lazy" decoding="async" />
+      </a>
+      <a class="landing-social-icon" href="https://t.me/magicabofficialchannel" target="_blank" rel="noopener noreferrer" title="Telegram channel">
+        <img src="social-telegram.png" width="36" height="36" alt="Telegram" loading="lazy" decoding="async" />
+      </a>
     </div>
 
     <section class="hero-copy">
