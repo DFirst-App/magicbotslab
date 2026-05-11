@@ -89,6 +89,46 @@
       width: 100%;
     }
 
+    .top-nav-cluster {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .landing-social-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 1px solid;
+      line-height: 1.15;
+      transition: transform 0.12s ease, filter 0.12s ease;
+    }
+
+    .landing-social-link:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+    }
+
+    .landing-social-link--wa {
+      background: rgba(37, 211, 102, 0.1);
+      border-color: rgba(37, 211, 102, 0.32);
+      color: #4ade80;
+    }
+
+    .landing-social-link--tg {
+      background: rgba(0, 136, 204, 0.1);
+      border-color: rgba(0, 136, 204, 0.32);
+      color: #38bdf8;
+    }
+
     .logo {
       display: inline-flex;
       align-items: center;
@@ -127,17 +167,24 @@
       width: 100%;
       max-width: 640px;
       margin: 14px auto 0;
-      padding: 10px 14px;
+      padding: 10px 14px 12px;
       border-radius: 12px;
       border: 1px solid rgba(251, 191, 36, 0.35);
       background: rgba(15, 23, 42, 0.65);
       backdrop-filter: blur(8px);
       display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    .landing-badge__row {
+      display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: center;
       gap: 10px 14px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
     }
 
     .landing-badge__text {
@@ -147,6 +194,18 @@
       line-height: 1.5;
       color: rgba(254, 243, 199, 0.95);
       text-align: center;
+    }
+
+    .landing-badge__hint {
+      margin: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.45;
+      font-weight: 500;
+      color: #99f6e4;
+      border-top: 1px solid rgba(45, 212, 191, 0.22);
+      padding-top: 8px;
     }
 
     .landing-badge__cta {
@@ -380,12 +439,19 @@
         <span class="logo-mark"></span>
         <span>Magic Bots Lab</span>
       </div>
-      <button type="button" class="ghost-btn connect-trigger" id="startBtn">Start</button>
+      <div class="top-nav-cluster">
+        <a class="landing-social-link landing-social-link--wa" href="https://whatsapp.com/channel/0029Vb6sxFG9xVJWbyIwL110" target="_blank" rel="noopener noreferrer" title="WhatsApp">WA</a>
+        <a class="landing-social-link landing-social-link--tg" href="https://t.me/magicabofficialchannel" target="_blank" rel="noopener noreferrer" title="Telegram">TG</a>
+        <button type="button" class="ghost-btn connect-trigger" id="startBtn">Start</button>
+      </div>
     </nav>
 
     <div class="landing-badge" role="note">
-      <p class="landing-badge__text">Most Deriv accounts created before <strong>1&nbsp;May&nbsp;2026</strong> may not connect—our bots use Deriv’s newer dashboard. If you can’t connect, create a new Deriv account with a <strong>new email</strong>.</p>
-      <a class="landing-badge__cta" href="https://track.deriv.com/_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk/1/" target="_blank" rel="noopener noreferrer">Create account</a>
+      <div class="landing-badge__row">
+        <p class="landing-badge__text">Most Deriv accounts created before <strong>1&nbsp;May&nbsp;2026</strong> may not connect—our bots use Deriv’s newer dashboard. If you can’t connect, create a new Deriv account with a <strong>new email</strong>.</p>
+        <a class="landing-badge__cta" href="https://track.deriv.com/_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk/1/" target="_blank" rel="noopener noreferrer">Create account</a>
+      </div>
+      <p class="landing-badge__hint">Log out from Deriv first, or open this page in a new/private browser—to avoid signup conflicts.</p>
     </div>
 
     <section class="hero-copy">
