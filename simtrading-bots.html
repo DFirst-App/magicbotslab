@@ -425,6 +425,130 @@
       letter-spacing: -0.01em;
     }
 
+    .deriv-balance-wrap {
+      position: relative;
+      display: inline-flex;
+      flex-shrink: 0;
+    }
+
+    .deriv-balance-input {
+      width: 5.5rem;
+      padding: 0;
+      margin: 0;
+      border: 0;
+      background: transparent;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      color: #00d2ff;
+      letter-spacing: -0.01em;
+      text-align: right;
+      outline: none;
+    }
+
+    .deriv-balance-input:focus {
+      box-shadow: 0 1px 0 0 rgba(0, 210, 255, 0.65);
+    }
+
+    .deriv-balance-input::-webkit-outer-spin-button,
+    .deriv-balance-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .deriv-balance-input[type="number"] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+
+    .deriv-balance-apply {
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 210, 255, 0.35);
+      background: rgba(0, 210, 255, 0.12);
+      color: #00d2ff;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: inherit;
+      line-height: 1.3;
+    }
+
+    .deriv-balance-apply:hover {
+      background: rgba(0, 210, 255, 0.2);
+    }
+
+    .sim-balance-tutorial {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      z-index: 60;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      max-width: 220px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.22), rgba(15, 23, 42, 0.95));
+      border: 1px solid rgba(0, 210, 255, 0.4);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.45;
+      color: #e0f7ff;
+      animation: simBalanceTutorialIn 0.35s ease;
+    }
+
+    .sim-balance-tutorial::before {
+      content: "";
+      position: absolute;
+      top: -6px;
+      right: 18px;
+      width: 10px;
+      height: 10px;
+      background: rgba(15, 23, 42, 0.95);
+      border-left: 1px solid rgba(0, 210, 255, 0.4);
+      border-top: 1px solid rgba(0, 210, 255, 0.4);
+      transform: rotate(45deg);
+    }
+
+    .sim-balance-tutorial.hidden {
+      display: none;
+    }
+
+    .sim-balance-tutorial-dismiss {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      border: 0;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .sim-balance-tutorial-dismiss:hover {
+      color: #f8fafc;
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    @keyframes simBalanceTutorialIn {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .deriv-balance-currency {
       font-size: 11px;
       font-weight: 600;
@@ -1327,12 +1451,18 @@
         font-size: 10px;
       }
 
-      .deriv-balance-value {
+      .deriv-balance-value,
+      .deriv-balance-input {
         font-size: 12px;
       }
 
       .deriv-balance-currency {
         font-size: 10px;
+      }
+
+      .deriv-balance-apply {
+        font-size: 9px;
+        padding: 2px 6px;
       }
 
       .header-active {
@@ -1852,12 +1982,20 @@
         font-size: 9px;
       }
 
-      .deriv-balance-value {
+      .deriv-balance-value,
+      .deriv-balance-input {
         font-size: 11px;
       }
 
       .deriv-balance-currency {
         font-size: 9px;
+      }
+
+      .sim-balance-tutorial {
+        max-width: 180px;
+        font-size: 11px;
+        right: auto;
+        left: 0;
       }
 
       .header-active {
@@ -1966,10 +2104,17 @@
         <h2>Deriv Bots</h2>
         <p>Choose any bot and start automated trading with smart risk management.</p>
       </div>
-      <div class="deriv-balance-display" id="derivBalanceDisplay">
-        <span class="deriv-balance-label">Balance</span>
-        <span class="deriv-balance-value" id="derivBalanceValue">-</span>
-        <span class="deriv-balance-currency" id="derivBalanceCurrency"></span>
+      <div class="deriv-balance-wrap" id="derivBalanceWrap">
+        <div class="sim-balance-tutorial" id="simBalanceTutorial" role="note">
+          <span>Edit your simulation balance here, then tap Apply.</span>
+          <button type="button" class="sim-balance-tutorial-dismiss" id="simBalanceTutorialDismiss" aria-label="Dismiss tip">×</button>
+        </div>
+        <div class="deriv-balance-display" id="derivBalanceDisplay">
+          <span class="deriv-balance-label">Sim balance</span>
+          <input type="number" class="deriv-balance-input" id="derivBalanceInput" min="0" step="0.01" inputmode="decimal" aria-label="Simulation balance in USD" />
+          <span class="deriv-balance-currency" id="derivBalanceCurrency">USD</span>
+          <button type="button" class="deriv-balance-apply" id="derivBalanceApply">Apply</button>
+        </div>
       </div>
     </div>
 
@@ -2319,16 +2464,44 @@
     };
 
     // Sim Balance Display
-    const derivBalanceValue = document.getElementById('derivBalanceValue');
+    const derivBalanceInput = document.getElementById('derivBalanceInput');
     const derivBalanceCurrency = document.getElementById('derivBalanceCurrency');
     const derivBalanceDisplay = document.getElementById('derivBalanceDisplay');
+    const derivBalanceApply = document.getElementById('derivBalanceApply');
+    const simBalanceTutorial = document.getElementById('simBalanceTutorial');
+    const simBalanceTutorialDismiss = document.getElementById('simBalanceTutorialDismiss');
 
     const SIM_STATE_KEY = 'simState';
     const SIM_BALANCE_KEY = 'simBalance';
+    const SIM_BALANCE_TUTORIAL_KEY = 'simBalanceTutorialDismissed';
 
     function getSimBalance() {
       const urlParams = new URLSearchParams(window.location.search);
       return parseFloat(localStorage.getItem(SIM_BALANCE_KEY)) || parseFloat(urlParams.get('balance')) || 1000;
+    }
+
+    function setSimBalance(amount) {
+      const parsed = parseFloat(amount);
+      if (!Number.isFinite(parsed) || parsed < 0) return null;
+      return parseFloat(parsed.toFixed(2));
+    }
+
+    function applySimBalanceFromInput() {
+      const value = setSimBalance(derivBalanceInput?.value);
+      if (value === null) {
+        if (derivBalanceInput) derivBalanceInput.value = getSimBalance().toFixed(2);
+        return;
+      }
+      try {
+        localStorage.setItem(SIM_BALANCE_KEY, String(value));
+      } catch (e) {}
+      lastKnownBalance = value;
+      lastKnownCurrency = 'USD';
+      if (derivBalanceInput) derivBalanceInput.value = value.toFixed(2);
+      if (derivBalanceCurrency) derivBalanceCurrency.textContent = 'USD';
+      if (derivBalanceDisplay) derivBalanceDisplay.classList.remove('disconnected');
+      if (botUI) botUI.updateBalance(value, lastKnownCurrency);
+      if (currentBotInstance) currentBotInstance.balance = value;
     }
 
     function updateSimBalanceDisplay() {
@@ -2336,9 +2509,28 @@
       const currency = 'USD';
       lastKnownBalance = simBalance;
       lastKnownCurrency = currency;
-      derivBalanceValue.textContent = simBalance.toFixed(2);
-      derivBalanceCurrency.textContent = currency;
-      derivBalanceDisplay.classList.remove('disconnected');
+      if (derivBalanceInput) derivBalanceInput.value = simBalance.toFixed(2);
+      if (derivBalanceCurrency) derivBalanceCurrency.textContent = currency;
+      if (derivBalanceDisplay) derivBalanceDisplay.classList.remove('disconnected');
+    }
+
+    function initSimBalanceEditor() {
+      if (localStorage.getItem(SIM_BALANCE_TUTORIAL_KEY) === '1') {
+        simBalanceTutorial?.classList.add('hidden');
+      }
+      simBalanceTutorialDismiss?.addEventListener('click', () => {
+        simBalanceTutorial?.classList.add('hidden');
+        try {
+          localStorage.setItem(SIM_BALANCE_TUTORIAL_KEY, '1');
+        } catch (e) {}
+      });
+      derivBalanceApply?.addEventListener('click', applySimBalanceFromInput);
+      derivBalanceInput?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          applySimBalanceFromInput();
+        }
+      });
     }
 
     const botsList = document.getElementById('botsList');
@@ -2953,7 +3145,8 @@
       } catch (e) {}
     }
 
-    if (derivBalanceValue && derivBalanceCurrency && derivBalanceDisplay) {
+    if (derivBalanceInput && derivBalanceCurrency && derivBalanceDisplay) {
+      initSimBalanceEditor();
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
           updateSimBalanceDisplay();
