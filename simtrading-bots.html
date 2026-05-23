@@ -480,6 +480,10 @@
       background: rgba(0, 210, 255, 0.2);
     }
 
+    .deriv-balance-apply.is-hidden {
+      display: none;
+    }
+
     .sim-balance-tutorial {
       position: absolute;
       top: calc(100% + 10px);
@@ -2106,14 +2110,14 @@
       </div>
       <div class="deriv-balance-wrap" id="derivBalanceWrap">
         <div class="sim-balance-tutorial" id="simBalanceTutorial" role="note">
-          <span>Edit your simulation balance here, then tap Apply.</span>
+          <span>Edit your balance here, then tap Apply.</span>
           <button type="button" class="sim-balance-tutorial-dismiss" id="simBalanceTutorialDismiss" aria-label="Dismiss tip">×</button>
         </div>
         <div class="deriv-balance-display" id="derivBalanceDisplay">
-          <span class="deriv-balance-label">Sim balance</span>
-          <input type="number" class="deriv-balance-input" id="derivBalanceInput" min="0" step="0.01" inputmode="decimal" aria-label="Simulation balance in USD" />
+          <span class="deriv-balance-label">Balance</span>
+          <input type="number" class="deriv-balance-input" id="derivBalanceInput" min="0" step="0.01" inputmode="decimal" aria-label="Balance in USD" />
           <span class="deriv-balance-currency" id="derivBalanceCurrency">USD</span>
-          <button type="button" class="deriv-balance-apply" id="derivBalanceApply">Apply</button>
+          <button type="button" class="deriv-balance-apply is-hidden" id="derivBalanceApply" hidden>Apply</button>
         </div>
       </div>
     </div>
@@ -2474,6 +2478,7 @@
     const SIM_STATE_KEY = 'simState';
     const SIM_BALANCE_KEY = 'simBalance';
     const SIM_BALANCE_TUTORIAL_KEY = 'simBalanceTutorialDismissed';
+    let committedBalanceValue = null;
 
     function getSimBalance() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -2486,10 +2491,36 @@
       return parseFloat(parsed.toFixed(2));
     }
 
+    function dismissBalanceTutorial() {
+      simBalanceTutorial?.classList.add('hidden');
+      try {
+        localStorage.setItem(SIM_BALANCE_TUTORIAL_KEY, '1');
+      } catch (e) {}
+    }
+
+    function setApplyVisible(visible) {
+      if (!derivBalanceApply) return;
+      derivBalanceApply.classList.toggle('is-hidden', !visible);
+      derivBalanceApply.hidden = !visible;
+    }
+
+    function isBalanceInputDirty() {
+      if (!derivBalanceInput) return false;
+      const parsed = setSimBalance(derivBalanceInput.value);
+      if (parsed === null) return true;
+      const committed = committedBalanceValue ?? getSimBalance().toFixed(2);
+      return parsed.toFixed(2) !== committed;
+    }
+
+    function syncBalanceEditorChrome() {
+      setApplyVisible(isBalanceInputDirty());
+    }
+
     function applySimBalanceFromInput() {
       const value = setSimBalance(derivBalanceInput?.value);
       if (value === null) {
         if (derivBalanceInput) derivBalanceInput.value = getSimBalance().toFixed(2);
+        syncBalanceEditorChrome();
         return;
       }
       try {
@@ -2497,11 +2528,14 @@
       } catch (e) {}
       lastKnownBalance = value;
       lastKnownCurrency = 'USD';
-      if (derivBalanceInput) derivBalanceInput.value = value.toFixed(2);
+      committedBalanceValue = value.toFixed(2);
+      if (derivBalanceInput) derivBalanceInput.value = committedBalanceValue;
       if (derivBalanceCurrency) derivBalanceCurrency.textContent = 'USD';
       if (derivBalanceDisplay) derivBalanceDisplay.classList.remove('disconnected');
       if (botUI) botUI.updateBalance(value, lastKnownCurrency);
       if (currentBotInstance) currentBotInstance.balance = value;
+      setApplyVisible(false);
+      dismissBalanceTutorial();
     }
 
     function updateSimBalanceDisplay() {
@@ -2509,26 +2543,30 @@
       const currency = 'USD';
       lastKnownBalance = simBalance;
       lastKnownCurrency = currency;
-      if (derivBalanceInput) derivBalanceInput.value = simBalance.toFixed(2);
+      committedBalanceValue = simBalance.toFixed(2);
+      if (derivBalanceInput) derivBalanceInput.value = committedBalanceValue;
       if (derivBalanceCurrency) derivBalanceCurrency.textContent = currency;
       if (derivBalanceDisplay) derivBalanceDisplay.classList.remove('disconnected');
+      setApplyVisible(false);
     }
 
     function initSimBalanceEditor() {
+      committedBalanceValue = getSimBalance().toFixed(2);
+      setApplyVisible(false);
       if (localStorage.getItem(SIM_BALANCE_TUTORIAL_KEY) === '1') {
         simBalanceTutorial?.classList.add('hidden');
       }
-      simBalanceTutorialDismiss?.addEventListener('click', () => {
-        simBalanceTutorial?.classList.add('hidden');
-        try {
-          localStorage.setItem(SIM_BALANCE_TUTORIAL_KEY, '1');
-        } catch (e) {}
+      simBalanceTutorialDismiss?.addEventListener('click', dismissBalanceTutorial);
+      derivBalanceApply?.addEventListener('click', (e) => {
+        e.preventDefault();
+        applySimBalanceFromInput();
       });
-      derivBalanceApply?.addEventListener('click', applySimBalanceFromInput);
+      derivBalanceInput?.addEventListener('input', syncBalanceEditorChrome);
+      derivBalanceInput?.addEventListener('change', syncBalanceEditorChrome);
       derivBalanceInput?.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
-          applySimBalanceFromInput();
+          if (!derivBalanceApply?.hidden) applySimBalanceFromInput();
         }
       });
     }
@@ -2686,7 +2724,9 @@
           balanceValue.textContent = `${currency} ${Number(value).toFixed(2)}`;
           try {
             localStorage.setItem(SIM_BALANCE_KEY, String(value));
-            if (derivBalanceValue) derivBalanceValue.textContent = Number(value).toFixed(2);
+            if (derivBalanceInput) derivBalanceInput.value = Number(value).toFixed(2);
+            committedBalanceValue = Number(value).toFixed(2);
+            setApplyVisible(false);
             if (derivBalanceCurrency) derivBalanceCurrency.textContent = currency;
           } catch (e) {}
         },
