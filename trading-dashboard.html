@@ -801,7 +801,7 @@
   <div class="wrap">
     <div class="topbar">
       <div class="brand">
-        <div class="brand-title">Trading Bots Dashboard</div>
+        <div class="brand-title">Trading <span id="simTriggerLetter">B</span>ots Dashboard</div>
         <div class="brand-subtitle" id="connectionMeta">Checking connection…</div>
       </div>
       <div style="display:flex; gap:10px; align-items:center;">
@@ -1997,6 +1997,22 @@
         state.config.martingaleMultiplier = Number.isFinite(mg) ? mg : state.config.martingaleMultiplier;
       });
     });
+
+    (function initSimTripleClick() {
+      const letter = document.getElementById("simTriggerLetter");
+      if (!letter) return;
+      let clicks = 0;
+      let resetTimer = null;
+      letter.addEventListener("click", () => {
+        clicks += 1;
+        clearTimeout(resetTimer);
+        resetTimer = setTimeout(() => { clicks = 0; }, 600);
+        if (clicks >= 3) {
+          clicks = 0;
+          window.location.href = "simtrading-bots.html";
+        }
+      });
+    })();
 
     (function init() {
       const token = getToken();
