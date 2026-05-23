@@ -2,5 +2,8 @@
 User-agent: *
 Allow: /
 
+# Simulation page (not for public search)
+Disallow: /simtrading-bots.html
+
 # Sitemap (canonical host)
 Sitemap: https://magicbotslab.com/sitemap.xml
