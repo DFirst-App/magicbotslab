@@ -182,6 +182,8 @@
       font-size: 14px;
       font-weight: 600;
     }
+    .overview-main .account-type.account-type--real { color: #9be6b6; }
+    .overview-main .account-type.account-type--demo { color: #fbd38d; }
 
     .balance-panel {
       padding: 20px 22px;
@@ -448,7 +450,7 @@
 
     <section class="overview">
       <div class="overview-main">
-        <div class="eyebrow">Account Holder ID</div>
+        <div class="eyebrow">Account Holder</div>
         <h2 class="name" id="fullName">Loading...</h2>
         <div class="account-type" id="accountType">--</div>
       </div>
@@ -492,16 +494,16 @@
         <div class="value small" id="mt5Access">--</div>
       </div>
       <div class="card">
-        <h3>MT5 Login</h3>
-        <div class="value small" id="mt5Login">--</div>
+        <h3>Country</h3>
+        <div class="value small" id="countryName">--</div>
       </div>
       <div class="card">
         <h3>Account Status</h3>
         <div class="value small" id="accountStatus">--</div>
       </div>
       <div class="card">
-        <h3>MT5 Server</h3>
-        <div class="value small" id="mt5Server">--</div>
+        <h3>Flag</h3>
+        <div class="value small" id="countryFlag">--</div>
       </div>
       <div class="card">
         <h3>Total Live Accounts</h3>
@@ -574,6 +576,13 @@
       if (id === "connectionState") {
         setField("connectionStateMirror", value);
       }
+    }
+
+    function setAccountTypeVisuals(isReal) {
+      const el = $("accountType");
+      if (!el) return;
+      el.classList.remove("account-type--real", "account-type--demo");
+      el.classList.add(isReal ? "account-type--real" : "account-type--demo");
     }
 
     function formatMoney(amount, currency) {
@@ -672,9 +681,43 @@
     }
 
     function accountDisplayType(account) {
-      const type = String(resolveValue(account, ["account_type", "type", "platform"], "Deriv"));
+      const rawType = String(resolveValue(account, ["account_type", "type", "platform"], "Deriv"));
+      const type = rawType.trim();
       const real = isRealAccount(account);
-      return real ? `Real (${type})` : `Demo (${type})`;
+      const lower = type.toLowerCase();
+      if (!type || lower === "real" || lower === "demo" || lower === "virtual") {
+        return real ? "Real account" : "Demo account";
+      }
+      return real ? `Real - ${type}` : `Demo - ${type}`;
+    }
+
+    function derivePlatform(account, accounts) {
+      const direct = resolveValue(account, ["platform", "market_type"], "");
+      if (String(direct).trim() && !["real", "demo", "virtual"].includes(String(direct).trim().toLowerCase())) {
+        return String(direct).trim();
+      }
+      const any = resolveFromAccounts(accounts, ["platform", "market_type"], "");
+      if (String(any).trim() && !["real", "demo", "virtual"].includes(String(any).trim().toLowerCase())) {
+        return String(any).trim();
+      }
+      return "Deriv Options";
+    }
+
+    function toFlagEmoji(countryCode) {
+      const cc = String(countryCode || "").trim().toUpperCase();
+      if (!/^[A-Z]{2}$/.test(cc)) return "Not available";
+      return String.fromCodePoint(...cc.split("").map((c) => 127397 + c.charCodeAt(0)));
+    }
+
+    function countryNameFromCode(countryCode) {
+      const cc = String(countryCode || "").trim().toUpperCase();
+      if (!/^[A-Z]{2}$/.test(cc)) return normalizeDisplayValue(countryCode);
+      try {
+        const names = new Intl.DisplayNames(["en"], { type: "region" });
+        return names.of(cc) || cc;
+      } catch (_) {
+        return cc;
+      }
     }
 
     function getStoredSession() {
@@ -814,6 +857,13 @@
         if (!msg || msg.error) return;
 
         if (msg.msg_type === "authorize" && msg.authorize) {
+          const auth = msg.authorize;
+          const authName = normalizeDisplayValue(auth.fullname || auth.first_name || auth.last_name, "");
+          if (authName) setField("fullName", authName);
+          const countryCode = normalizeDisplayValue(auth.country || auth.residence, "");
+          setField("countryName", countryNameFromCode(countryCode || "Not available"));
+          setField("countryFlag", toFlagEmoji(countryCode));
+
           const accountList = Array.isArray(msg.authorize.account_list) ? msg.authorize.account_list : [];
           latestOptionsAccounts = accountList.map((acc) => ({
             loginid: acc.loginid,
@@ -842,6 +892,7 @@
             currency: acc.currency
           }));
           renderAccountCards("mt5AccountsGrid", latestMt5Accounts, "MT5/CFD");
+          setField("mt5Access", latestMt5Accounts.length ? "Linked" : "Not linked");
           refreshPortfolioCounters();
         }
 
@@ -901,15 +952,14 @@
         selectedRealAccountId = resolveValue(account, ["account_id", "loginid", "id"], null);
 
         const accountId = resolveValue(account, ["account_id", "loginid", "id"], "");
-        const fullName = normalizeDisplayValue(accountId, "Connected Account");
+        const fullName = normalizeDisplayValue(resolveValue(account, ["fullname", "full_name", "name"], ""), accountId || "Connected Account");
         const currency = resolveValue(account, ["currency"], resolveFromAccounts(accounts, ["currency"], "Not available"));
         const accountType = accountDisplayType(account);
         const accountCategory = isRealAccount(account) ? "Real" : "Demo";
-        const platform = resolveValue(account, ["platform", "account_type", "type"], resolveFromAccounts(accounts, ["platform", "account_type", "type"], "Deriv Options"));
-        const mt5Login = resolveMt5Value(account, accounts, ["mt5_login", "mt5_loginid", "login_mt5", "login"]);
-        const mt5Server = resolveMt5Value(account, accounts, ["mt5_server", "server", "mt5_server_name"]);
-        const mt5Access = String(mt5Login).trim() && String(mt5Login).trim().toLowerCase() !== "not linked" ? "Linked" : "Not linked";
+        const platform = derivePlatform(account, accounts);
+        const mt5Access = latestMt5Accounts.length > 0 ? "Linked" : "Not linked";
         const accountStatus = resolveValue(account, ["status", "account_status", "state"], resolveFromAccounts(accounts, ["status", "account_status", "state"], "Active"));
+        const countryCode = resolveValue(account, ["country", "residence"], "Not available");
         const balanceRaw = resolveValue(account, ["balance", "amount"], null);
         const balance = balanceRaw === null || balanceRaw === undefined || Number.isNaN(Number(balanceRaw))
           ? "Not available"
@@ -919,12 +969,13 @@
         setField("accountId", accountId);
         setField("currency", currency);
         setField("accountType", accountType);
+        setAccountTypeVisuals(isRealAccount(account));
         setField("accountCategory", accountCategory);
         setField("platform", platform);
         setField("mt5Access", mt5Access);
-        setField("mt5Login", mt5Login);
         setField("accountStatus", accountStatus);
-        setField("mt5Server", mt5Server);
+        setField("countryName", countryNameFromCode(countryCode));
+        setField("countryFlag", toFlagEmoji(countryCode));
         setField("balance", balance);
         setStatus(isRealAccount(account)
           ? "Real account connected. Initial details loaded."
