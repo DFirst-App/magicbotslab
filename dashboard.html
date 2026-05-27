@@ -250,14 +250,16 @@
       padding: 9px 13px;
     }
     .fund-btn--deposit {
-      background: linear-gradient(135deg, #296f4d, #225d42);
+      background: linear-gradient(135deg, #2f8159, #225d42);
       color: #ecfff5;
       border-color: rgba(104, 211, 145, 0.45);
+      box-shadow: 0 8px 20px rgba(24, 73, 54, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.14);
     }
     .fund-btn--withdraw {
-      background: linear-gradient(135deg, #8c4f21, #70411d);
+      background: linear-gradient(135deg, #a4622e, #70411d);
       color: #fff3e4;
       border-color: rgba(246, 173, 85, 0.4);
+      box-shadow: 0 8px 20px rgba(86, 50, 21, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.12);
     }
     .start-trading-btn {
       display: inline-flex;
@@ -269,8 +271,16 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: #eef6ff;
-      background: linear-gradient(135deg, #2f5f9f, #3a73bf);
+      background: linear-gradient(135deg, #356cb4, #3a73bf);
       border-color: rgba(97, 165, 255, 0.45);
+      box-shadow: 0 8px 22px rgba(27, 55, 97, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    }
+    .balance-hint {
+      margin-top: -2px;
+      font-size: 11px;
+      color: #aeb8cd;
+      line-height: 1.35;
+      max-width: 42ch;
     }
 
     .meta-grid {
@@ -463,8 +473,9 @@
             <a class="fund-btn fund-btn--deposit" href="https://track.deriv.com/_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk/1/?redirect=https%3A%2F%2Fhome.deriv.com%2Fdashboard%2Fdeposit%3Ffrom%3Dhome" target="_blank" rel="noopener noreferrer sponsored">Deposit</a>
             <a class="fund-btn fund-btn--withdraw" href="https://track.deriv.com/_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk/1/?redirect=https%3A%2F%2Fhome.deriv.com%2Fdashboard%2Fwithdraw%3Ffrom%3Dhome" target="_blank" rel="noopener noreferrer sponsored">Withdraw</a>
           </div>
-          <button class="start-trading-btn" id="startTradingBtn" type="button">Start trading</button>
+          <button class="start-trading-btn" id="startTradingBtn" type="button">Start trading with AI bots</button>
         </div>
+        <div class="balance-hint">If your full balance is not visible, transfer funds to your Deriv options account.</div>
       </div>
     </section>
 
@@ -493,7 +504,7 @@
         <h3>MT5 Access</h3>
         <div class="value small" id="mt5Access">--</div>
       </div>
-      <div class="card">
+      <div class="card" id="countryCard">
         <h3>Country</h3>
         <div class="value small" id="countryName">--</div>
       </div>
@@ -501,7 +512,7 @@
         <h3>Account Status</h3>
         <div class="value small" id="accountStatus">--</div>
       </div>
-      <div class="card">
+      <div class="card" id="flagCard">
         <h3>Flag</h3>
         <div class="value small" id="countryFlag">--</div>
       </div>
@@ -720,6 +731,18 @@
       }
     }
 
+    function updateCountryAndFlag(countryCode) {
+      const code = String(countryCode || "").trim().toUpperCase();
+      const hasCode = /^[A-Z]{2}$/.test(code);
+      const countryCard = $("countryCard");
+      const flagCard = $("flagCard");
+      if (countryCard) countryCard.hidden = !hasCode;
+      if (flagCard) flagCard.hidden = !hasCode;
+      if (!hasCode) return;
+      setField("countryName", countryNameFromCode(code));
+      setField("countryFlag", toFlagEmoji(code));
+    }
+
     function getStoredSession() {
       try {
         const raw = localStorage.getItem(DERIV_OAUTH_SESSION_KEY);
@@ -861,8 +884,7 @@
           const authName = normalizeDisplayValue(auth.fullname || auth.first_name || auth.last_name, "");
           if (authName) setField("fullName", authName);
           const countryCode = normalizeDisplayValue(auth.country || auth.residence, "");
-          setField("countryName", countryNameFromCode(countryCode || "Not available"));
-          setField("countryFlag", toFlagEmoji(countryCode));
+          updateCountryAndFlag(countryCode);
 
           const accountList = Array.isArray(msg.authorize.account_list) ? msg.authorize.account_list : [];
           latestOptionsAccounts = accountList.map((acc) => ({
@@ -959,7 +981,7 @@
         const platform = derivePlatform(account, accounts);
         const mt5Access = latestMt5Accounts.length > 0 ? "Linked" : "Not linked";
         const accountStatus = resolveValue(account, ["status", "account_status", "state"], resolveFromAccounts(accounts, ["status", "account_status", "state"], "Active"));
-        const countryCode = resolveValue(account, ["country", "residence"], "Not available");
+        const countryCode = resolveValue(account, ["country", "residence"], "");
         const balanceRaw = resolveValue(account, ["balance", "amount"], null);
         const balance = balanceRaw === null || balanceRaw === undefined || Number.isNaN(Number(balanceRaw))
           ? "Not available"
@@ -974,8 +996,7 @@
         setField("platform", platform);
         setField("mt5Access", mt5Access);
         setField("accountStatus", accountStatus);
-        setField("countryName", countryNameFromCode(countryCode));
-        setField("countryFlag", toFlagEmoji(countryCode));
+        updateCountryAndFlag(countryCode);
         setField("balance", balance);
         setStatus(isRealAccount(account)
           ? "Real account connected. Initial details loaded."
