@@ -67,11 +67,12 @@
     }
     .brand-title {
       margin: 0;
-      font-family: "DM Sans", "Plus Jakarta Sans", system-ui, sans-serif;
-      font-size: clamp(20px, 2.7vw, 28px);
+      font-family: "Inter", "Plus Jakarta Sans", system-ui, sans-serif;
+      font-size: clamp(16px, 2vw, 20px);
       line-height: 1.1;
       font-weight: 700;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.01em;
+      color: #9fc4ff;
     }
     .brand-sub {
       margin-top: 2px;
@@ -311,6 +312,29 @@
       line-height: 1.35;
     }
     .value.small { font-size: 14px; font-weight: 650; }
+    .platform-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #f2f6ff;
+      font-weight: 700;
+    }
+    .platform-brand__icon {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ff444f;
+      box-shadow: 0 0 0 3px rgba(255, 68, 79, 0.2);
+      flex-shrink: 0;
+    }
+    .platform-brand__word {
+      color: #ff5a64;
+      text-transform: lowercase;
+      letter-spacing: 0.04em;
+      font-weight: 800;
+      font-size: 14px;
+      line-height: 1;
+    }
     .ok { color: #9be6b6; }
 
     .accounts-layout {
@@ -586,6 +610,12 @@
       if (id === "connectionState") {
         setField("connectionStateMirror", value);
       }
+    }
+
+    function setPlatformBrand() {
+      const el = $("platform");
+      if (!el) return;
+      el.innerHTML = '<span class="platform-brand"><span class="platform-brand__icon"></span><span class="platform-brand__word">deriv</span></span>';
     }
 
     function setAccountTypeVisuals(isReal) {
@@ -977,7 +1007,6 @@
         const currency = resolveValue(account, ["currency"], resolveFromAccounts(accounts, ["currency"], "Not available"));
         const accountType = accountDisplayType(account);
         const accountCategory = isRealAccount(account) ? "Real" : "Demo";
-        const platform = derivePlatform(account, accounts);
         const mt5Access = latestMt5Accounts.length > 0 ? "Linked" : "Not linked";
         const accountStatus = resolveValue(account, ["status", "account_status", "state"], resolveFromAccounts(accounts, ["status", "account_status", "state"], "Active"));
         const countryCode = resolveValue(account, ["country", "residence"], "");
@@ -992,7 +1021,7 @@
         setField("accountType", accountType);
         setAccountTypeVisuals(isRealAccount(account));
         setField("accountCategory", accountCategory);
-        setField("platform", platform);
+        setPlatformBrand();
         setField("mt5Access", mt5Access);
         setField("accountStatus", accountStatus);
         updateCountryAndFlag(countryCode);
