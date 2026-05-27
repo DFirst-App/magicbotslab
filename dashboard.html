@@ -9,15 +9,18 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,500;0,9..40,600;0,9..40,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #020617;
-      --surface: #0f172a;
-      --surface-elevated: #1e293b;
-      --border: rgba(148, 163, 184, 0.14);
-      --text: #f1f5f9;
-      --muted: #94a3b8;
-      --accent: #34d399;
-      --accent2: #38bdf8;
-      --ring: rgba(56, 189, 248, 0.35);
+      --bg: #16181d;
+      --surface: #1e2229;
+      --surface-2: #252b34;
+      --surface-3: #2d3440;
+      --border: rgba(255, 255, 255, 0.1);
+      --text: #f3f6fb;
+      --muted: #a8b1c2;
+      --blue: #61a5ff;
+      --green: #68d391;
+      --orange: #f6ad55;
+      --violet: #b794f4;
+      --red: #fc8181;
     }
 
     * { box-sizing: border-box; }
@@ -27,26 +30,56 @@
       min-height: 100vh;
       font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
       font-feature-settings: "tnum" 1;
-      background-color: var(--bg);
+      background: radial-gradient(circle at 10% -10%, rgba(97, 165, 255, 0.14), transparent 40%),
+                  radial-gradient(circle at 92% 0%, rgba(183, 148, 244, 0.12), transparent 36%),
+                  var(--bg);
       color: var(--text);
       -webkit-font-smoothing: antialiased;
     }
 
     .wrap {
-      width: 100%;
-      max-width: none;
-      margin: 0;
-      padding: 24px 24px 56px;
+      width: min(1400px, 100%);
+      margin: 0 auto;
+      padding: 24px 22px 56px;
     }
 
     .topbar {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 18px;
-      margin-bottom: 28px;
-      padding-bottom: 22px;
-      border-bottom: 1px solid var(--border);
+      gap: 16px;
+      margin-bottom: 16px;
+      padding: 16px 18px;
+      border-radius: 16px;
+      background: linear-gradient(140deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+      border: 1px solid var(--border);
+      backdrop-filter: blur(2px);
+    }
+
+    .brand-block { display: flex; flex-direction: column; gap: 4px; }
+    .brand-kicker {
+      margin: 0;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .brand-title {
+      margin: 0;
+      font-family: "DM Sans", "Plus Jakarta Sans", system-ui, sans-serif;
+      font-size: clamp(20px, 2.7vw, 28px);
+      line-height: 1.1;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+    .brand-sub {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
     }
 
     .topbar-actions {
@@ -57,462 +90,339 @@
       gap: 10px;
     }
 
-    .fund-actions {
-      display: inline-flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .fund-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 9px 14px;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
+    .primary-btn,
+    .logout-btn,
+    .start-trading-btn,
+    .fund-btn,
+    .social-btn {
+      border-radius: 11px;
+      border: 1px solid var(--border);
+      font-family: inherit;
+      cursor: pointer;
       text-decoration: none;
-      border: 1px solid transparent;
-      transition: transform 0.12s ease, box-shadow 0.12s ease;
-    }
-
-    .fund-btn:hover {
-      transform: translateY(-1px);
-    }
-
-    .fund-btn--deposit {
-      background: #065f46;
-      color: #ecfdf5;
-      border-color: rgba(52, 211, 153, 0.45);
-      box-shadow: 0 4px 14px rgba(6, 95, 70, 0.35);
-    }
-
-    .fund-btn--withdraw {
-      background: #9a3412;
-      color: #fff7ed;
-      border-color: rgba(251, 146, 60, 0.45);
-      box-shadow: 0 4px 14px rgba(154, 52, 18, 0.35);
-    }
-
-    .brand-block {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .brand-kicker {
-      margin: 0;
-      font-family: "Plus Jakarta Sans", system-ui, sans-serif;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .brand-title {
-      margin: 0;
-      font-family: "DM Sans", "Plus Jakarta Sans", system-ui, sans-serif;
-      font-size: clamp(17px, 2.6vw, 21px);
-      line-height: 1.15;
-      letter-spacing: -0.04em;
-      font-weight: 600;
-      color: #f8fafc;
-    }
-
-    .brand-sub {
-      margin-top: 5px;
-      color: var(--muted);
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      font-weight: 600;
+      font-weight: 700;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
     }
 
     .primary-btn {
-      border: 1px solid rgba(56, 189, 248, 0.45);
-      background: var(--surface-elevated);
-      color: #f8fafc;
-      border-radius: 12px;
+      background: linear-gradient(130deg, #2d3b4f, #223042);
+      color: #e8f2ff;
       padding: 10px 14px;
-      cursor: pointer;
-      font-family: inherit;
-      font-weight: 700;
-      font-size: 13px;
-      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.6), 0 8px 20px rgba(0, 0, 0, 0.35);
       display: inline-flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      box-shadow: 0 8px 20px rgba(12, 16, 25, 0.45);
     }
+    .primary-btn:hover,
+    .logout-btn:hover,
+    .fund-btn:hover,
+    .start-trading-btn:hover,
+    .social-btn:hover { transform: translateY(-1px); }
 
-    .primary-btn__label {
-      white-space: nowrap;
-    }
-
-    .primary-btn__badges {
-      display: inline-flex;
-      align-items: center;
-      flex-wrap: nowrap;
-      gap: 6px;
-    }
-
+    .primary-btn__label { white-space: nowrap; }
+    .primary-btn__badges { display: inline-flex; gap: 5px; }
     .bot-badge {
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 800;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
-      padding: 4px 8px;
+      padding: 4px 7px;
       border-radius: 6px;
       border: 1px solid var(--border);
-      line-height: 1;
-      flex-shrink: 0;
     }
-
-    .bot-badge--deriv {
-      background: rgba(56, 189, 248, 0.15);
-      color: #7dd3fc;
-    }
-
-    .bot-badge--mt5 {
-      background: rgba(167, 139, 250, 0.15);
-      color: #ddd6fe;
-    }
+    .bot-badge--deriv { background: rgba(97, 165, 255, 0.15); color: #a9d0ff; }
+    .bot-badge--mt5 { background: rgba(183, 148, 244, 0.15); color: #dcc6ff; }
 
     .logout-btn {
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: #e2e8f0;
-      border-radius: 12px;
+      background: #2b313b;
+      color: #e4ebf7;
       padding: 10px 14px;
-      cursor: pointer;
-      font-family: inherit;
-      font-weight: 600;
       font-size: 13px;
     }
 
     .overview {
-      margin-bottom: 22px;
       display: grid;
-      grid-template-columns: 1.15fr 1fr;
-      gap: 16px;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .overview-main,
+    .balance-panel,
+    .meta-grid .card,
+    .accounts-panel,
+    .status {
+      background: linear-gradient(150deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 14px 35px rgba(8, 12, 19, 0.35);
     }
 
     .overview-main {
       padding: 20px 22px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
+      display: grid;
+      gap: 8px;
     }
-
     .overview-main .eyebrow {
       color: var(--muted);
-      font-size: 11px;
+      font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.14em;
       font-weight: 700;
-      margin-bottom: 10px;
     }
-
     .overview-main .name {
-      font-size: clamp(22px, 4vw, 32px);
-      font-weight: 800;
-      line-height: 1.15;
       margin: 0;
-      word-break: break-word;
-      letter-spacing: -0.02em;
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
     }
-
     .overview-main .account-type {
-      margin-top: 10px;
-      color: var(--muted);
+      color: #d4dbeb;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 600;
     }
 
     .balance-panel {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
       padding: 20px 22px;
-      min-height: 150px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
+      display: grid;
       gap: 10px;
-      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.5);
+      align-content: start;
+    }
+    .balance-label {
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .balance-value {
+      font-size: clamp(30px, 4.8vw, 42px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #f4f8ff;
+      line-height: 1.03;
+    }
+    .live-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      border-radius: 999px;
+      border: 1px solid rgba(104, 211, 145, 0.35);
+      background: rgba(104, 211, 145, 0.12);
+      color: #b6efcb;
+      padding: 6px 11px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 3px rgba(104, 211, 145, 0.28);
     }
 
     .balance-actions {
-      margin-top: 6px;
-      padding-top: 16px;
+      margin-top: 4px;
+      padding-top: 14px;
       border-top: 1px solid var(--border);
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       gap: 8px 10px;
     }
-
+    .fund-actions {
+      display: inline-flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .fund-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      padding: 9px 13px;
+    }
+    .fund-btn--deposit {
+      background: linear-gradient(135deg, #296f4d, #225d42);
+      color: #ecfff5;
+      border-color: rgba(104, 211, 145, 0.45);
+    }
+    .fund-btn--withdraw {
+      background: linear-gradient(135deg, #8c4f21, #70411d);
+      color: #fff3e4;
+      border-color: rgba(246, 173, 85, 0.4);
+    }
     .start-trading-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 42px;
-      padding: 12px 20px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 700;
+      min-height: 40px;
+      padding: 10px 16px;
+      font-size: 12px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      font-family: inherit;
-      cursor: pointer;
-      border: 1px solid rgba(14, 165, 233, 0.85);
-      background: #0284c7;
-      color: #ffffff;
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.12),
-        0 4px 0 #0369a1,
-        0 10px 24px rgba(14, 165, 233, 0.35);
-      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+      color: #eef6ff;
+      background: linear-gradient(135deg, #2f5f9f, #3a73bf);
+      border-color: rgba(97, 165, 255, 0.45);
     }
 
-    .start-trading-btn:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.05);
-    }
-
-    .start-trading-btn:active {
-      transform: translateY(1px);
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.1),
-        0 2px 0 #0369a1,
-        0 6px 16px rgba(14, 165, 233, 0.3);
-    }
-
-    .balance-label {
-      color: var(--muted);
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-weight: 700;
-    }
-
-    .balance-value {
-      font-size: clamp(26px, 5vw, 36px);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      word-break: break-word;
-      color: #f8fafc;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .live-pill {
-      display: inline-flex;
-      width: fit-content;
-      align-items: center;
-      gap: 8px;
-      background: rgba(52, 211, 153, 0.12);
-      color: #a7f3d0;
-      border: 1px solid rgba(52, 211, 153, 0.28);
-      border-radius: 999px;
-      padding: 6px 11px;
-      font-size: 11px;
-      font-weight: 700;
-      margin-top: 2px;
-      letter-spacing: 0.02em;
-    }
-
-    .live-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.35);
-    }
-
-    .grid {
+    .meta-grid {
+      margin-bottom: 14px;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px 18px;
-      display: flex;
-      flex-direction: column;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 10px;
-      min-height: 92px;
     }
-
-    .card h3 {
+    .meta-grid .card {
+      padding: 14px 14px 12px;
+      min-height: 85px;
+      display: grid;
+      align-content: start;
+      gap: 8px;
+    }
+    .meta-grid .card h3 {
       margin: 0;
-      font-size: 10px;
-      color: var(--muted);
+      font-size: 9px;
       text-transform: uppercase;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.13em;
+      color: var(--muted);
       font-weight: 700;
     }
-
     .value {
-      font-size: 18px;
+      font-size: 15px;
       font-weight: 700;
-      color: #f8fafc;
-      word-break: break-word;
-      letter-spacing: -0.02em;
-      font-variant-numeric: tabular-nums;
+      color: #f2f6ff;
       line-height: 1.35;
     }
+    .value.small { font-size: 14px; font-weight: 650; }
+    .ok { color: #9be6b6; }
 
-    .value.small {
-      font-size: 15px;
-      font-weight: 600;
+    .accounts-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
     }
-
-    .ok {
-      color: var(--accent);
+    .accounts-panel { padding: 16px; }
+    .panel-title {
+      margin: 0 0 12px;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
     }
+    .accounts-grid {
+      display: grid;
+      gap: 8px;
+      max-height: 340px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+    .acct-item {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 10px 12px;
+      display: grid;
+      gap: 6px;
+    }
+    .acct-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+    }
+    .acct-id { font-weight: 700; color: #ebf1ff; }
+    .acct-type {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      padding: 3px 6px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .acct-balance {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #e6eeff;
+    }
+    .acct-meta {
+      font-size: 11px;
+      color: #acb5c7;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .accent-options { border-left: 3px solid rgba(97, 165, 255, 0.85); }
+    .accent-mt5 { border-left: 3px solid rgba(183, 148, 244, 0.9); }
 
     .status {
-      margin-top: 18px;
       font-size: 13px;
-      color: var(--muted);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      color: #cad3e6;
       padding: 12px 14px;
       line-height: 1.5;
+      margin-top: 0;
     }
 
     .dash-footer {
-      margin-top: 28px;
-      padding-top: 22px;
+      margin-top: 16px;
+      padding-top: 16px;
       border-top: 1px solid var(--border);
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       gap: 10px;
     }
-
     .social-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 10px 16px;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-decoration: none;
-      border: 1px solid transparent;
-      transition: transform 0.12s ease, box-shadow 0.12s ease;
+      padding: 10px 14px;
+      font-size: 11px;
+      letter-spacing: 0.05em;
     }
-
-    .social-btn:hover {
-      transform: translateY(-1px);
-    }
-
     .social-btn--whatsapp {
-      background: #166534;
-      color: #ecfdf5;
-      border-color: rgba(74, 222, 128, 0.45);
-      box-shadow: 0 4px 14px rgba(22, 101, 52, 0.35);
+      background: linear-gradient(135deg, #2d7b56, #1f6a48);
+      color: #ecfff5;
+      border-color: rgba(104, 211, 145, 0.45);
+    }
+    .social-btn--telegram {
+      background: linear-gradient(135deg, #2d5f95, #244f7d);
+      color: #e8f1ff;
+      border-color: rgba(97, 165, 255, 0.45);
     }
 
-    .social-btn--telegram {
-      background: #075985;
-      color: #e0f2fe;
-      border-color: rgba(56, 189, 248, 0.45);
-      box-shadow: 0 4px 14px rgba(7, 89, 133, 0.35);
+    @media (max-width: 1180px) {
+      .meta-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .accounts-layout { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 900px) {
-      .overview {
-        grid-template-columns: 1fr;
-      }
-      .grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
+      .overview { grid-template-columns: 1fr; }
+      .topbar { flex-direction: column; }
+      .topbar-actions { justify-content: flex-start; }
     }
 
     @media (max-width: 640px) {
-      .topbar {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .topbar-actions {
-        justify-content: flex-start;
-      }
-      .grid {
-        grid-template-columns: 1fr;
-      }
-      .primary-btn {
-        flex-wrap: nowrap;
-      }
+      .wrap { padding: 12px 12px 40px; }
+      .meta-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .primary-btn, .logout-btn { padding: 8px 10px; font-size: 11px; }
+      .balance-value { font-size: 32px; }
     }
 
-    @media (max-width: 480px) {
-      .wrap {
-        padding: 12px 14px 44px;
-      }
-
-      .topbar {
-        margin-bottom: 14px;
-        padding-bottom: 12px;
-        gap: 10px;
-      }
-
-      .brand-kicker {
-        font-size: 9px;
-        letter-spacing: 0.12em;
-      }
-
-      .brand-title {
-        font-size: 15px;
-      }
-
-      .brand-sub {
-        font-size: 9px;
-        margin-top: 3px;
-        letter-spacing: 0.08em;
-      }
-
-      .topbar-actions {
-        gap: 6px;
-        flex-wrap: wrap;
-      }
-
-      .primary-btn {
-        padding: 6px 9px;
-        font-size: 11px;
-        gap: 6px;
-        border-radius: 10px;
-      }
-
-      .primary-btn__badges {
-        gap: 4px;
-      }
-
-      .bot-badge {
-        font-size: 8px;
-        padding: 3px 6px;
-        border-radius: 5px;
-      }
-
-      .logout-btn {
-        padding: 6px 10px;
-        font-size: 11px;
-      }
-
-      .start-trading-btn {
-        min-height: 38px;
-        padding: 10px 16px;
-        font-size: 11px;
-      }
+    @media (max-width: 460px) {
+      .meta-grid { grid-template-columns: 1fr; }
+      .fund-actions { width: 100%; }
+      .fund-btn, .start-trading-btn { width: 100%; }
     }
   </style>
 </head>
@@ -556,7 +466,7 @@
       </div>
     </section>
 
-    <div class="grid">
+    <div class="meta-grid">
       <div class="card">
         <h3>Account ID</h3>
         <div class="value small" id="accountId">--</div>
@@ -593,7 +503,30 @@
         <h3>MT5 Server</h3>
         <div class="value small" id="mt5Server">--</div>
       </div>
+      <div class="card">
+        <h3>Total Live Accounts</h3>
+        <div class="value small" id="totalAccounts">--</div>
+      </div>
+      <div class="card">
+        <h3>Options Accounts</h3>
+        <div class="value small" id="optionsAccountsCount">--</div>
+      </div>
+      <div class="card">
+        <h3>MT5/CFD Accounts</h3>
+        <div class="value small" id="mt5AccountsCount">--</div>
+      </div>
     </div>
+
+    <section class="accounts-layout">
+      <div class="accounts-panel">
+        <h3 class="panel-title">Live Options Balances</h3>
+        <div class="accounts-grid" id="optionsAccountsGrid"></div>
+      </div>
+      <div class="accounts-panel">
+        <h3 class="panel-title">Live MT5 / CFD Balances</h3>
+        <div class="accounts-grid" id="mt5AccountsGrid"></div>
+      </div>
+    </section>
 
     <div class="status" id="statusText"></div>
 
@@ -612,8 +545,11 @@
     const TOKEN_URL = "https://auth.deriv.com/oauth2/token";
 
     let liveWs = null;
+    let portfolioWs = null;
     let liveReconnectTimer = null;
     let selectedRealAccountId = null;
+    let latestOptionsAccounts = [];
+    let latestMt5Accounts = [];
 
     function $(id) {
       return document.getElementById(id);
@@ -638,6 +574,43 @@
       if (id === "connectionState") {
         setField("connectionStateMirror", value);
       }
+    }
+
+    function formatMoney(amount, currency) {
+      if (!Number.isFinite(Number(amount))) return "Not available";
+      return `${Number(amount).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency || ""}`.trim();
+    }
+
+    function renderAccountCards(gridId, rows, kindLabel) {
+      const grid = $(gridId);
+      if (!grid) return;
+      if (!rows.length) {
+        grid.innerHTML = `<div class="acct-item ${kindLabel === "MT5/CFD" ? "accent-mt5" : "accent-options"}"><div class="acct-meta">No ${kindLabel} accounts available.</div></div>`;
+        return;
+      }
+      grid.innerHTML = rows.map((row) => {
+        const balanceText = formatMoney(row.balance, row.currency);
+        const prefixClass = kindLabel === "MT5/CFD" ? "accent-mt5" : "accent-options";
+        return `
+          <article class="acct-item ${prefixClass}">
+            <div class="acct-top">
+              <span class="acct-id">${normalizeDisplayValue(row.loginid || row.account_id || row.mt5_login || row.id, "Unknown")}</span>
+              <span class="acct-type">${normalizeDisplayValue(row.type || row.account_type || kindLabel, kindLabel)}</span>
+            </div>
+            <div class="acct-balance">${balanceText}</div>
+            <div class="acct-meta">
+              <span>${normalizeDisplayValue(row.platform || row.market_type || kindLabel, kindLabel)}</span>
+              <span>${normalizeDisplayValue(row.server || row.mt5_server || row.region || "", "")}</span>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function refreshPortfolioCounters() {
+      setField("optionsAccountsCount", String(latestOptionsAccounts.length));
+      setField("mt5AccountsCount", String(latestMt5Accounts.length));
+      setField("totalAccounts", String(latestOptionsAccounts.length + latestMt5Accounts.length));
     }
 
     function pickAccount(payload) {
@@ -823,6 +796,70 @@
       };
     }
 
+    function connectPortfolioWebSocket(token) {
+      if (!token) return;
+      if (portfolioWs) {
+        try { portfolioWs.close(); } catch (_) {}
+      }
+      const wsEndpoint = `wss://ws.derivws.com/websockets/v3?app_id=${encodeURIComponent(DERIV_OAUTH_CLIENT_ID)}`;
+      portfolioWs = new WebSocket(wsEndpoint);
+
+      portfolioWs.onopen = () => {
+        portfolioWs.send(JSON.stringify({ authorize: token, req_id: 100 }));
+      };
+
+      portfolioWs.onmessage = (event) => {
+        let msg;
+        try { msg = JSON.parse(event.data); } catch (_) { return; }
+        if (!msg || msg.error) return;
+
+        if (msg.msg_type === "authorize" && msg.authorize) {
+          const accountList = Array.isArray(msg.authorize.account_list) ? msg.authorize.account_list : [];
+          latestOptionsAccounts = accountList.map((acc) => ({
+            loginid: acc.loginid,
+            account_id: acc.loginid,
+            type: acc.is_virtual ? "Demo" : "Real",
+            account_type: acc.landing_company_name || "Options",
+            platform: "Deriv Options",
+            balance: acc.balance,
+            currency: acc.currency
+          }));
+          renderAccountCards("optionsAccountsGrid", latestOptionsAccounts, "Options");
+          refreshPortfolioCounters();
+
+          // Deriv WebSocket account endpoint for MT5/CFD list.
+          portfolioWs.send(JSON.stringify({ mt5_login_list: 1, req_id: 101 }));
+        }
+
+        if (msg.msg_type === "mt5_login_list" && msg.mt5_login_list) {
+          const mt5List = Array.isArray(msg.mt5_login_list) ? msg.mt5_login_list : [];
+          latestMt5Accounts = mt5List.map((acc) => ({
+            mt5_login: acc.login || acc.mt5_login || acc.loginid,
+            type: (acc.account_type || "MT5").toUpperCase(),
+            platform: "MT5/CFD",
+            server: acc.server || acc.mt5_server_name || acc.server_info,
+            balance: acc.balance ?? acc.account_balance,
+            currency: acc.currency
+          }));
+          renderAccountCards("mt5AccountsGrid", latestMt5Accounts, "MT5/CFD");
+          refreshPortfolioCounters();
+        }
+
+        if (msg.msg_type === "balance" && msg.balance && msg.balance.loginid) {
+          const idx = latestOptionsAccounts.findIndex((a) => String(a.loginid) === String(msg.balance.loginid));
+          if (idx >= 0) {
+            latestOptionsAccounts[idx] = {
+              ...latestOptionsAccounts[idx],
+              balance: msg.balance.balance,
+              currency: msg.balance.currency || latestOptionsAccounts[idx].currency
+            };
+            renderAccountCards("optionsAccountsGrid", latestOptionsAccounts, "Options");
+            refreshPortfolioCounters();
+          }
+        }
+      };
+    }
+
     function resolveValue(account, keys, fallback = "--") {
       for (const k of keys) {
         if (account && account[k] !== undefined && account[k] !== null && account[k] !== "") {
@@ -853,6 +890,13 @@
 
         const payload = await response.json();
         const accounts = extractAccounts(payload);
+        latestOptionsAccounts = accounts.map((acc) => ({
+          ...acc,
+          loginid: resolveValue(acc, ["account_id", "loginid", "id"], ""),
+          balance: resolveValue(acc, ["balance", "amount"], null),
+          currency: resolveValue(acc, ["currency"], "")
+        }));
+        renderAccountCards("optionsAccountsGrid", latestOptionsAccounts, "Options");
         const account = choosePreferredAccount(accounts) || {};
         selectedRealAccountId = resolveValue(account, ["account_id", "loginid", "id"], null);
 
@@ -869,7 +913,7 @@
         const balanceRaw = resolveValue(account, ["balance", "amount"], null);
         const balance = balanceRaw === null || balanceRaw === undefined || Number.isNaN(Number(balanceRaw))
           ? "Not available"
-          : `${Number(balanceRaw).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency !== "--" ? currency : ""}`.trim();
+          : formatMoney(balanceRaw, currency !== "--" ? currency : "");
 
         setField("fullName", fullName);
         setField("accountId", accountId);
@@ -892,6 +936,10 @@
         } else {
           setField("connectionState", "Connected");
         }
+
+        connectPortfolioWebSocket(token);
+        renderAccountCards("mt5AccountsGrid", latestMt5Accounts, "MT5/CFD");
+        refreshPortfolioCounters();
       } catch (err) {
         setField("connectionState", "Error");
         setStatus("Connected, but failed to load account details. Please reconnect.");
@@ -903,6 +951,9 @@
       localStorage.removeItem(DERIV_OAUTH_SESSION_KEY);
       if (liveWs) {
         try { liveWs.close(); } catch (_) {}
+      }
+      if (portfolioWs) {
+        try { portfolioWs.close(); } catch (_) {}
       }
       window.location.href = "index.html";
     });
