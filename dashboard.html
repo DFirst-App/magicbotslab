@@ -59,19 +59,23 @@
     .brand-block { display: flex; flex-direction: column; gap: 4px; }
     .brand-kicker {
       margin: 0;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.16em;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.11em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: #e6edf9;
     }
     .brand-title {
       margin: 0;
       font-family: "DM Sans", "Plus Jakarta Sans", system-ui, sans-serif;
-      font-size: clamp(20px, 2.7vw, 28px);
+      font-size: clamp(18px, 2.2vw, 24px);
       line-height: 1.1;
-      font-weight: 700;
-      letter-spacing: -0.03em;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #dbe7ff, #8ec5ff 55%, #bca8ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
     .brand-sub {
       margin-top: 2px;
@@ -444,7 +448,6 @@
       <div class="brand-block">
         <p class="brand-kicker">Magic Bots Lab</p>
         <h1 class="brand-title">Dashboard</h1>
-        <div class="brand-sub">Connected account profile</div>
       </div>
       <div class="topbar-actions">
         <button class="primary-btn" id="tradingBotsBtn" type="button">
