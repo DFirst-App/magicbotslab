@@ -1253,8 +1253,12 @@
       }
 
       .back-btn {
-        padding: 8px 12px;
-        font-size: 13px;
+        padding: 5px 8px;
+        font-size: 10px;
+        border-radius: 8px;
+        line-height: 1.2;
+        min-height: 28px;
+        box-sizing: border-box;
       }
 
       .back-btn .full-text {
@@ -1269,6 +1273,10 @@
         padding: 5px 8px;
         font-size: 10px;
         gap: 4px;
+        border-radius: 8px;
+        line-height: 1.2;
+        min-height: 28px;
+        box-sizing: border-box;
       }
 
       .header-mt5-btn .full-text {
@@ -1333,9 +1341,28 @@
       .header {
         margin-bottom: 10px;
         gap: 6px;
+        flex-wrap: nowrap;
+        align-items: center;
+      }
+      .header:not(.show-active) {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        grid-template-areas: "title back mt5";
+        column-gap: 6px;
+        row-gap: 0;
+      }
+      .header.show-active {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 6px;
+      }
+      .header-default {
+        display: contents;
       }
       .header-default-title {
+        grid-area: title;
         gap: 0;
+        min-width: 0;
       }
       .header-default h1 {
         line-height: 1.1;
@@ -1349,14 +1376,36 @@
       .brand-subtitle {
         display: none;
       }
+      .header-default .back-btn {
+        grid-area: back;
+      }
       .header-end {
-        gap: 5px;
+        grid-area: mt5;
+        margin-left: 0;
+        gap: 6px;
+      }
+      .header.show-active .header-active {
+        flex: 1;
+        min-width: 0;
       }
       .header-end .btn {
         padding: 5px 8px;
         font-size: 10px;
         border-radius: 8px;
         font-weight: 600;
+      }
+      .back-btn,
+      .header-mt5-btn {
+        padding: 5px 8px;
+        font-size: 10px;
+        border-radius: 8px;
+        line-height: 1.2;
+        min-height: 28px;
+        box-sizing: border-box;
+        white-space: nowrap;
+      }
+      .header-end .btn {
+        min-height: 28px;
       }
     }
 
@@ -1365,16 +1414,11 @@
         gap: 6px;
       }
 
-      .back-btn {
-        padding: 6px 10px;
-        font-size: 12px;
-        min-width: auto;
-      }
-
+      .back-btn,
       .header-mt5-btn {
-        padding: 4px 6px;
-        font-size: 9px;
-        gap: 3px;
+        padding: 5px 8px;
+        font-size: 10px;
+        min-height: 28px;
       }
 
       .deriv-balance-display {
@@ -1775,6 +1819,8 @@
       martingaleMultiplier: 16
     };
     const VOLATILITY_MARKETS = ["R_10", "R_25", "R_50", "R_75", "R_100"];
+    const HISTORY_VIEW_LIST = "list";
+    const HISTORY_VIEW_BOT = "bot";
 
     let botRunning = false;
     let currentAccountId = null;
@@ -1811,7 +1857,7 @@
       $("botsGrid").style.display = show ? "" : "none";
     }
 
-    function showBotListView() {
+    function renderBotListView() {
       document.querySelectorAll(".bot-list-card").forEach((el) => {
         el.style.display = "";
       });
@@ -1822,6 +1868,14 @@
       if (detailPanel) detailPanel.hidden = true;
       $("pageHeader")?.classList.remove("show-active");
       setNotice("Select a bot and click Open Bot.");
+    }
+
+    function showBotListView({ fromHistory = false } = {}) {
+      if (botRunning && !fromHistory) return;
+      renderBotListView();
+      if (!fromHistory && history.state?.view === HISTORY_VIEW_BOT) {
+        history.back();
+      }
     }
 
     function showBotDetailView() {
@@ -2227,7 +2281,7 @@
       group.style.display = def.supportsMartingale === false ? "none" : "";
     }
 
-    function openBot(botKey) {
+    function openBot(botKey, { fromHistory = false } = {}) {
       if (!botKey) return;
       if (botRunning) return;
       activeBotKey = botKey;
@@ -2239,6 +2293,9 @@
 
       setMartingaleVisibility(activeBotKey);
       showBotDetailView();
+      if (!fromHistory) {
+        history.pushState({ view: HISTORY_VIEW_BOT, botKey }, "", `#bot-${botKey}`);
+      }
 
       // Mode + account preview
       setMode(state.mode || "real");
@@ -2583,8 +2640,46 @@
 
     $("backToBotsBtn").addEventListener("click", () => {
       if (botRunning) return;
-      showBotListView();
+      if (history.state?.view === HISTORY_VIEW_BOT) {
+        history.back();
+      } else {
+        showBotListView({ fromHistory: true });
+      }
     });
+
+    function initAppHistory() {
+      const baseUrl = window.location.pathname + window.location.search;
+      if (!history.state || history.state.view !== HISTORY_VIEW_LIST) {
+        history.replaceState({ view: HISTORY_VIEW_LIST }, "", baseUrl);
+      }
+
+      window.addEventListener("popstate", (event) => {
+        const state = event.state;
+        if (!state || state.view === HISTORY_VIEW_LIST) {
+          if (botRunning) {
+            history.pushState(
+              { view: HISTORY_VIEW_BOT, botKey: activeBotKey },
+              "",
+              `#bot-${activeBotKey}`
+            );
+            return;
+          }
+          renderBotListView();
+          return;
+        }
+        if (state.view === HISTORY_VIEW_BOT && state.botKey && BOT_DEFS[state.botKey]) {
+          if (botRunning && state.botKey !== activeBotKey) return;
+          openBot(state.botKey, { fromHistory: true });
+        }
+      });
+    }
+
+    function restoreBotFromHash() {
+      const match = window.location.hash.match(/^#bot-([A-Za-z0-9_]+)$/);
+      if (!match || !BOT_DEFS[match[1]]) return;
+      history.pushState({ view: HISTORY_VIEW_BOT, botKey: match[1] }, "", window.location.hash);
+      openBot(match[1], { fromHistory: true });
+    }
 
     $("accountBtn").addEventListener("click", (e) => {
       e.stopPropagation();
@@ -2711,6 +2806,7 @@
     })();
 
     (function init() {
+      initAppHistory();
       const token = getToken();
       if (!token) {
         updateMeta("Not connected to Deriv");
@@ -2729,8 +2825,9 @@
       loadAccountsByMode(token)
         .then(() => {
           updateAccountModeAvailability();
-          showBotListView();
+          showBotListView({ fromHistory: true });
           startBalanceWatch();
+          restoreBotFromHash();
         })
         .catch(() => {
           setNotice("Connected, but failed to load account mode details.", true);
