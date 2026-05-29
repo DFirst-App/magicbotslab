@@ -401,15 +401,23 @@
       align-items: center;
     }
 
+    @media (max-width: 768px) {
+      .bot-config .input-group small {
+        display: none;
+      }
+    }
+
     .history-card {
       background: rgba(15, 17, 23, 0.6);
       border: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: 16px;
       padding: 20px;
+      flex: 1;
       display: flex;
       flex-direction: column;
       gap: 12px;
       max-height: 560px;
+      min-height: 0;
       overflow: hidden;
     }
 
@@ -420,40 +428,82 @@
     }
 
     .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
     .stat-card {
       display: flex;
-      flex-direction: column;
-      gap: 6px;
-      padding: 14px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .stat-card:last-child {
+      border-bottom: none;
     }
 
     .stat-label {
       font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      letter-spacing: 0.05em;
       text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: rgba(152, 162, 189, 0.7);
+      font-weight: 500;
+      font-family: 'Inter', system-ui, sans-serif;
     }
 
     .stat-value {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
-      color: var(--text);
+      letter-spacing: -0.01em;
+      font-family: 'Inter', system-ui, sans-serif;
     }
 
-    .stat-value.value-positive { color: var(--success); }
-    .stat-value.value-negative { color: var(--danger); }
-    .stat-value.value-neutral { color: var(--text); }
-    .stat-value.value-accent { color: var(--accent); }
-    .stat-value.value-warning { color: var(--warning); }
+    .stat-value.positive {
+      color: #24d970;
+    }
+
+    .stat-value.negative {
+      color: #ff5f6d;
+    }
+
+    #balanceValue {
+      color: #00d2ff;
+    }
+
+    #totalProfitValue.positive {
+      color: #24d970;
+    }
+
+    #totalProfitValue.negative {
+      color: #ff5f6d;
+    }
+
+    #totalTradesValue {
+      color: #ff7a18;
+    }
+
+    #winRateValue {
+      color: #a855f7;
+    }
+
+    #currentStakeValue {
+      color: #00d2ff;
+    }
+
+    #consecutiveLossesValue {
+      color: #ff5f6d;
+    }
+
+    #targetValue {
+      color: #fcd34d;
+    }
+
+    #runningTimeValue {
+      color: #00d2ff;
+    }
 
     .history-list {
       display: flex;
@@ -483,8 +533,103 @@
       transform: translateX(0);
     }
 
-    .history-item.win { border-color: rgba(36, 217, 112, 0.3); }
-    .history-item.loss { border-color: rgba(255, 68, 79, 0.3); }
+    .history-item--enter {
+      animation: history-slide-in 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .history-item--enter.win {
+      animation: history-slide-in-win 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .history-item--enter.loss {
+      animation: history-slide-in-loss 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes history-slide-in {
+      0% {
+        opacity: 0;
+        transform: translateX(-36px);
+        box-shadow: 0 0 20px rgba(0, 210, 255, 0.5), 0 0 40px rgba(0, 210, 255, 0.2);
+      }
+      25% {
+        opacity: 1;
+        transform: translateX(4px);
+        box-shadow: 0 0 24px rgba(0, 210, 255, 0.45), 0 0 48px rgba(0, 210, 255, 0.18);
+      }
+      50% {
+        transform: translateX(-2px);
+        box-shadow: 0 0 16px rgba(0, 210, 255, 0.3), 0 0 32px rgba(0, 210, 255, 0.1);
+      }
+      75% {
+        transform: translateX(1px);
+        box-shadow: 0 0 8px rgba(0, 210, 255, 0.15);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+        box-shadow: none;
+      }
+    }
+
+    @keyframes history-slide-in-win {
+      0% {
+        opacity: 0;
+        transform: translateX(-36px);
+        box-shadow: 0 0 22px rgba(36, 217, 112, 0.55), 0 0 44px rgba(36, 217, 112, 0.25);
+      }
+      25% {
+        opacity: 1;
+        transform: translateX(4px);
+        box-shadow: 0 0 26px rgba(36, 217, 112, 0.5), 0 0 52px rgba(36, 217, 112, 0.2);
+      }
+      50% {
+        transform: translateX(-2px);
+        box-shadow: 0 0 18px rgba(36, 217, 112, 0.35), 0 0 36px rgba(36, 217, 112, 0.12);
+      }
+      75% {
+        transform: translateX(1px);
+        box-shadow: 0 0 10px rgba(36, 217, 112, 0.18);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+        box-shadow: none;
+      }
+    }
+
+    @keyframes history-slide-in-loss {
+      0% {
+        opacity: 0;
+        transform: translateX(-36px);
+        box-shadow: 0 0 22px rgba(255, 95, 109, 0.5), 0 0 44px rgba(255, 95, 109, 0.22);
+      }
+      25% {
+        opacity: 1;
+        transform: translateX(4px);
+        box-shadow: 0 0 26px rgba(255, 95, 109, 0.45), 0 0 52px rgba(255, 95, 109, 0.18);
+      }
+      50% {
+        transform: translateX(-2px);
+        box-shadow: 0 0 18px rgba(255, 95, 109, 0.3), 0 0 36px rgba(255, 95, 109, 0.1);
+      }
+      75% {
+        transform: translateX(1px);
+        box-shadow: 0 0 10px rgba(255, 95, 109, 0.15);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+        box-shadow: none;
+      }
+    }
+
+    .history-item.win {
+      border-color: rgba(36, 217, 112, 0.3);
+    }
+
+    .history-item.loss {
+      border-color: rgba(255, 68, 79, 0.3);
+    }
 
     .history-meta {
       display: flex;
@@ -507,12 +652,29 @@
       cursor: pointer;
       transition: all 0.2s ease;
       font-family: inherit;
+      position: relative;
     }
 
     .primary-btn {
       background: linear-gradient(135deg, rgba(0, 210, 255, 0.35), rgba(0, 210, 255, 0.15));
       border: 1px solid rgba(0, 210, 255, 0.6);
       color: #00d2ff;
+    }
+
+    .primary-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .secondary-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text);
+    }
+
+    .secondary-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     @keyframes btn-liquid-flow {
@@ -523,14 +685,24 @@
       0%, 100% { box-shadow: 0 0 14px rgba(0, 212, 255, 0.4), 0 0 28px rgba(0, 212, 255, 0.15); border-color: rgba(0, 212, 255, 0.55); }
       50% { box-shadow: 0 0 22px rgba(0, 212, 255, 0.6), 0 0 40px rgba(0, 212, 255, 0.25); border-color: rgba(0, 212, 255, 0.75); }
     }
-
-    .primary-btn.btn-liquid-glow {
+    @keyframes btn-glow-pulse-stop {
+      0%, 100% { box-shadow: 0 0 14px rgba(251, 146, 60, 0.35), 0 0 28px rgba(251, 146, 60, 0.12); border-color: rgba(251, 146, 60, 0.5); }
+      50% { box-shadow: 0 0 22px rgba(251, 146, 60, 0.55), 0 0 40px rgba(251, 146, 60, 0.2); border-color: rgba(251, 146, 60, 0.7); }
+    }
+    .primary-btn.btn-liquid-glow,
+    .secondary-btn.btn-liquid-glow {
       position: relative;
       overflow: hidden;
+    }
+    .primary-btn.btn-liquid-glow {
       animation: btn-glow-pulse-start 2.2s ease-in-out infinite;
       border-color: rgba(0, 212, 255, 0.6);
     }
-
+    .secondary-btn.btn-liquid-glow {
+      animation: btn-glow-pulse-stop 2.2s ease-in-out infinite;
+      border-color: rgba(251, 146, 60, 0.55);
+      color: rgba(251, 180, 120, 0.95);
+    }
     .primary-btn.btn-liquid-glow::before {
       content: '';
       position: absolute;
@@ -549,22 +721,28 @@
       pointer-events: none;
       z-index: 0;
     }
-
-    .primary-btn.btn-liquid-glow > * {
+    .secondary-btn.btn-liquid-glow::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(
+        110deg,
+        transparent 0%,
+        transparent 35%,
+        rgba(251, 146, 60, 0.25) 50%,
+        transparent 65%,
+        transparent 100%
+      );
+      background-size: 200% 100%;
+      animation: btn-liquid-flow 2.5s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .primary-btn.btn-liquid-glow > *,
+    .secondary-btn.btn-liquid-glow > * {
       position: relative;
       z-index: 1;
-    }
-
-    .secondary-btn {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: var(--text);
-    }
-
-    .primary-btn:disabled,
-    .secondary-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
     }
 
     .notice {
@@ -812,9 +990,109 @@
       line-height: 1.45;
     }
 
+    @media (min-width: 1024px) {
+      .bot-panel-grid {
+        grid-template-columns: 1.05fr 0.9fr 1fr;
+        align-items: start;
+      }
+
+      .bot-stats {
+        height: 100%;
+      }
+
+      .bot-history-column {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .history-card {
+        height: 100%;
+        max-height: 100%;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+
+      .history-list {
+        max-height: 380px;
+        overflow-y: auto;
+      }
+    }
+
+    @media (max-width: 1023px) {
+      .bot-panel-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .bot-history-column {
+        width: 100%;
+      }
+
+      .history-card {
+        max-height: none;
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .history-list {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        padding-bottom: 20px;
+        margin-bottom: -20px;
+      }
+    }
+
     @media (max-width: 900px) {
       .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .bot-panel-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .bot-config {
+        padding: 14px;
+        gap: 14px;
+        border-radius: 12px;
+      }
+
+      .bot-config h4,
+      .bot-stats h4 {
+        font-size: 16px;
+      }
+
+      .config-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .input-group {
+        gap: 6px;
+      }
+
+      .input-group label {
+        font-size: 11px;
+      }
+
+      .input-group input {
+        padding: 10px 12px;
+        font-size: 13px;
+        border-radius: 8px;
+      }
+
+      .config-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+
+      .primary-btn,
+      .secondary-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 10px 16px;
+        font-size: 13px;
+      }
     }
     @media (max-width: 620px) {
       .grid { grid-template-columns: 1fr; }
@@ -944,7 +1222,7 @@
             <div class="bot-column">
               <div class="bot-config" id="botConfig">
                 <h4>Configuration</h4>
-                <div class="config-grid" style="display:grid; gap:12px;">
+                <div class="config-grid">
                   <div class="input-group">
                     <label for="stakeInput">Initial Stake (USD)</label>
                     <input type="number" id="stakeInput" min="0.35" step="0.01" value="1" />
@@ -963,7 +1241,7 @@
                     <input type="number" id="martingaleInput" min="1" step="0.1" value="16" />
                   </div>
                 </div>
-                <div class="config-actions" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <div class="config-actions">
                   <button class="primary-btn btn-liquid-glow" type="button" id="startBotBtn" disabled>Start Bot</button>
                   <button class="secondary-btn" type="button" id="stopBotBtn" disabled>Stop Bot</button>
                   <div class="bot-stat">Connection: <strong id="botConnection">Idle</strong></div>
@@ -1304,8 +1582,14 @@
 
       const startBtn = $("startBotBtn");
       const stopBtn = $("stopBotBtn");
-      if (startBtn) startBtn.disabled = !!running || !activeBotKey || !currentAccountId;
-      if (stopBtn) stopBtn.disabled = !running;
+      if (startBtn) {
+        startBtn.disabled = !!running || !activeBotKey || !currentAccountId;
+        startBtn.classList.toggle("btn-liquid-glow", !running);
+      }
+      if (stopBtn) {
+        stopBtn.disabled = !running;
+        stopBtn.classList.toggle("btn-liquid-glow", !!running);
+      }
 
       const inputIds = ["stakeInput", "takeProfitInput", "stopLossInput", "martingaleInput"];
       inputIds.forEach((id) => {
@@ -1520,6 +1804,41 @@
       return `$${v.toFixed(2)}`;
     }
 
+    function buildHistoryItem(entry, animate) {
+      const item = document.createElement("div");
+      item.className = `history-item ${entry.win ? "win" : "loss"}${animate ? " history-item--enter" : ""}`;
+
+      const meta = document.createElement("div");
+      meta.className = "history-meta";
+      const ts = entry.timestamp instanceof Date ? entry.timestamp : new Date(entry.timestamp || Date.now());
+      meta.innerHTML = `
+        <strong>${entry.market || "--"} · Digit ${entry.digit ?? "-"}</strong>
+        <span>${ts.toLocaleTimeString()}</span>
+        <span>Stake: $${Number(entry.stake ?? 0).toFixed(2)}</span>
+      `;
+
+      const profit = document.createElement("div");
+      const p = Number(entry.profit ?? 0);
+      profit.className = `history-profit ${entry.win ? "win" : "loss"}`;
+      profit.textContent = `${entry.win ? "+" : ""}$${p.toFixed(2)}`;
+
+      item.appendChild(meta);
+      item.appendChild(profit);
+      return item;
+    }
+
+    function prependHistoryItem(entry) {
+      const list = $("historyList");
+      if (!list) return;
+      const onlyPlaceholder = list.children.length === 1
+        && list.querySelector(".history-meta")?.textContent?.includes("No trades yet");
+      if (onlyPlaceholder) list.innerHTML = "";
+      list.prepend(buildHistoryItem(entry, true));
+      while (list.children.length > 25) {
+        list.removeChild(list.lastChild);
+      }
+    }
+
     function renderTradeLogFor(botKey) {
       const list = $("historyList");
       if (!list) return;
@@ -1531,34 +1850,9 @@
         return;
       }
 
-      const limit = 25;
-      const items = history.slice(0, limit);
       list.innerHTML = "";
-      items.forEach((entry) => {
-        const item = document.createElement("div");
-        item.className = `history-item ${entry.win ? "win" : "loss"}`.trim();
-
-        const meta = document.createElement("div");
-        meta.className = "history-meta";
-        const time = document.createElement("div");
-        time.textContent = new Date(entry.timestamp || Date.now()).toLocaleTimeString();
-        const info = document.createElement("div");
-        const market = entry.market || "--";
-        const digit = entry.digit ?? "-";
-        const stake = Number(entry.stake ?? 0);
-        info.textContent = `${market} · Digit ${digit} · Stake $${stake.toFixed(2)}`;
-        meta.appendChild(time);
-        meta.appendChild(info);
-
-        const profit = document.createElement("div");
-        const p = Number(entry.profit ?? 0);
-        const currency = entry.currency || currentCurrency || "USD";
-        profit.className = `history-profit ${entry.win ? "win" : "loss"}`.trim();
-        profit.textContent = `${p.toFixed(2)} ${currency}`;
-
-        item.appendChild(meta);
-        item.appendChild(profit);
-        list.appendChild(item);
+      history.slice(0, 25).forEach((entry) => {
+        list.appendChild(buildHistoryItem(entry, false));
       });
     }
 
@@ -1567,53 +1861,43 @@
       if (!state) return;
       const modeKey = currentMode === "demo" ? "demo" : "real";
       const stats = state.modes?.[modeKey]?.stats;
-      const setValueClass = (id, cls) => {
-        const el = $(id);
-        if (!el) return;
-        el.classList.remove("value-positive", "value-negative", "value-neutral", "value-accent", "value-warning");
-        if (cls) el.classList.add(cls);
-      };
+      const totalProfitEl = $("totalProfitValue");
 
       if (!stats) {
         $("balanceValue").textContent = "-";
-        $("totalProfitValue").textContent = "$0.00";
+        if (totalProfitEl) {
+          totalProfitEl.textContent = "$0.00";
+          totalProfitEl.classList.remove("positive", "negative");
+        }
         $("totalTradesValue").textContent = "0";
         $("winRateValue").textContent = "0%";
         $("currentStakeValue").textContent = "$0.00";
         $("consecutiveLossesValue").textContent = "0";
         $("targetValue").textContent = "-";
         $("runningTimeValue").textContent = "00:00:00";
-        setValueClass("balanceValue", "value-neutral");
-        setValueClass("totalProfitValue", "value-neutral");
-        setValueClass("totalTradesValue", "value-neutral");
-        setValueClass("winRateValue", "value-neutral");
-        setValueClass("currentStakeValue", "value-accent");
-        setValueClass("consecutiveLossesValue", "value-neutral");
-        setValueClass("targetValue", "value-accent");
-        setValueClass("runningTimeValue", "value-accent");
         return;
       }
 
       const currency = stats.currency || currentCurrency || "USD";
       const totalProfit = Number(stats.totalProfit ?? 0);
-      const winRateNum = Number(stats.winRate ?? 0);
-      const losses = Number(stats.consecutiveLosses ?? 0);
-      $("balanceValue").textContent = stats.balance !== undefined ? `${Number(stats.balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency}` : "-";
-      $("totalProfitValue").textContent = formatMoney(stats.totalProfit ?? 0);
+      $("balanceValue").textContent = stats.balance !== undefined
+        ? `${Number(stats.balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency}`
+        : "-";
+      if (totalProfitEl) {
+        totalProfitEl.textContent = `${totalProfit >= 0 ? "+" : ""}$${totalProfit.toFixed(2)}`;
+        totalProfitEl.classList.toggle("positive", totalProfit > 0);
+        totalProfitEl.classList.toggle("negative", totalProfit < 0);
+      }
       $("totalTradesValue").textContent = String(stats.totalTrades ?? 0);
-      $("winRateValue").textContent = stats.winRate !== undefined ? `${stats.winRate}%`.replace("%%", "%") : "0%";
-      $("currentStakeValue").textContent = formatMoney(stats.currentStake ?? 0);
+      $("winRateValue").textContent = `${stats.winRate ?? 0}%`.replace("%%", "%");
+      $("currentStakeValue").textContent = `$${Number(stats.currentStake ?? 0).toFixed(2)}`;
       $("consecutiveLossesValue").textContent = String(stats.consecutiveLosses ?? 0);
-      $("targetValue").textContent = stats.market !== undefined ? `${stats.market}${stats.digit !== undefined ? ` / ${stats.digit}` : ""}` : "-";
+      if (stats.market !== undefined && stats.digit !== undefined) {
+        $("targetValue").textContent = `${stats.market} / ${stats.digit}`;
+      } else {
+        $("targetValue").textContent = stats.market !== undefined ? String(stats.market) : "-";
+      }
       $("runningTimeValue").textContent = stats.runningTime || "00:00:00";
-      setValueClass("balanceValue", "value-accent");
-      setValueClass("totalProfitValue", totalProfit > 0 ? "value-positive" : (totalProfit < 0 ? "value-negative" : "value-neutral"));
-      setValueClass("totalTradesValue", "value-neutral");
-      setValueClass("winRateValue", winRateNum >= 70 ? "value-positive" : (winRateNum >= 45 ? "value-warning" : "value-negative"));
-      setValueClass("currentStakeValue", "value-accent");
-      setValueClass("consecutiveLossesValue", losses >= 3 ? "value-negative" : (losses > 0 ? "value-warning" : "value-positive"));
-      setValueClass("targetValue", "value-accent");
-      setValueClass("runningTimeValue", "value-accent");
     }
 
     function setMartingaleVisibility(botKey) {
@@ -1792,7 +2076,9 @@
             setBotBalance(balance, currency || "USD");
           },
           updateTargets: (market, displayTarget) => {
-            if ($("targetValue")) $("targetValue").textContent = displayTarget || market || "-";
+            if ($("targetValue")) {
+              $("targetValue").textContent = displayTarget || (market !== undefined ? String(market) : "-");
+            }
           },
           addHistoryEntry: ({ win, profit, stake, market, digit, timestamp }) => {
             const s = ensureBotState(thisBotKey);
@@ -1819,7 +2105,7 @@
               if (m) {
                 m.lastContract = `${result} | ${market || "--"} | Digit ${digit ?? "-"}`;
               }
-              renderTradeLogFor(thisBotKey);
+              prependHistoryItem(entry);
             }
           }
         };
