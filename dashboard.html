@@ -335,6 +335,38 @@
       font-size: 14px;
       line-height: 1;
     }
+    .platform-card__row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .platform-card__main {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+    .details-toggle {
+      display: none;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: #dbe7ff;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+    }
+    .details-toggle:hover {
+      background: var(--surface-3);
+    }
+    .dashboard-meta { margin-bottom: 14px; }
+    .mobile-bottom { margin-top: 0; }
     .ok { color: #9be6b6; }
 
     .accounts-layout {
@@ -449,16 +481,93 @@
     }
 
     @media (max-width: 640px) {
-      .wrap { padding: 12px 12px 40px; }
-      .meta-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .wrap {
+        padding: 12px 12px 16px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .topbar {
+        margin-bottom: 10px;
+        padding: 12px 14px;
+      }
+      .overview {
+        margin-bottom: 10px;
+        gap: 10px;
+      }
+      .overview-main,
+      .balance-panel {
+        padding: 16px 18px;
+      }
+      .overview-main .name {
+        font-size: 22px;
+      }
+      .balance-value { font-size: 28px; }
+      .balance-hint { display: none; }
+      .live-pill { display: none; }
       .primary-btn, .logout-btn { padding: 8px 10px; font-size: 11px; }
-      .balance-value { font-size: 32px; }
+      .dashboard-meta {
+        margin-bottom: 0;
+        flex: 1 1 auto;
+      }
+      .meta-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        margin-bottom: 0;
+      }
+      #platformCard {
+        order: -1;
+        margin-bottom: 0;
+      }
+      .dashboard-meta:not(.details-open) .meta-grid .card:not(#platformCard) {
+        display: none;
+      }
+      .dashboard-meta:not(.details-open) .accounts-layout {
+        display: none;
+      }
+      .dashboard-meta.details-open .meta-grid {
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .dashboard-meta.details-open .meta-grid .card {
+        min-height: auto;
+      }
+      .dashboard-meta.details-open .accounts-layout {
+        display: grid;
+        margin-bottom: 10px;
+      }
+      .details-toggle {
+        display: inline-flex;
+      }
+      .mobile-bottom {
+        margin-top: auto;
+        padding-top: 12px;
+      }
+      .status {
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 12px;
+        padding: 10px 12px;
+      }
+      .dash-footer {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: 0;
+      }
+      .social-btn {
+        flex: 1 1 calc(50% - 5px);
+        justify-content: center;
+      }
     }
 
     @media (max-width: 460px) {
-      .meta-grid { grid-template-columns: 1fr; }
       .fund-actions { width: 100%; }
       .fund-btn, .start-trading-btn { width: 100%; }
+      .balance-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
     }
   </style>
 </head>
@@ -502,6 +611,7 @@
       </div>
     </section>
 
+    <section class="dashboard-meta" id="dashboardMeta">
     <div class="meta-grid">
       <div class="card">
         <h3>Account ID</h3>
@@ -519,9 +629,14 @@
         <h3>Account Category</h3>
         <div class="value small" id="accountCategory">--</div>
       </div>
-      <div class="card">
-        <h3>Platform</h3>
-        <div class="value small" id="platform">--</div>
+      <div class="card platform-card" id="platformCard">
+        <div class="platform-card__row">
+          <div class="platform-card__main">
+            <h3>Platform</h3>
+            <div class="value small" id="platform">--</div>
+          </div>
+          <button type="button" class="details-toggle" id="detailsToggle" aria-expanded="false" aria-controls="dashboardMeta">Details</button>
+        </div>
       </div>
       <div class="card">
         <h3>MT5 Access</h3>
@@ -563,13 +678,16 @@
         <div class="accounts-grid" id="mt5AccountsGrid"></div>
       </div>
     </section>
+    </section>
 
+    <div class="mobile-bottom">
     <div class="status" id="statusText"></div>
 
     <footer class="dash-footer">
       <a class="social-btn social-btn--whatsapp" href="https://whatsapp.com/channel/0029Vb6sxFG9xVJWbyIwL110" target="_blank" rel="noopener noreferrer">Join WhatsApp</a>
       <a class="social-btn social-btn--telegram" href="https://t.me/magicabofficialchannel" target="_blank" rel="noopener noreferrer">Join Telegram</a>
     </footer>
+    </div>
   </div>
 
   <script>
@@ -1064,6 +1182,14 @@
 
     $("startTradingBtn").addEventListener("click", () => {
       window.location.href = "trading-dashboard.html";
+    });
+
+    const dashboardMeta = $("dashboardMeta");
+    const detailsToggle = $("detailsToggle");
+    detailsToggle?.addEventListener("click", () => {
+      const open = dashboardMeta?.classList.toggle("details-open");
+      detailsToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      detailsToggle.textContent = open ? "Hide" : "Details";
     });
 
     loadDashboard();
