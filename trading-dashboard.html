@@ -64,6 +64,30 @@
       color: var(--muted);
     }
 
+    .brand-label-mobile {
+      display: none;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #c8d4ea;
+    }
+
+    .sim-trigger-letter {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .account-menu-wrap {
+      position: relative;
+    }
+
     .brand-subtitle {
       font-size: 12px;
       color: var(--muted);
@@ -794,6 +818,59 @@
     }
     @media (max-width: 620px) {
       .grid { grid-template-columns: 1fr; }
+      .wrap {
+        padding: 10px 10px 72px;
+      }
+      .topbar {
+        margin-bottom: 10px;
+        gap: 6px;
+        align-items: center;
+      }
+      .brand {
+        gap: 0;
+        min-width: 0;
+        flex: 0 0 auto;
+      }
+      .brand-title {
+        line-height: 1.1;
+      }
+      .brand-label-full {
+        display: none;
+      }
+      .brand-label-mobile {
+        display: inline;
+      }
+      .brand-subtitle {
+        display: none;
+      }
+      .topbar-actions {
+        gap: 5px;
+        flex: 1 1 auto;
+        justify-content: flex-end;
+        min-width: 0;
+      }
+      .fund-nav-btn {
+        padding: 5px 8px;
+        font-size: 9px;
+        border-radius: 8px;
+        letter-spacing: 0.03em;
+      }
+      .topbar-actions .btn {
+        padding: 5px 8px;
+        font-size: 10px;
+        border-radius: 8px;
+        font-weight: 600;
+      }
+      #accountBtn {
+        max-width: 108px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      #backToBotsBtn {
+        padding: 5px 7px;
+        font-size: 9px;
+      }
     }
   </style>
 </head>
@@ -801,12 +878,15 @@
   <div class="wrap">
     <div class="topbar">
       <div class="brand">
-        <div class="brand-title">Trading <span id="simTriggerLetter">B</span>ots Dashboard</div>
+        <div class="brand-title">
+          <span class="brand-label-full">Trading <span class="sim-trigger-letter" id="simTriggerLetter">B</span>ots Dashboard</span>
+          <span class="brand-label-mobile">Deriv <span class="sim-trigger-letter">B</span>ots</span>
+        </div>
         <div class="brand-subtitle" id="connectionMeta">Checking connection…</div>
       </div>
-      <div style="display:flex; gap:10px; align-items:center;">
+      <div class="topbar-actions">
         <a class="fund-nav-btn fund-nav-btn--mt5" href="mt5-dashboard.html">MT5 Bots</a>
-        <div style="position:relative;">
+        <div class="account-menu-wrap">
           <button class="btn" id="accountBtn" type="button" style="display:none;">
             <span id="accountBtnMode">Real</span> · <span id="accountBtnBalance">--</span>
           </button>
@@ -1999,18 +2079,20 @@
     });
 
     (function initSimTripleClick() {
-      const letter = document.getElementById("simTriggerLetter");
-      if (!letter) return;
+      const letters = document.querySelectorAll(".sim-trigger-letter");
+      if (!letters.length) return;
       let clicks = 0;
       let resetTimer = null;
-      letter.addEventListener("click", () => {
-        clicks += 1;
-        clearTimeout(resetTimer);
-        resetTimer = setTimeout(() => { clicks = 0; }, 600);
-        if (clicks >= 3) {
-          clicks = 0;
-          window.location.href = "simtrading-bots.html";
-        }
+      letters.forEach((letter) => {
+        letter.addEventListener("click", () => {
+          clicks += 1;
+          clearTimeout(resetTimer);
+          resetTimer = setTimeout(() => { clicks = 0; }, 600);
+          if (clicks >= 3) {
+            clicks = 0;
+            window.location.href = "simtrading-bots.html";
+          }
+        });
       });
     })();
 
