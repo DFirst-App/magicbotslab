@@ -243,6 +243,13 @@
       font-weight: 700;
       color: #00d2ff;
       letter-spacing: -0.01em;
+      min-width: 2.5rem;
+      text-align: right;
+    }
+
+    .deriv-balance-value:empty::after {
+      content: "…";
+      opacity: 0.75;
     }
 
     .deriv-balance-currency {
@@ -877,16 +884,36 @@
     .notice {
       background: rgba(34, 197, 94, 0.08);
       border: 1px solid rgba(34, 197, 94, 0.18);
-      border-radius: 12px;
-      padding: 12px;
+      border-radius: 10px;
+      padding: 8px 12px;
       color: rgba(187, 247, 208, 0.95);
-      margin-bottom: 14px;
+      font-size: 12px;
+      line-height: 1.4;
     }
 
     .notice.error {
       background: rgba(239, 68, 68, 0.08);
       border-color: rgba(239, 68, 68, 0.2);
       color: rgba(254, 202, 202, 0.95);
+    }
+
+    .status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .wrap:has(.header.show-active) .status-bar {
+      display: none !important;
+    }
+
+    .status-bar-notice {
+      flex: 1;
+      min-width: 0;
+      margin: 0;
     }
 
     .bot-panel-content {
@@ -1252,6 +1279,15 @@
         display: inline;
       }
 
+      .status-bar {
+        gap: 10px;
+      }
+
+      .status-bar-notice {
+        font-size: 11px;
+        padding: 7px 10px;
+      }
+
       .deriv-balance-display {
         padding: 5px 10px;
       }
@@ -1381,26 +1417,6 @@
         <span id="headerActiveBotName">Bot</span>
       </div>
       <div class="header-end">
-        <div class="deriv-balance-wrap account-menu-wrap">
-          <button type="button" class="deriv-balance-display" id="accountBtn" style="display:none;" aria-haspopup="true" aria-expanded="false">
-            <span class="deriv-balance-label">Balance</span>
-            <span class="deriv-balance-value" id="accountBtnBalance">--</span>
-            <span class="deriv-balance-currency" id="accountBtnCurrency">USD</span>
-          </button>
-          <div id="accountMenu" class="card" style="display:none; position:absolute; right:0; top:44px; width:280px; z-index:20;">
-            <div class="card-title">Account & Mode</div>
-            <div class="pill-row">
-              <span class="pill" id="modePill">Mode: Real</span>
-              <span class="pill live" id="connectionPill">Live</span>
-            </div>
-            <div class="mode-toggle" aria-label="Account mode">
-              <button class="mode-btn active" id="realModeBtn" type="button">Real</button>
-              <button class="mode-btn" id="demoModeBtn" type="button" style="display:none;">Demo</button>
-            </div>
-            <div class="bot-stat">Account: <strong id="botAccountId">--</strong></div>
-            <div class="bot-stat">Balance: <strong id="botBalance">--</strong></div>
-          </div>
-        </div>
         <a class="header-mt5-btn" href="mt5-dashboard.html">
           <span class="full-text">Explore MT5 Bots →</span>
           <span class="short-text">MT5 Bots →</span>
@@ -1409,7 +1425,29 @@
       </div>
     </div>
 
-    <div class="notice" id="noticeBox">Loading…</div>
+    <div class="status-bar" id="statusBar">
+      <div class="status-bar-notice notice" id="noticeBox"><span id="noticeText">Loading…</span></div>
+      <div class="deriv-balance-wrap account-menu-wrap">
+        <button type="button" class="deriv-balance-display" id="accountBtn" style="display:none;" aria-haspopup="true" aria-expanded="false">
+          <span class="deriv-balance-label">Balance</span>
+          <span class="deriv-balance-value" id="accountBtnBalance"></span>
+          <span class="deriv-balance-currency" id="accountBtnCurrency">USD</span>
+        </button>
+        <div id="accountMenu" class="card" style="display:none; position:absolute; right:0; top:44px; width:280px; z-index:20;">
+          <div class="card-title">Account & Mode</div>
+          <div class="pill-row">
+            <span class="pill" id="modePill">Mode: Real</span>
+            <span class="pill live" id="connectionPill">Live</span>
+          </div>
+          <div class="mode-toggle" aria-label="Account mode">
+            <button class="mode-btn active" id="realModeBtn" type="button">Real</button>
+            <button class="mode-btn" id="demoModeBtn" type="button" style="display:none;">Demo</button>
+          </div>
+          <div class="bot-stat">Account: <strong id="botAccountId">--</strong></div>
+          <div class="bot-stat">Balance: <strong id="botBalance">--</strong></div>
+        </div>
+      </div>
+    </div>
 
     <div class="grid" id="botsGrid" style="display:none;">
 
@@ -1752,6 +1790,8 @@
     let realTapTimer = null;
     let lastKnownBalance = null;
     let lastKnownCurrency = "USD";
+    let balanceWatchWs = null;
+    let balanceWatchReconnectTimer = null;
 
     function $(id) { return document.getElementById(id); }
 
@@ -1761,8 +1801,10 @@
 
     function setNotice(message, isError = false) {
       const box = $("noticeBox");
-      box.className = `notice${isError ? " error" : ""}`;
-      box.textContent = message;
+      const text = $("noticeText");
+      if (box) box.className = `status-bar-notice notice${isError ? " error" : ""}`;
+      if (text) text.textContent = message;
+      else if (box) box.textContent = message;
     }
 
     function showBotsGrid(show) {
@@ -1855,10 +1897,66 @@
       const cur = currency || lastKnownCurrency || "USD";
       const formatted = Number(balance).toLocaleString(undefined, { maximumFractionDigits: 2 });
       $("botBalance").textContent = `${formatted} ${cur}`;
-      $("accountBtnBalance").textContent = formatted;
+      if ($("accountBtnBalance")) $("accountBtnBalance").textContent = formatted;
       if ($("accountBtnCurrency")) $("accountBtnCurrency").textContent = cur;
       lastKnownBalance = Number(balance);
       lastKnownCurrency = cur;
+    }
+
+    function stopBalanceWatch() {
+      if (balanceWatchReconnectTimer) {
+        clearTimeout(balanceWatchReconnectTimer);
+        balanceWatchReconnectTimer = null;
+      }
+      if (balanceWatchWs) {
+        try { balanceWatchWs.close(); } catch (_) {}
+        balanceWatchWs = null;
+      }
+    }
+
+    async function startBalanceWatch() {
+      if (botRunning) return;
+      const token = getToken();
+      const accountId = getCurrentModeAccountId();
+      if (!token || !accountId) return;
+
+      stopBalanceWatch();
+
+      try {
+        const wsUrl = await getOtpWsUrl(token, accountId);
+        if (!wsUrl || botRunning) return;
+
+        balanceWatchWs = new WebSocket(wsUrl);
+        balanceWatchWs.onopen = () => {
+          if (botRunning || !balanceWatchWs) return;
+          balanceWatchWs.send(JSON.stringify({ balance: 1, subscribe: 1, req_id: Date.now() }));
+        };
+        balanceWatchWs.onmessage = (event) => {
+          try {
+            const msg = JSON.parse(event.data);
+            if (msg.error) return;
+            if (msg.msg_type === "balance" && msg.balance) {
+              setBotBalance(msg.balance.balance, msg.balance.currency);
+              currentCurrency = msg.balance.currency || currentCurrency;
+              if (msg.balance.loginid) {
+                $("botAccountId").textContent = msg.balance.loginid;
+              }
+            }
+          } catch (_) {}
+        };
+        balanceWatchWs.onclose = () => {
+          balanceWatchWs = null;
+          if (!botRunning && getToken() && getCurrentModeAccountId()) {
+            balanceWatchReconnectTimer = setTimeout(() => {
+              balanceWatchReconnectTimer = null;
+              startBalanceWatch();
+            }, 2500);
+          }
+        };
+        balanceWatchWs.onerror = () => {
+          try { balanceWatchWs?.close(); } catch (_) {}
+        };
+      } catch (_) {}
     }
 
     function logTrade() {
@@ -1914,6 +2012,7 @@
       }
       currentAccountId = getCurrentModeAccountId();
       $("botAccountId").textContent = currentAccountId || "--";
+      if (!botRunning) startBalanceWatch();
     }
 
     async function getOtpWsUrl(token, accountId) {
@@ -1982,6 +2081,7 @@
       botRunning = false;
       setControlsForRunning(false);
       setBotConnection("Stopped");
+      startBalanceWatch();
     }
 
     const BOT_DEFS = {
@@ -2182,10 +2282,10 @@
       const startBtn = $("startBotBtn");
       if (startBtn) startBtn.disabled = !currentAccountId;
 
-      // Update balance preview
+      // Refresh live balance subscription for this account
       const token = getToken();
       if (token && currentAccountId) {
-        fetchModeBalancePreview(token, currentAccountId)
+        startBalanceWatch()
           .then(() => showLowBalanceRecommendPopupIfNeeded(activeBotKey))
           .catch(() => {});
       }
@@ -2234,6 +2334,7 @@
       }
 
       botRunning = true;
+      stopBalanceWatch();
       setControlsForRunning(true);
       setBotConnection("Initializing...");
 
@@ -2261,6 +2362,11 @@
           setRunningState: (running) => {
             botRunning = !!running;
             setControlsForRunning(botRunning);
+            if (botRunning) {
+              stopBalanceWatch();
+            } else {
+              startBalanceWatch();
+            }
           },
           resetHistory: () => {
             const s = ensureBotState(thisBotKey);
@@ -2538,7 +2644,7 @@
       $("botAccountId").textContent = currentAccountId || "--";
       const token = getToken();
       if (token && currentAccountId) {
-        fetchModeBalancePreview(token, currentAccountId)
+        startBalanceWatch()
           .then(() => showLowBalanceRecommendPopupIfNeeded(activeBotKey))
           .catch(() => {});
       }
@@ -2557,7 +2663,7 @@
       $("botAccountId").textContent = currentAccountId || "--";
       const token = getToken();
       if (token && currentAccountId) {
-        fetchModeBalancePreview(token, currentAccountId)
+        startBalanceWatch()
           .then(() => showLowBalanceRecommendPopupIfNeeded(activeBotKey))
           .catch(() => {});
       }
@@ -2624,6 +2730,7 @@
         .then(() => {
           updateAccountModeAvailability();
           showBotListView();
+          startBalanceWatch();
         })
         .catch(() => {
           setNotice("Connected, but failed to load account mode details.", true);
