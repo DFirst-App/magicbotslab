@@ -42,26 +42,39 @@
       padding-bottom: 80px;
     }
 
-    .topbar {
+    .header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      align-items: center;
+      gap: 16px;
       margin-bottom: 18px;
+      position: relative;
+      flex-wrap: wrap;
     }
 
-    .brand {
+    .header-default {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .header-default-title {
       display: flex;
       flex-direction: column;
       gap: 4px;
+      min-width: 0;
     }
 
-    .brand-title {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+    .header-default h1 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
       color: var(--muted);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-family: 'Inter', system-ui, sans-serif;
+      line-height: 1.2;
     }
 
     .brand-label-mobile {
@@ -77,10 +90,123 @@
       user-select: none;
     }
 
-    .topbar-actions {
-      display: flex;
-      gap: 10px;
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .back-btn {
+      display: inline-flex;
       align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      font-family: 'Inter', system-ui, sans-serif;
+      flex-shrink: 0;
+    }
+
+    .back-btn .full-text {
+      display: inline;
+    }
+
+    .back-btn .short-text {
+      display: none;
+    }
+
+    .header-active {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .header-active button {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      flex-shrink: 0;
+    }
+
+    .header-active button:hover {
+      background: rgba(0, 210, 255, 0.15);
+      border-color: rgba(0, 210, 255, 0.4);
+    }
+
+    .header-active span {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.8);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .header.show-active .header-default {
+      display: none;
+    }
+
+    .header.show-active .header-active {
+      display: inline-flex;
+    }
+
+    .header-end {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .header-mt5-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 210, 255, 0.4);
+      color: #00d2ff;
+      font-size: 11px;
+      font-weight: 600;
+      text-decoration: none;
+      background: rgba(0, 210, 255, 0.08);
+      transition: all 0.2s ease;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .header-mt5-btn:hover {
+      background: rgba(0, 210, 255, 0.15);
+      border-color: rgba(0, 210, 255, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .header-mt5-btn .full-text {
+      display: inline;
+    }
+
+    .header-mt5-btn .short-text {
+      display: none;
+    }
+
+    .deriv-balance-wrap {
+      position: relative;
+      display: inline-flex;
       flex-shrink: 0;
     }
 
@@ -88,9 +214,42 @@
       position: relative;
     }
 
-    .brand-subtitle {
-      font-size: 12px;
-      color: var(--muted);
+    .deriv-balance-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.12), rgba(0, 210, 255, 0.06));
+      border: 1px solid rgba(0, 210, 255, 0.25);
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    button.deriv-balance-display {
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .deriv-balance-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(152, 162, 189, 0.8);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .deriv-balance-value {
+      font-size: 13px;
+      font-weight: 700;
+      color: #00d2ff;
+      letter-spacing: -0.01em;
+    }
+
+    .deriv-balance-currency {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(152, 162, 189, 0.85);
+      letter-spacing: 0.04em;
     }
 
     .btn {
@@ -108,36 +267,6 @@
       border-color: rgba(0, 210, 255, 0.35);
       background: linear-gradient(135deg, rgba(0, 210, 255, 0.18) 0%, rgba(0, 210, 255, 0.08) 100%);
       color: var(--accent);
-    }
-
-    /* Compact pill style aligned with dashboard Deposit / Withdraw */
-    .fund-nav-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 7px 12px;
-      border-radius: 10px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-decoration: none;
-      border: 1px solid transparent;
-      transition: transform 0.12s ease, box-shadow 0.12s ease;
-      white-space: nowrap;
-      font-family: inherit;
-      line-height: 1.2;
-    }
-
-    .fund-nav-btn:hover {
-      transform: translateY(-1px);
-    }
-
-    .fund-nav-btn--mt5 {
-      background: #5b21b6;
-      color: #f5f3ff;
-      border-color: rgba(167, 139, 250, 0.45);
-      box-shadow: 0 4px 14px rgba(91, 33, 182, 0.35);
     }
 
     /* --- trading-bots.html: bot cards + open button --- */
@@ -864,16 +993,6 @@
       color: #ffffff;
     }
 
-    #accountBtnMode {
-      color: #22c55e;
-      font-weight: 800;
-    }
-
-    #accountBtnBalance {
-      color: #7dd3fc;
-      font-weight: 700;
-    }
-
     .deposit-popup-overlay,
     .low-balance-recommend-overlay {
       position: fixed;
@@ -1094,22 +1213,95 @@
         font-size: 13px;
       }
     }
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .header-default h1 {
+        font-size: 14px;
+      }
+
+      .back-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+
+      .back-btn .full-text {
+        display: none !important;
+      }
+
+      .back-btn .short-text {
+        display: inline !important;
+      }
+
+      .header-mt5-btn {
+        padding: 5px 8px;
+        font-size: 10px;
+        gap: 4px;
+      }
+
+      .header-mt5-btn .full-text {
+        display: none;
+      }
+
+      .header-mt5-btn .short-text {
+        display: inline;
+      }
+
+      .deriv-balance-display {
+        padding: 5px 10px;
+      }
+
+      .deriv-balance-label {
+        font-size: 10px;
+      }
+
+      .deriv-balance-value {
+        font-size: 12px;
+      }
+
+      .deriv-balance-currency {
+        font-size: 10px;
+      }
+
+      .header-active {
+        gap: 6px;
+        flex: 1;
+        min-width: 0;
+      }
+
+      .header-active button {
+        padding: 5px 8px;
+        font-size: 10px;
+        white-space: nowrap;
+      }
+
+      .header-active span {
+        font-size: 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 120px;
+      }
+    }
+
     @media (max-width: 620px) {
       .grid { grid-template-columns: 1fr; }
       .wrap {
         padding: 10px 10px 72px;
       }
-      .topbar {
+      .header {
         margin-bottom: 10px;
         gap: 6px;
-        align-items: center;
       }
-      .brand {
+      .header-default-title {
         gap: 0;
-        min-width: 0;
-        flex: 0 0 auto;
       }
-      .brand-title {
+      .header-default h1 {
         line-height: 1.1;
       }
       .brand-label-full {
@@ -1121,32 +1313,48 @@
       .brand-subtitle {
         display: none;
       }
-      .topbar-actions {
+      .header-end {
         gap: 5px;
-        flex: 1 1 auto;
-        justify-content: flex-end;
-        min-width: 0;
       }
-      .fund-nav-btn {
-        padding: 5px 8px;
-        font-size: 9px;
-        border-radius: 8px;
-        letter-spacing: 0.03em;
-      }
-      .topbar-actions .btn {
+      .header-end .btn {
         padding: 5px 8px;
         font-size: 10px;
         border-radius: 8px;
         font-weight: 600;
       }
-      #accountBtn {
-        max-width: 108px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+    }
+
+    @media (max-width: 480px) {
+      .header {
+        gap: 6px;
       }
-      #backToBotsBtn {
-        padding: 5px 7px;
+
+      .back-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+        min-width: auto;
+      }
+
+      .header-mt5-btn {
+        padding: 4px 6px;
+        font-size: 9px;
+        gap: 3px;
+      }
+
+      .deriv-balance-display {
+        padding: 4px 8px;
+        gap: 6px;
+      }
+
+      .deriv-balance-label {
+        font-size: 9px;
+      }
+
+      .deriv-balance-value {
+        font-size: 11px;
+      }
+
+      .deriv-balance-currency {
         font-size: 9px;
       }
     }
@@ -1154,19 +1362,30 @@
 </head>
 <body>
   <div class="wrap">
-    <div class="topbar">
-      <div class="brand">
-        <div class="brand-title">
-          <span class="brand-label-full">Trading <span class="sim-trigger-letter" id="simTriggerLetter">B</span>ots Dashboard</span>
-          <span class="brand-label-mobile">Deriv <span class="sim-trigger-letter">B</span>ots</span>
+    <div class="header" id="pageHeader">
+      <div class="header-default" id="headerDefault">
+        <div class="header-default-title">
+          <h1>
+            <span class="brand-label-full">Trading <span class="sim-trigger-letter" id="simTriggerLetter">B</span>ots Dashboard</span>
+            <span class="brand-label-mobile">Deriv <span class="sim-trigger-letter">B</span>ots</span>
+          </h1>
+          <div class="brand-subtitle" id="connectionMeta">Checking connection…</div>
         </div>
-        <div class="brand-subtitle" id="connectionMeta">Checking connection…</div>
+        <a href="dashboard.html" class="back-btn" id="backBtn">
+          <span class="full-text">← Back to Dashboard</span>
+          <span class="short-text">← Back</span>
+        </a>
       </div>
-      <div class="topbar-actions">
-        <a class="fund-nav-btn fund-nav-btn--mt5" href="mt5-dashboard.html">MT5 Bots</a>
-        <div class="account-menu-wrap">
-          <button class="btn" id="accountBtn" type="button" style="display:none;">
-            <span id="accountBtnMode">Real</span> · <span id="accountBtnBalance">--</span>
+      <div class="header-active" id="headerActive">
+        <button type="button" id="backToBotsBtn">← Back to bots</button>
+        <span id="headerActiveBotName">Bot</span>
+      </div>
+      <div class="header-end">
+        <div class="deriv-balance-wrap account-menu-wrap">
+          <button type="button" class="deriv-balance-display" id="accountBtn" style="display:none;" aria-haspopup="true" aria-expanded="false">
+            <span class="deriv-balance-label">Balance</span>
+            <span class="deriv-balance-value" id="accountBtnBalance">--</span>
+            <span class="deriv-balance-currency" id="accountBtnCurrency">USD</span>
           </button>
           <div id="accountMenu" class="card" style="display:none; position:absolute; right:0; top:44px; width:280px; z-index:20;">
             <div class="card-title">Account & Mode</div>
@@ -1182,8 +1401,10 @@
             <div class="bot-stat">Balance: <strong id="botBalance">--</strong></div>
           </div>
         </div>
-        <button class="btn" id="backToBotsBtn" type="button" style="display:none;">← Back to bots</button>
-        <button class="btn" id="backBtn" type="button">Back</button>
+        <a class="header-mt5-btn" href="mt5-dashboard.html">
+          <span class="full-text">Explore MT5 Bots →</span>
+          <span class="short-text">MT5 Bots →</span>
+        </a>
         <button class="btn primary" id="connectBtn" type="button" style="display:none;">Reconnect</button>
       </div>
     </div>
@@ -1557,8 +1778,7 @@
       });
       const detailPanel = $("botDetailPanel");
       if (detailPanel) detailPanel.hidden = true;
-      $("backToBotsBtn").style.display = "none";
-      $("backBtn").style.display = "";
+      $("pageHeader")?.classList.remove("show-active");
       setNotice("Select a bot and click Open Bot.");
     }
 
@@ -1571,8 +1791,7 @@
       });
       const detailPanel = $("botDetailPanel");
       if (detailPanel) detailPanel.hidden = false;
-      $("backToBotsBtn").style.display = "";
-      $("backBtn").style.display = "none";
+      $("pageHeader")?.classList.add("show-active");
     }
 
     function setControlsForRunning(running) {
@@ -1614,8 +1833,6 @@
 
     function setMode(mode) {
       currentMode = mode === "demo" ? "demo" : "real";
-      $("accountBtnMode").textContent = currentMode === "real" ? "Real" : "Demo";
-      $("accountBtnMode").style.color = currentMode === "real" ? "#22c55e" : "#cbd5e1";
       $("realModeBtn").classList.toggle("active", currentMode === "real");
       $("demoModeBtn").classList.toggle("active", currentMode === "demo");
       if (activeBotKey && botStates[activeBotKey]) {
@@ -1635,11 +1852,13 @@
 
     function setBotBalance(balance, currency) {
       if (balance === undefined || balance === null || Number.isNaN(Number(balance))) return;
-      const text = `${Number(balance).toLocaleString(undefined, { maximumFractionDigits: 2 })} ${currency || "USD"}`;
-      $("botBalance").textContent = text;
-      $("accountBtnBalance").textContent = text;
+      const cur = currency || lastKnownCurrency || "USD";
+      const formatted = Number(balance).toLocaleString(undefined, { maximumFractionDigits: 2 });
+      $("botBalance").textContent = `${formatted} ${cur}`;
+      $("accountBtnBalance").textContent = formatted;
+      if ($("accountBtnCurrency")) $("accountBtnCurrency").textContent = cur;
       lastKnownBalance = Number(balance);
-      lastKnownCurrency = currency || lastKnownCurrency || "USD";
+      lastKnownCurrency = cur;
     }
 
     function logTrade() {
@@ -1676,6 +1895,7 @@
       // Use currency hint from selected-mode account if available
       const selected = currentMode === "real" ? (real || accounts[0]) : (demo || accounts[0]);
       currentCurrency = selected?.currency || "USD";
+      if ($("accountBtnCurrency")) $("accountBtnCurrency").textContent = currentCurrency;
     }
 
     function getCurrentModeAccountId() {
@@ -1950,6 +2170,9 @@
         smartDiffer: "Smart Differ Pro"
       };
       $("activeBotName").textContent = nameMap[activeBotKey] || activeBotKey;
+      if ($("headerActiveBotName")) {
+        $("headerActiveBotName").textContent = nameMap[activeBotKey] || activeBotKey;
+      }
       $("activeBotDesc").textContent = "Configure the bot, then start it. Stats and recent trades update live.";
 
       // Idle connection indicator
@@ -2230,10 +2453,6 @@
       }
     }
 
-    $("backBtn").addEventListener("click", () => {
-      window.location.href = "dashboard.html";
-    });
-
     $("connectBtn").addEventListener("click", () => {
       window.location.href = "index.html";
     });
@@ -2264,7 +2483,9 @@
     $("accountBtn").addEventListener("click", (e) => {
       e.stopPropagation();
       const menu = $("accountMenu");
-      menu.style.display = menu.style.display === "none" || !menu.style.display ? "" : "none";
+      const open = menu.style.display === "none" || !menu.style.display;
+      menu.style.display = open ? "" : "none";
+      $("accountBtn").setAttribute("aria-expanded", open ? "true" : "false");
     });
     $("accountMenu").addEventListener("click", (e) => {
       e.stopPropagation();
@@ -2273,6 +2494,7 @@
     document.addEventListener("click", () => {
       const menu = $("accountMenu");
       if (menu) menu.style.display = "none";
+      if ($("accountBtn")) $("accountBtn").setAttribute("aria-expanded", "false");
     });
 
     document.querySelectorAll(".bot-open").forEach((btn) => {
