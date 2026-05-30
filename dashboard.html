@@ -131,13 +131,14 @@
     .primary-btn__label { white-space: nowrap; }
     .primary-btn__badges { display: inline-flex; gap: 5px; }
     .bot-badge {
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 800;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      padding: 4px 7px;
-      border-radius: 6px;
+      padding: 5px 9px;
+      border-radius: 7px;
       border: 1px solid var(--border);
+      line-height: 1;
     }
     .bot-badge--deriv { background: rgba(97, 165, 255, 0.15); color: #a9d0ff; }
     .bot-badge--mt5 { background: rgba(183, 148, 244, 0.15); color: #dcc6ff; }
@@ -274,27 +275,35 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      min-height: 40px;
+      flex-wrap: wrap;
+      gap: 10px;
+      min-height: 44px;
       padding: 10px 16px;
       font-size: 12px;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
       color: #eef6ff;
       background: linear-gradient(135deg, #356cb4, #3a73bf);
       border-color: rgba(97, 165, 255, 0.45);
       box-shadow: 0 8px 22px rgba(27, 55, 97, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.14);
     }
-    .start-trading-btn__label { white-space: nowrap; }
+    .start-trading-btn__label { white-space: nowrap; font-weight: 800; }
+    .start-trading-btn .primary-btn__badges { gap: 6px; }
+    .start-trading-btn .bot-badge {
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
     .start-trading-btn .bot-badge--deriv {
-      background: rgba(97, 165, 255, 0.22);
-      color: #c8e0ff;
-      border-color: rgba(97, 165, 255, 0.35);
+      background: linear-gradient(135deg, rgba(97, 165, 255, 0.45), rgba(59, 130, 246, 0.28));
+      color: #ffffff;
+      border-color: rgba(147, 197, 253, 0.65);
     }
     .start-trading-btn .bot-badge--mt5 {
-      background: rgba(183, 148, 244, 0.22);
-      color: #e8d4ff;
-      border-color: rgba(183, 148, 244, 0.35);
+      background: linear-gradient(135deg, rgba(183, 148, 244, 0.45), rgba(139, 92, 246, 0.28));
+      color: #ffffff;
+      border-color: rgba(216, 180, 254, 0.65);
     }
     .balance-hint {
       margin-top: -2px;
@@ -623,7 +632,7 @@
             <a class="fund-btn fund-btn--withdraw" href="https://partner-tracking.deriv.com/click?a=18562&o=1&c=4&link_id=1" target="_blank" rel="noopener noreferrer sponsored">Withdraw</a>
           </div>
           <button class="start-trading-btn" id="startTradingBtn" type="button">
-            <span class="start-trading-btn__label">Start trading with AI bots</span>
+            <span class="start-trading-btn__label">Open AI bots</span>
             <span class="primary-btn__badges">
               <span class="bot-badge bot-badge--deriv">Deriv</span>
               <span class="bot-badge bot-badge--mt5">MT5</span>
