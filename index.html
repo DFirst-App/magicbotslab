@@ -108,8 +108,34 @@
       flex-wrap: wrap;
       align-items: center;
       justify-content: center;
-      gap: 10px 12px;
+      gap: 10px;
       width: 100%;
+    }
+
+    .hero-cta-actions {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .connect-help-link {
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      background: rgba(251, 191, 36, 0.1);
+      color: #fcd34d;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .connect-help-link:hover {
+      background: rgba(251, 191, 36, 0.16);
+      border-color: rgba(251, 191, 36, 0.6);
     }
 
     .hero-social-icons {
@@ -209,6 +235,12 @@
       text-align: center;
     }
 
+    .landing .guide-steps {
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
     .landing-badge__hint {
       margin: 0;
       width: 100%;
@@ -262,7 +294,7 @@
       z-index: 2;
       max-width: 980px;
       width: 100%;
-      margin-top: 34px;
+      margin-top: 22px;
       text-align: center;
     }
 
@@ -444,12 +476,6 @@
       .landing-badge__text { font-size: 11px; }
       .landing-social-icon img { width: 26px; height: 26px; }
     }
-
-    .landing .guide-steps {
-      max-width: 640px;
-      margin-left: auto;
-      margin-right: auto;
-    }
   </style>
   <link rel="stylesheet" href="guide.css" />
 </head>
@@ -472,9 +498,9 @@
     </div>
 
     <ol class="guide-steps" aria-label="Getting started steps">
-      <li class="is-active" id="guideStepConnect"><strong>Step 1</strong>Connect your Deriv account below</li>
-      <li id="guideStepDashboard"><strong>Step 2</strong>Open your dashboard</li>
-      <li id="guideStepBots"><strong>Step 3</strong>Start with our recommended bot</li>
+      <li class="is-active" id="guideStepConnect"><strong>Step 1</strong>Connect Account</li>
+      <li id="guideStepDashboard"><strong>Step 2</strong>Choose AI Bot</li>
+      <li id="guideStepBots"><strong>Step 3</strong>Start Trading</li>
     </ol>
 
     <section class="hero-copy">
@@ -482,8 +508,10 @@
       <p>Connect your Deriv account to run Magic Bots Lab automations, access MT5 bot downloads, and manage fully automated trading systems from one control dashboard.</p>
       <div class="status" id="statusText"></div>
       <div class="hero-cta-row">
-        <button type="button" class="hero-connect connect-trigger" id="connectBtn">Connect</button>
-        <button type="button" class="ghost-btn" id="connectHelpLink" style="margin-top:8px;font-size:12px;">Can't connect?</button>
+        <div class="hero-cta-actions">
+          <button type="button" class="hero-connect connect-trigger" id="connectBtn">Connect</button>
+          <button type="button" class="connect-help-link" id="connectHelpLink">Can't connect?</button>
+        </div>
         <div class="hero-social-icons" aria-label="Community updates">
           <a class="landing-social-icon" href="https://whatsapp.com/channel/0029Vb6sxFG9xVJWbyIwL110" target="_blank" rel="noopener noreferrer" title="WhatsApp channel">
             <img src="social-whatsapp.png" width="28" height="28" alt="WhatsApp" loading="lazy" decoding="async" />
@@ -557,6 +585,7 @@
     const OAUTH_STATE_KEY = "oauth_state";
     const DERIV_ACCESS_TOKEN_KEY = "deriv_access_token";
     const DERIV_OAUTH_SESSION_KEY = "deriv_oauth_session";
+    const CONNECT_ATTEMPT_KEY = "mbl_connect_attempt";
 
     function getStoredOAuthSession() {
       try {
@@ -637,6 +666,7 @@
         authUrl.searchParams.set("code_challenge", challenge);
         authUrl.searchParams.set("code_challenge_method", "S256");
 
+        sessionStorage.setItem(CONNECT_ATTEMPT_KEY, "1");
         window.location.href = authUrl.toString();
       } catch (error) {
         setStatus("Unable to start OAuth flow. Please try again.", "error");
@@ -685,7 +715,28 @@
       );
       sessionStorage.removeItem(PKCE_VERIFIER_KEY);
       sessionStorage.removeItem(OAUTH_STATE_KEY);
+      sessionStorage.removeItem(CONNECT_ATTEMPT_KEY);
       return tokenData.access_token;
+    }
+
+    function cleanOAuthQueryFromUrl() {
+      if (window.location.search) {
+        history.replaceState({}, "", window.location.pathname);
+      }
+    }
+
+    function maybeShowConnectHelpAfterReturn() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("error")) {
+        cleanOAuthQueryFromUrl();
+        showConnectHelp();
+        return;
+      }
+      const attempt = sessionStorage.getItem(CONNECT_ATTEMPT_KEY);
+      if (attempt === "1" && !params.get("code") && !hasValidExistingConnection()) {
+        sessionStorage.removeItem(CONNECT_ATTEMPT_KEY);
+        showConnectHelp();
+      }
     }
 
     async function handleOAuthCallback() {
@@ -696,6 +747,8 @@
 
       if (error) {
         setStatus("Authorization was cancelled or failed. See connection help below.", "error");
+        cleanOAuthQueryFromUrl();
+        sessionStorage.removeItem(CONNECT_ATTEMPT_KEY);
         showConnectHelp();
         return;
       }
@@ -716,6 +769,7 @@
         window.location.href = "dashboard.html?welcome=1";
       } catch (e) {
         setStatus("Connected but token exchange failed. Please try again.", "error");
+        sessionStorage.removeItem(CONNECT_ATTEMPT_KEY);
         showConnectHelp();
       }
     }
@@ -749,8 +803,7 @@
     });
     if (!maybeRedirectConnectedUser()) {
       handleOAuthCallback();
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("error")) showConnectHelp();
+      maybeShowConnectHelpAfterReturn();
     }
   </script>
 </body>

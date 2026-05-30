@@ -71,7 +71,7 @@
         level: "warn",
         suggestedStake: suggested,
         minBalanceForStake: minBal,
-        message: `Suggested starting stake: $${suggested.toFixed(2)} (based on a ${STAKE_COACH.lossBuffer}-loss recovery buffer at ${STAKE_COACH.smartRecoveryMartingale}×).`
+        message: ""
       };
     }
 
@@ -80,9 +80,7 @@
         level: bal < minBal * 0.85 ? "tight" : "warn",
         suggestedStake: suggested,
         minBalanceForStake: minBal,
-        message: bal < recommendedBal
-          ? `Your stake is a bit high for this balance. Try $${suggested.toFixed(2)} so the bot has room if several trades lose in a row. Growing toward $${recommendedBal.toLocaleString()} USD helps long-term.`
-          : `Consider lowering stake to about $${suggested.toFixed(2)} so recovery has room after a losing streak.`
+        message: ""
       };
     }
 
@@ -91,7 +89,7 @@
         level: "good",
         suggestedStake: suggested,
         minBalanceForStake: minBal,
-        message: `Good fit — your balance gives the bot room for recovery at about $${st.toFixed(2)} per trade. Rome wasn't built in a day; steady sessions win.`
+        message: ""
       };
     }
 
@@ -99,7 +97,7 @@
       level: "good",
       suggestedStake: suggested,
       minBalanceForStake: minBal,
-      message: `Sizing looks reasonable. For the smoothest experience we still recommend working toward $${recommendedBal.toLocaleString()} USD over time.`
+      message: ""
     };
   }
 
