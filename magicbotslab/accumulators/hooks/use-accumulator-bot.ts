@@ -35,6 +35,7 @@ export interface UseAccumulatorBotParams {
   setStake: (value: string) => void;
   takeProfitGoal: number;
   proposal: AccumulatorProposalInfo | null;
+  proposalError: string | null;
   buyContract: () => Promise<void>;
   isBuying: boolean;
   openPositions: OpenPosition[];
@@ -70,6 +71,7 @@ export function useAccumulatorBot(params: UseAccumulatorBotParams): UseAccumulat
     setStake,
     takeProfitGoal,
     proposal,
+    proposalError,
     buyContract,
     isBuying,
     openPositions,
@@ -241,11 +243,22 @@ export function useAccumulatorBot(params: UseAccumulatorBotParams): UseAccumulat
     if (
       botPhase === 'arming' &&
       proposal &&
+      !proposalError &&
       activeSymbol &&
       parseFloat(String(proposal.askPrice)) > 0 &&
       !busyRef.current &&
       !isBuying
     ) {
+      // Diagnostic log for bot buy attempts (very useful when pasting logs)
+      console.log('[ACCU Bot] Triggering buy from arming phase', {
+        symbol: activeSymbol.underlying_symbol,
+        growthRate,
+        stakeUsed: stake,
+        proposalId: proposal.id,
+        askPrice: proposal.askPrice,
+        proposalError,
+      });
+
       busyRef.current = true;
       setBotPhase('buying');
       setBotStatus(formatBotStatus('Opening', activeSymbol.underlying_symbol, sessionProfitRef.current, takeProfitGoal));
@@ -255,6 +268,11 @@ export function useAccumulatorBot(params: UseAccumulatorBotParams): UseAccumulat
         setBotPhase('managing');
       });
       return;
+    }
+
+    // Extra visibility when proposal error blocks the bot
+    if (botPhase === 'arming' && proposalError && !busyRef.current) {
+      console.warn('[ACCU Bot] Waiting — proposal has error:', proposalError);
     }
 
     if (

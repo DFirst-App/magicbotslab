@@ -35,6 +35,7 @@ export default function AccumulatorPage() {
     setStake: trading.setStake,
     takeProfitGoal,
     proposal: trading.proposal,
+    proposalError: trading.proposalError,
     buyContract: trading.buyContract,
     isBuying: trading.isBuying,
     openPositions: trading.openPositions,

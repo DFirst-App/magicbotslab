@@ -61,14 +61,20 @@ export interface AccumulatorProposalInfo extends ProposalInfo {
 
 interface UseAccumulatorProposalReturn {
   proposal: AccumulatorProposalInfo | null;
+  /** Last proposal error (if any). Rich logs are also emitted to console for easy copy-paste diagnosis. */
+  proposalError: string | null;
 }
 
 /**
  * Custom proposal hook for accumulator contracts.
  *
- * The core `useProposal` doesn't support accumulator-specific fields like
- * `growth_rate` and `limit_order.take_profit`. This hook subscribes directly
- * to the WebSocket with the correct accumulator proposal payload.
+ * NOTE ON DUPLICATE CODE:
+ * This is intentionally a specialized copy of packages/core/src/react/useProposal.ts
+ * because the shared hook does not yet support `growth_rate` + `limit_order` + ACCU contract_details.
+ * If you refactor, consider making useProposal generic (extraPayload + custom response mapper)
+ * so this file can delegate instead of duplicating subscription/error logic.
+ *
+ * This version now includes robust error handling + diagnostic logging per Deriv docs.
  */
 export function useAccumulatorProposal(
   ws: DerivWS | null,
@@ -76,6 +82,7 @@ export function useAccumulatorProposal(
   params: AccumulatorProposalParams | null
 ): UseAccumulatorProposalReturn {
   const [proposal, setProposal] = useState<AccumulatorProposalInfo | null>(null);
+  const [proposalError, setProposalError] = useState<string | null>(null);
   const unsubRef = useRef<(() => void) | null>(null);
   // Track previous barriers for delayed display — barriers shown on chart are
   // one tick behind.
@@ -94,6 +101,9 @@ export function useAccumulatorProposal(
 
     let cancelled = false;
 
+    // Clear previous error when starting a new proposal request
+    setProposalError(null);
+
     const payload: Record<string, unknown> = {
       proposal: 1,
       amount: params.amount,
@@ -108,8 +118,38 @@ export function useAccumulatorProposal(
       payload.limit_order = { take_profit: params.takeProfit };
     }
 
+    // Rich diagnostic log of what we are requesting (helps when user pastes logs)
+    console.log('[ACCU Proposal] Requesting', {
+      symbol: params.symbol,
+      growthRate: params.growthRate,
+      amount: params.amount,
+      currency: params.currency,
+      hasTakeProfit: !!params.takeProfit,
+      payload,
+    });
+
     ws.subscribe(payload, (data) => {
       if (cancelled) return;
+
+      // === CRITICAL: Handle proposal errors from Deriv (this was previously swallowed) ===
+      if ((data as any).error) {
+        const err = (data as any).error;
+        const errorMsg = err.message || 'Unknown proposal error';
+        console.error('[ACCU Proposal Error] Full details for diagnosis:', {
+          symbol: params.symbol,
+          growthRate: params.growthRate,
+          amount: params.amount,
+          errorCode: err.code,
+          errorMessage: errorMsg,
+          errorDetails: err,
+          fullResponse: data,
+          sentPayload: payload,
+        });
+        setProposalError(errorMsg);
+        setProposal(null);
+        return;
+      }
+
       const resp = data as unknown as AccumulatorProposalResponse;
       if (resp.proposal) {
         const p = resp.proposal;
@@ -151,6 +191,7 @@ export function useAccumulatorProposal(
           barrierSpotDistance: details?.barrier_spot_distance ?? '',
           hasCrossedBarrier,
         });
+        setProposalError(null);
       }
     }).then((sub) => {
       if (cancelled) {
@@ -158,13 +199,23 @@ export function useAccumulatorProposal(
       } else {
         unsubRef.current = sub.unsubscribe;
       }
-    }).catch(() => {
-      if (!cancelled) setProposal(null);
+    }).catch((err) => {
+      if (!cancelled) {
+        const msg = err instanceof Error ? err.message : 'Proposal subscription failed';
+        console.error('[ACCU Proposal] Subscription setup failed:', {
+          symbol: params.symbol,
+          growthRate: params.growthRate,
+          error: msg,
+        });
+        setProposalError(msg);
+        setProposal(null);
+      }
     });
 
     return () => {
       cancelled = true;
       setProposal(null);
+      setProposalError(null);
       if (unsubRef.current) {
         unsubRef.current();
         unsubRef.current = null;
@@ -173,5 +224,5 @@ export function useAccumulatorProposal(
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ws, isConnected, params?.symbol, params?.amount, params?.growthRate, params?.currency, params?.takeProfit]);
 
-  return { proposal };
+  return { proposal, proposalError };
 }
