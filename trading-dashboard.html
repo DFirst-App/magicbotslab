@@ -1111,6 +1111,24 @@
       color: #24d970;
     }
 
+    .low-balance-recommend-btn-apply,
+    .stake-coach__apply {
+      flex: 1 1 100%;
+      min-width: 0;
+      white-space: normal;
+      line-height: 1.35;
+      font-size: 12px;
+      border-color: rgba(0, 210, 255, 0.45);
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.16), rgba(0, 210, 255, 0.08));
+      color: #cbd5e1;
+    }
+
+    .stake-amt {
+      color: #00d2ff;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
     .low-balance-recommend-tips {
       border: 1px solid rgba(0, 210, 255, 0.2);
       background: rgba(0, 210, 255, 0.06);
@@ -1782,7 +1800,7 @@
         </p>
       </div>
       <div class="deposit-popup-actions">
-        <a href="https://home.deriv.com/dashboard/deposit?from=home" target="_blank" rel="noopener" class="deposit-popup-btn deposit-popup-btn-primary" id="depositPopupBtn">Deposit Funds</a>
+        <a href="https://partner-tracking.deriv.com/click?a=18562&o=1&c=4&link_id=1" target="_blank" rel="noopener" class="deposit-popup-btn deposit-popup-btn-primary" id="depositPopupBtn">Deposit Funds</a>
         <button class="deposit-popup-btn deposit-popup-btn-secondary" id="depositPopupCancel" type="button">Maybe Later</button>
       </div>
     </div>
@@ -1794,19 +1812,21 @@
       <h3 class="low-balance-recommend-title">Balance tip</h3>
       <p class="low-balance-recommend-balance" id="lowBalanceRecommendBalance">Your balance: —</p>
       <p class="low-balance-recommend-message">
-        For a smoother run, we recommend <strong>1,000 USD</strong> or more with Smart Recovery.
+        For more stable results, we recommend a balance of <strong>1,000 USD</strong> or more so Smart Recovery has room to work.
       </p>
       <p class="low-balance-recommend-stake" id="lowBalanceRecommendStake"></p>
       <div class="low-balance-recommend-tips">
-        <span class="low-balance-recommend-tips-label">Quick tip</span>
+        <span class="low-balance-recommend-tips-label">Stay in the game:</span>
         <ul class="low-balance-recommend-tips-list">
-          <li>The bot stops automatically at your take-profit target—pause after a good session.</li>
+          <li>Use a smaller stake per trade (see suggestion below)</li>
+          <li>The bot stops automatically at your take-profit target—pause after a good session</li>
+          <li>Scale stake only after consistency</li>
         </ul>
       </div>
       <div class="low-balance-recommend-actions">
-        <button type="button" class="low-balance-recommend-btn low-balance-recommend-btn-ok" id="lowBalanceRecommendApply" hidden>Apply suggested stake</button>
+        <button type="button" class="low-balance-recommend-btn low-balance-recommend-btn-apply" id="lowBalanceRecommendApply" style="display:none;">Apply suggested stake</button>
         <button type="button" class="low-balance-recommend-btn low-balance-recommend-btn-ok" id="lowBalanceRecommendOk">OK</button>
-        <a href="https://home.deriv.com/dashboard/deposit?from=home" target="_blank" rel="noopener" class="low-balance-recommend-btn low-balance-recommend-btn-deposit" id="lowBalanceRecommendDeposit" style="display:none;">Deposit</a>
+        <a href="https://partner-tracking.deriv.com/click?a=18562&o=1&c=4&link_id=1" target="_blank" rel="noopener" class="low-balance-recommend-btn low-balance-recommend-btn-deposit" id="lowBalanceRecommendDeposit" style="display:none;">Deposit</a>
       </div>
     </div>
   </div>
@@ -2602,8 +2622,8 @@
         const same = Number.isFinite(stake) && Math.abs(stake - evaluation.suggestedStake) < 0.01;
         const showApply = !same && (stake > evaluation.suggestedStake * 1.15 || evaluation.level === "tight" || evaluation.level === "warn");
         applyBtn.hidden = !showApply;
-        applyBtn.textContent = showApply
-          ? `Apply suggested stake ($${evaluation.suggestedStake.toFixed(2)})`
+        applyBtn.innerHTML = showApply
+          ? formatStakeApplyLabel(evaluation.suggestedStake)
           : "Apply suggested stake";
       }
     }
@@ -2620,12 +2640,18 @@
       updateStakeCoachDisplay();
     }
 
+    function formatStakeApplyLabel(amount) {
+      const v = Number(amount);
+      if (!Number.isFinite(v)) return "Apply suggested stake";
+      return `Apply suggested stake (<span class="stake-amt">$${v.toFixed(2)}</span>)`;
+    }
+
     function formatBalanceTipStakeLine() {
       const guide = window.MBLGuide;
       if (!guide || lastKnownBalance == null) return "";
       const suggested = guide.suggestStake(lastKnownBalance);
       lastSuggestedStake = suggested;
-      return `Suggested stake: <strong>$${suggested.toFixed(2)}</strong>`;
+      return `Suggested stake: <span class="stake-amt">$${suggested.toFixed(2)}</span>`;
     }
     const depositPopupOverlay = $("depositPopupOverlay");
     const depositPopupCancel = $("depositPopupCancel");
@@ -2682,15 +2708,15 @@
       const applyFromTip = $("lowBalanceRecommendApply");
       if (stakeLine && botKey === RECOMMENDED_BOT_KEY) {
         stakeLine.innerHTML = formatBalanceTipStakeLine();
-        stakeLine.style.display = stakeLine.textContent ? "" : "none";
+        stakeLine.style.display = stakeLine.innerHTML ? "" : "none";
       } else if (stakeLine) {
         stakeLine.style.display = "none";
       }
       if (applyFromTip) {
         const showApply = botKey === RECOMMENDED_BOT_KEY && lastSuggestedStake != null;
-        applyFromTip.hidden = !showApply;
-        applyFromTip.textContent = showApply
-          ? `Apply suggested stake ($${lastSuggestedStake.toFixed(2)})`
+        applyFromTip.style.display = showApply ? "" : "none";
+        applyFromTip.innerHTML = showApply
+          ? formatStakeApplyLabel(lastSuggestedStake)
           : "Apply suggested stake";
       }
       if (lowBalanceRecommendTimerEl) lowBalanceRecommendTimerEl.textContent = "5";

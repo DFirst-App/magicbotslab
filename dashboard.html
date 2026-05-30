@@ -114,7 +114,15 @@
       gap: 8px;
       box-shadow: 0 8px 20px rgba(12, 16, 25, 0.45);
     }
+    .primary-btn--mt5 {
+      background: linear-gradient(130deg, #4a3568, #352850);
+      color: #f0e8ff;
+      border-color: rgba(183, 148, 244, 0.45);
+      box-shadow: 0 8px 20px rgba(40, 28, 60, 0.45);
+    }
+    .primary-btn--mt5:hover { filter: brightness(1.06); }
     .primary-btn:hover,
+    .primary-btn--mt5:hover,
     .logout-btn:hover,
     .fund-btn:hover,
     .start-trading-btn:hover,
@@ -266,6 +274,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 8px;
       min-height: 40px;
       padding: 10px 16px;
       font-size: 12px;
@@ -275,6 +284,17 @@
       background: linear-gradient(135deg, #356cb4, #3a73bf);
       border-color: rgba(97, 165, 255, 0.45);
       box-shadow: 0 8px 22px rgba(27, 55, 97, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    }
+    .start-trading-btn__label { white-space: nowrap; }
+    .start-trading-btn .bot-badge--deriv {
+      background: rgba(97, 165, 255, 0.22);
+      color: #c8e0ff;
+      border-color: rgba(97, 165, 255, 0.35);
+    }
+    .start-trading-btn .bot-badge--mt5 {
+      background: rgba(183, 148, 244, 0.22);
+      color: #e8d4ff;
+      border-color: rgba(183, 148, 244, 0.35);
     }
     .balance-hint {
       margin-top: -2px;
@@ -580,13 +600,9 @@
         <h1 class="brand-title">Dashboard</h1>
       </div>
       <div class="topbar-actions">
-        <button class="primary-btn" id="tradingBotsBtn" type="button">
-          <span class="primary-btn__label">Trading Bots</span>
-          <span class="primary-btn__badges">
-            <span class="bot-badge bot-badge--deriv">Deriv</span>
-            <span class="bot-badge bot-badge--mt5">MT5</span>
-          </span>
-        </button>
+        <a class="primary-btn primary-btn--mt5" id="createMt5AccountBtn" href="https://partner-tracking.deriv.com/click?a=18562&o=1&c=3&link_id=1" target="_blank" rel="noopener noreferrer sponsored">
+          <span class="primary-btn__label">Create MT5 account</span>
+        </a>
         <button class="logout-btn" id="logoutBtn" type="button">Disconnect</button>
       </div>
     </div>
@@ -603,10 +619,16 @@
         <div class="live-pill"><span class="live-dot"></span><span id="connectionState">Connected</span></div>
         <div class="balance-actions">
           <div class="fund-actions">
-            <a class="fund-btn fund-btn--deposit" href="https://track.deriv.com/_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk/1/?redirect=https%3A%2F%2Fhome.deriv.com%2Fdashboard%2Fdeposit%3Ffrom%3Dhome" target="_blank" rel="noopener noreferrer sponsored">Deposit</a>
-            <a class="fund-btn fund-btn--withdraw" href="https://track.deriv.com/_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk/1/?redirect=https%3A%2F%2Fhome.deriv.com%2Fdashboard%2Fwithdraw%3Ffrom%3Dhome" target="_blank" rel="noopener noreferrer sponsored">Withdraw</a>
+            <a class="fund-btn fund-btn--deposit" href="https://partner-tracking.deriv.com/click?a=18562&o=1&c=4&link_id=1" target="_blank" rel="noopener noreferrer sponsored">Deposit</a>
+            <a class="fund-btn fund-btn--withdraw" href="https://partner-tracking.deriv.com/click?a=18562&o=1&c=4&link_id=1" target="_blank" rel="noopener noreferrer sponsored">Withdraw</a>
           </div>
-          <button class="start-trading-btn" id="startTradingBtn" type="button">Start trading with AI bots</button>
+          <button class="start-trading-btn" id="startTradingBtn" type="button">
+            <span class="start-trading-btn__label">Start trading with AI bots</span>
+            <span class="primary-btn__badges">
+              <span class="bot-badge bot-badge--deriv">Deriv</span>
+              <span class="bot-badge bot-badge--mt5">MT5</span>
+            </span>
+          </button>
         </div>
         <div class="balance-hint">If your full balance is not visible, transfer funds to your Deriv options account.</div>
       </div>
@@ -1199,7 +1221,6 @@
       window.location.href = firstTime ? "trading-dashboard.html?guide=1" : "trading-dashboard.html";
     }
 
-    $("tradingBotsBtn").addEventListener("click", goToTradingBots);
     $("startTradingBtn").addEventListener("click", goToTradingBots);
 
     const dashboardMeta = $("dashboardMeta");

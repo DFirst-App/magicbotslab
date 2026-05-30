@@ -1,5 +1,6 @@
 (() => {
-  const DERIV_PARTNER_URL = "https://track.deriv.com/_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk/1/";
+  const DERIV_PARTNER_URL = "https://partner-tracking.deriv.com/click?a=18562&o=1&c=4&link_id=1";
+  const DERIV_MT5_PARTNER_URL = "https://partner-tracking.deriv.com/click?a=18562&o=1&c=3&link_id=1";
   const STORAGE_PREFIX = "mbl_guide_";
 
   const KEYS = {
@@ -105,6 +106,7 @@
     KEYS,
     STAKE_COACH,
     DERIV_PARTNER_URL,
+    DERIV_MT5_PARTNER_URL,
     mark,
     isDone,
     lossSumMultiplier,

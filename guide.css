@@ -213,16 +213,22 @@
 }
 
 .stake-coach__apply {
-  align-self: flex-start;
-  padding: 6px 10px;
+  align-self: stretch;
+  width: 100%;
+  max-width: 100%;
+  padding: 8px 10px;
   border-radius: 8px;
-  border: 1px solid rgba(0, 210, 255, 0.4);
-  background: rgba(0, 210, 255, 0.1);
-  color: #00d2ff;
-  font-size: 11px;
+  border: 1px solid rgba(0, 210, 255, 0.45);
+  background: linear-gradient(135deg, rgba(0, 210, 255, 0.16), rgba(0, 210, 255, 0.08));
+  color: #cbd5e1;
+  font-size: 12px;
   font-weight: 700;
+  line-height: 1.35;
+  white-space: normal;
+  text-align: center;
   cursor: pointer;
   font-family: inherit;
+  box-sizing: border-box;
 }
 
 .stake-coach__apply[hidden] {
@@ -240,8 +246,10 @@
   color: #cbd5e1;
 }
 
-.low-balance-recommend-stake strong {
+.low-balance-recommend-stake strong,
+.low-balance-recommend-stake .stake-amt {
   color: #00d2ff;
+  font-weight: 800;
 }
 
 @media (max-width: 620px) {
