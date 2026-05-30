@@ -6,12 +6,11 @@ import type { AccumulatorProposalInfo } from './use-accumulator-proposal';
 import type { OpenPosition } from './use-open-positions';
 import type { GrowthRate } from '@/lib/types';
 import {
-  BOT_DEFAULTS,
-  buildBotDecision,
+  analyzePrices,
+  isGoodEntry,
   formatBotStatus,
   shouldCloseTrade,
 } from '@/lib/accumulator-bot-engine';
-import { useAccumulatorMarketScan } from './use-accumulator-market-scan';
 
 export type BotPhase =
   | 'idle'
@@ -79,11 +78,11 @@ export function useAccumulatorBot(params: UseAccumulatorBotParams): UseAccumulat
     sellingId,
   } = params;
 
-  const { scanMarkets } = useAccumulatorMarketScan(ws, isConnected);
+  // useAccumulatorMarketScan kept imported but not used (single market mode now)
 
   const [botRunning, setBotRunning] = useState(false);
   const [botPhase, setBotPhase] = useState<BotPhase>('idle');
-  const [botStatus, setBotStatus] = useState('Bot ready — scans 10 Continuous Indices');
+  const [botStatus, setBotStatus] = useState('Bot ready — using your market & settings');
   const [sessionProfit, setSessionProfit] = useState(0);
 
   const botRunningRef = useRef(false);
@@ -100,50 +99,43 @@ export function useAccumulatorBot(params: UseAccumulatorBotParams): UseAccumulat
     };
   }, []);
 
-  const symbolAvailable = useCallback(
-    (symbol: string) => symbols.some((s) => s.underlying_symbol === symbol),
-    [symbols]
-  );
+  // Simplified single-market mode: bot uses whatever market + growth + stake + take profit the user has set.
+  // Only basic analysis for entry on the currently selected market. No more market switching or overriding user params.
 
-  const runScanAndArm = useCallback(async () => {
+  const runBasicAnalysisAndArm = useCallback(() => {
     if (!botRunningRef.current || busyRef.current) return;
     if (findAccuPosition(openPositions)) return;
+    if (!activeSymbol) return;
 
     busyRef.current = true;
     setBotPhase('scanning');
-    setBotStatus(formatBotStatus('Scanning', '10 Continuous Indices', sessionProfitRef.current, takeProfitGoal));
 
-    try {
-      const best = await scanMarkets();
-      if (!botRunningRef.current || !mountedRef.current) return;
+    const metrics = analyzePrices(activeSymbol.underlying_symbol, prices);
+    const goodEntry = isGoodEntry(metrics);
 
-      if (!best || !symbolAvailable(best.symbol)) {
-        setBotStatus(formatBotStatus('Scanning', 'No stable market yet — retrying', sessionProfitRef.current, takeProfitGoal));
-        busyRef.current = false;
-        return;
-      }
+    setBotStatus(
+      formatBotStatus(
+        'Analyzing',
+        `${activeSymbol.underlying_symbol} · ${goodEntry ? 'Good conditions' : 'Waiting for calmer market'}`,
+        sessionProfitRef.current,
+        takeProfitGoal
+      )
+    );
 
-      const decision = buildBotDecision(best);
-      const userBaseStake = parseFloat(stake) || BOT_DEFAULTS.defaultStake;
-      const finalStake = Math.max(BOT_DEFAULTS.minStake, userBaseStake * decision.stakeMultiplier);
-
-      selectSymbol(best.symbol);
-      setGrowthRate(decision.growthRate);
-      setStake(String(finalStake));
-
+    if (goodEntry) {
       setBotPhase('arming');
       setBotStatus(
         formatBotStatus(
           'Arming',
-          `${best.symbol} · ${(decision.growthRate * 100).toFixed(0)}% · $${finalStake.toFixed(2)} stake`,
+          `${activeSymbol.underlying_symbol} (user settings)`,
           sessionProfitRef.current,
           takeProfitGoal
         )
       );
-    } finally {
-      busyRef.current = false;
     }
-  }, [openPositions, scanMarkets, selectSymbol, setGrowthRate, setStake, stake, symbolAvailable, takeProfitGoal]);
+
+    busyRef.current = false;
+  }, [openPositions, activeSymbol, prices, takeProfitGoal]);
 
   const startBot = useCallback(() => {
     sessionProfitRef.current = 0;
@@ -152,9 +144,9 @@ export function useAccumulatorBot(params: UseAccumulatorBotParams): UseAccumulat
     botRunningRef.current = true;
     setBotRunning(true);
     setBotPhase('scanning');
-    setBotStatus(formatBotStatus('Starting', 'Analyzing markets', 0, takeProfitGoal));
-    void runScanAndArm();
-  }, [runScanAndArm, takeProfitGoal]);
+    setBotStatus(formatBotStatus('Starting', 'Basic analysis on selected market', 0, takeProfitGoal));
+    runBasicAnalysisAndArm();
+  }, [runBasicAnalysisAndArm, takeProfitGoal]);
 
   const stopBot = useCallback(() => {
     botRunningRef.current = false;
@@ -207,8 +199,6 @@ export function useAccumulatorBot(params: UseAccumulatorBotParams): UseAccumulat
         position,
         proposal: activeSymbol?.underlying_symbol === position.underlying_symbol ? proposal : null,
         recentPrices: prices,
-        growthRate,
-        peakProfit: peakProfitRef.current,
       });
 
       setBotStatus(
@@ -233,7 +223,7 @@ export function useAccumulatorBot(params: UseAccumulatorBotParams): UseAccumulat
           peakProfitRef.current = 0;
           busyRef.current = false;
           if (botRunningRef.current) {
-            setTimeout(() => void runScanAndArm(), 400);
+            setTimeout(() => runBasicAnalysisAndArm(), 400);
           }
         });
       }
@@ -249,14 +239,11 @@ export function useAccumulatorBot(params: UseAccumulatorBotParams): UseAccumulat
       !busyRef.current &&
       !isBuying
     ) {
-      // Diagnostic log for bot buy attempts (very useful when pasting logs)
-      console.log('[ACCU Bot] Triggering buy from arming phase', {
+      console.log('[ACCU Bot Simple] Buying with user settings', {
         symbol: activeSymbol.underlying_symbol,
         growthRate,
-        stakeUsed: stake,
+        stake,
         proposalId: proposal.id,
-        askPrice: proposal.askPrice,
-        proposalError,
       });
 
       busyRef.current = true;
@@ -270,11 +257,6 @@ export function useAccumulatorBot(params: UseAccumulatorBotParams): UseAccumulat
       return;
     }
 
-    // Extra visibility when proposal error blocks the bot
-    if (botPhase === 'arming' && proposalError && !busyRef.current) {
-      console.warn('[ACCU Bot] Waiting — proposal has error:', proposalError);
-    }
-
     if (
       (botPhase === 'scanning' || (botPhase === 'arming' && !proposal)) &&
       !busyRef.current &&
@@ -285,9 +267,9 @@ export function useAccumulatorBot(params: UseAccumulatorBotParams): UseAccumulat
       scanRetryRef.current = setTimeout(() => {
         scanRetryRef.current = null;
         if (botRunningRef.current && !findAccuPosition(openPositions)) {
-          void runScanAndArm();
+          runBasicAnalysisAndArm();
         }
-      }, botPhase === 'scanning' ? 900 : 1800);
+      }, 1200);
     }
   }, [
     botRunning,
@@ -296,6 +278,7 @@ export function useAccumulatorBot(params: UseAccumulatorBotParams): UseAccumulat
     takeProfitGoal,
     sellingId,
     proposal,
+    proposalError,
     activeSymbol,
     prices,
     growthRate,
@@ -303,7 +286,7 @@ export function useAccumulatorBot(params: UseAccumulatorBotParams): UseAccumulat
     isBuying,
     sellContract,
     botPhase,
-    runScanAndArm,
+    runBasicAnalysisAndArm,
   ]);
 
   return {
