@@ -1409,6 +1409,17 @@
       }
     }
 
+    @media (max-width: 620px) {
+      .low-balance-recommend-actions {
+        flex-direction: column;
+      }
+
+      .low-balance-recommend-btn {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+
     @media (max-width: 480px) {
       .header {
         gap: 6px;
@@ -1439,6 +1450,7 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="guide.css" />
 </head>
 <body>
   <div class="wrap">
@@ -1500,6 +1512,7 @@
           <div class="bot-badges-row">
             <span class="bot-chip">Smart Recovery</span>
             <span class="bot-badge bot-badge--popular">Popular</span>
+            <span class="bot-badge bot-badge--recommended-start" id="recommendedBotBadge">Recommended start</span>
           </div>
           <h3>Smart Recovery Differ</h3>
           <p>Runs smart recovery digit differ. Starts with DIGITDIFF, then uses DIGITOVER/DIGITUNDER recovery with martingale.</p>
@@ -1551,6 +1564,23 @@
                 </div>
                 <div class="bot-stat">Target: <strong id="botTarget">--</strong></div>
                 <div class="bot-stat">Last contract: <strong id="botLastContract">--</strong></div>
+                <div class="stake-coach" id="stakeCoach" hidden>
+                  <div class="stake-coach__head">
+                    <h5 class="stake-coach__title">Stake sizing</h5>
+                    <button type="button" class="stake-coach__toggle" id="stakeCoachToggle" aria-expanded="true">Hide</button>
+                  </div>
+                  <p class="stake-coach__lead">After a loss, stake increases so the bot can recover. A smaller stake on a larger balance gives more room for a rough streak.</p>
+                  <p class="stake-coach__result" id="stakeCoachResult">Checking your balance…</p>
+                  <div class="stake-coach__actions">
+                    <button type="button" class="stake-coach__apply" id="stakeCoachApply">Apply suggested stake</button>
+                  </div>
+                  <ul class="stake-coach__details" id="stakeCoachDetails">
+                    <li>Smart Recovery uses 3.1× recovery (default).</li>
+                    <li>Suggestion targets ~6 consecutive losses with 50% balance buffer.</li>
+                    <li>Minimum stake $0.35 · recommended balance $1,000 USD for smoother runs.</li>
+                    <li>Take profit and pause—fresh sessions often behave better than marathon runs.</li>
+                  </ul>
+                </div>
               </div>
             </div>
 
@@ -1777,23 +1807,41 @@
       <h3 class="low-balance-recommend-title">Balance tip</h3>
       <p class="low-balance-recommend-balance" id="lowBalanceRecommendBalance">Your balance: —</p>
       <p class="low-balance-recommend-message">
-        For more stable results and less struggle, we recommend a balance of <strong>1,000 USD</strong> or more.
+        For more stable results, we recommend <strong>1,000 USD</strong> or more so Smart Recovery has room to work. Rome wasn't built in a day—grow steadily and stay in the game.
       </p>
+      <p class="low-balance-recommend-stake" id="lowBalanceRecommendStake"></p>
       <div class="low-balance-recommend-tips">
-        <span class="low-balance-recommend-tips-label">Tips for small accounts:</span>
+        <span class="low-balance-recommend-tips-label">Stay in the game:</span>
         <ul class="low-balance-recommend-tips-list">
-          <li>Use a smaller stake per trade</li>
-          <li>Grow your account gradually</li>
+          <li>Use a smaller stake per trade (see suggestion below)</li>
+          <li>Stop after take-profit—come back for a fresh session</li>
           <li>Scale stake only after consistency</li>
         </ul>
       </div>
       <div class="low-balance-recommend-actions">
+        <button type="button" class="low-balance-recommend-btn low-balance-recommend-btn-ok" id="lowBalanceRecommendApply" style="display:none;">Apply suggested stake</button>
         <button type="button" class="low-balance-recommend-btn low-balance-recommend-btn-ok" id="lowBalanceRecommendOk">OK</button>
         <a href="https://home.deriv.com/dashboard/deposit?from=home" target="_blank" rel="noopener" class="low-balance-recommend-btn low-balance-recommend-btn-deposit" id="lowBalanceRecommendDeposit" style="display:none;">Deposit</a>
       </div>
     </div>
   </div>
 
+  <div class="guide-overlay" id="tradingWelcomeOverlay" aria-hidden="true">
+    <div class="guide-modal" role="dialog" aria-labelledby="tradingWelcomeTitle">
+      <button type="button" class="guide-dismiss" id="tradingWelcomeDismiss" aria-label="Close">×</button>
+      <p class="guide-modal__kicker">Step 3 · Deriv Bots</p>
+      <h2 id="tradingWelcomeTitle">Start with Smart Recovery Differ</h2>
+      <p>We have many bots—on day one, we'll open our <strong>recommended starter</strong> so you're not overwhelmed.</p>
+      <p>It uses recovery logic: stake rises after losses, then resets on a win. We'll help you size stake to your balance.</p>
+      <div class="guide-modal__note">Markets change. No size guarantees a win—but sensible sizing gives recovery the best chance.</div>
+      <div class="guide-modal__actions">
+        <button type="button" class="guide-btn guide-btn--primary" id="tradingWelcomeGo">Open recommended bot</button>
+        <button type="button" class="guide-btn guide-btn--ghost" id="tradingWelcomeBrowse">Browse all bots</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="guide.js"></script>
   <script src="popup-notifications.js"></script>
   <script src="bots/smartRecoveryDiffer.js"></script>
   <script src="bots/allMarketsDiffer.js"></script>
@@ -1955,6 +2003,7 @@
       if ($("accountBtnCurrency")) $("accountBtnCurrency").textContent = cur;
       lastKnownBalance = Number(balance);
       lastKnownCurrency = cur;
+      updateStakeCoachDisplay();
     }
 
     function stopBalanceWatch() {
@@ -2292,10 +2341,15 @@
       if (!state || !def) return;
 
       setMartingaleVisibility(activeBotKey);
+      updateStakeCoachVisibility();
       showBotDetailView();
       if (!fromHistory) {
         history.pushState({ view: HISTORY_VIEW_BOT, botKey }, "", `#bot-${botKey}`);
       }
+      document.getElementById("smartRecoveryDifferCard")?.classList.toggle(
+        "bot-card--recommended",
+        botKey === RECOMMENDED_BOT_KEY
+      );
 
       // Mode + account preview
       setMode(state.mode || "real");
@@ -2338,6 +2392,8 @@
 
       const startBtn = $("startBotBtn");
       if (startBtn) startBtn.disabled = !currentAccountId;
+
+      updateStakeCoachDisplay();
 
       // Refresh live balance subscription for this account
       const token = getToken();
@@ -2532,6 +2588,64 @@
     }
 
     const LOW_BALANCE_RECOMMEND_THRESHOLD = 1000;
+    const RECOMMENDED_BOT_KEY = "smartRecoveryDiffer";
+    let lastSuggestedStake = null;
+
+    function isSmartRecoveryActive() {
+      return activeBotKey === RECOMMENDED_BOT_KEY;
+    }
+
+    function updateStakeCoachVisibility() {
+      const coach = $("stakeCoach");
+      if (!coach) return;
+      coach.hidden = !isSmartRecoveryActive();
+    }
+
+    function updateStakeCoachDisplay() {
+      const resultEl = $("stakeCoachResult");
+      const applyBtn = $("stakeCoachApply");
+      if (!resultEl || !isSmartRecoveryActive()) return;
+
+      const guide = window.MBLGuide;
+      if (!guide) return;
+
+      const stakeInput = $("stakeInput");
+      const stake = parseFloat(stakeInput?.value);
+      const balance = lastKnownBalance;
+      const evaluation = guide.evaluateStake(balance, stake);
+      lastSuggestedStake = evaluation.suggestedStake;
+
+      resultEl.textContent = evaluation.message;
+      resultEl.className = `stake-coach__result stake-coach__result--${evaluation.level === "good" ? "good" : evaluation.level === "tight" ? "tight" : "warn"}`;
+
+      if (applyBtn) {
+        const same = Number.isFinite(stake) && Math.abs(stake - evaluation.suggestedStake) < 0.01;
+        applyBtn.disabled = same;
+        applyBtn.textContent = same
+          ? "Suggested stake applied"
+          : `Apply suggested stake ($${evaluation.suggestedStake.toFixed(2)})`;
+      }
+    }
+
+    function applySuggestedStakeToConfig() {
+      if (!isSmartRecoveryActive() || lastSuggestedStake == null) return;
+      const stakeInput = $("stakeInput");
+      if (!stakeInput) return;
+      const applied = Math.max(BOT_DEFAULTS.minStake, lastSuggestedStake);
+      stakeInput.value = String(applied);
+      if (activeBotKey && botStates[activeBotKey]) {
+        botStates[activeBotKey].config.initialStake = applied;
+      }
+      updateStakeCoachDisplay();
+    }
+
+    function formatBalanceTipStakeLine() {
+      const guide = window.MBLGuide;
+      if (!guide || lastKnownBalance == null) return "";
+      const suggested = guide.suggestStake(lastKnownBalance);
+      lastSuggestedStake = suggested;
+      return `For your balance, a starting stake around <strong>$${suggested.toFixed(2)}</strong> gives room for recovery streaks (min $${BOT_DEFAULTS.minStake.toFixed(2)}).`;
+    }
     const depositPopupOverlay = $("depositPopupOverlay");
     const depositPopupCancel = $("depositPopupCancel");
     const depositPopupBalance = $("depositPopupBalance");
@@ -2564,6 +2678,11 @@
 
     function showLowBalanceRecommendPopupIfNeeded(botKey) {
       if (!botKey || lastKnownBalance == null || Number(lastKnownBalance) >= LOW_BALANCE_RECOMMEND_THRESHOLD) return;
+      const sessionKey = window.MBLGuide?.KEYS?.balanceTipSession || "balance_tip_session_v1";
+      try {
+        if (sessionStorage.getItem("mbl_guide_" + sessionKey) === "1") return;
+        sessionStorage.setItem("mbl_guide_" + sessionKey, "1");
+      } catch (_) {}
 
       let autoCloseTimeout = null;
       let countdownInterval = null;
@@ -2577,6 +2696,21 @@
       }
       if (lowBalanceRecommendDeposit) {
         lowBalanceRecommendDeposit.style.display = Number(lastKnownBalance) === 0 ? "" : "none";
+      }
+      const stakeLine = $("lowBalanceRecommendStake");
+      const applyFromTip = $("lowBalanceRecommendApply");
+      if (stakeLine && botKey === RECOMMENDED_BOT_KEY) {
+        stakeLine.innerHTML = formatBalanceTipStakeLine();
+        stakeLine.style.display = stakeLine.textContent ? "" : "none";
+      } else if (stakeLine) {
+        stakeLine.style.display = "none";
+      }
+      if (applyFromTip) {
+        const showApply = botKey === RECOMMENDED_BOT_KEY && lastSuggestedStake != null;
+        applyFromTip.style.display = showApply ? "" : "none";
+        applyFromTip.textContent = showApply
+          ? `Apply suggested stake ($${lastSuggestedStake.toFixed(2)})`
+          : "Apply suggested stake";
       }
       if (lowBalanceRecommendTimerEl) lowBalanceRecommendTimerEl.textContent = "5";
 
@@ -2636,6 +2770,70 @@
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && depositPopupOverlay?.classList.contains("show")) hideDepositPopup();
       if (e.key === "Escape" && lowBalanceRecommendOverlay?.classList.contains("show")) hideLowBalanceRecommendPopup();
+    });
+
+    function shouldRunTradingWelcome() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("guide") === "1") return true;
+      const guide = window.MBLGuide;
+      return guide && !guide.isDone(guide.KEYS.tradingWelcome);
+    }
+
+    function showTradingWelcomeOverlay() {
+      const overlay = $("tradingWelcomeOverlay");
+      if (!overlay) return;
+      overlay.classList.add("show");
+      overlay.setAttribute("aria-hidden", "false");
+    }
+
+    function hideTradingWelcomeOverlay() {
+      const overlay = $("tradingWelcomeOverlay");
+      if (!overlay) return;
+      overlay.classList.remove("show");
+      overlay.setAttribute("aria-hidden", "true");
+    }
+
+    function completeTradingWelcome(openRecommended) {
+      if (window.MBLGuide) MBLGuide.mark(MBLGuide.KEYS.tradingWelcome);
+      hideTradingWelcomeOverlay();
+      const url = new URL(window.location.href);
+      url.searchParams.delete("guide");
+      history.replaceState(history.state, "", url.pathname + url.search + url.hash);
+      if (openRecommended) {
+        openBot(RECOMMENDED_BOT_KEY);
+      } else {
+        renderBotListView();
+        document.getElementById("smartRecoveryDifferCard")?.classList.add("bot-card--recommended");
+        setNotice("Select a bot and click Open Bot. Smart Recovery Differ is our recommended start.");
+      }
+    }
+
+    $("tradingWelcomeGo")?.addEventListener("click", () => completeTradingWelcome(true));
+    $("tradingWelcomeBrowse")?.addEventListener("click", () => completeTradingWelcome(false));
+    $("tradingWelcomeDismiss")?.addEventListener("click", () => completeTradingWelcome(false));
+    $("tradingWelcomeOverlay")?.addEventListener("click", (e) => {
+      if (e.target === $("tradingWelcomeOverlay")) completeTradingWelcome(false);
+    });
+
+    $("stakeCoachApply")?.addEventListener("click", applySuggestedStakeToConfig);
+    $("lowBalanceRecommendApply")?.addEventListener("click", () => {
+      applySuggestedStakeToConfig();
+      hideLowBalanceRecommendPopup();
+    });
+    $("stakeCoachToggle")?.addEventListener("click", () => {
+      const details = $("stakeCoachDetails");
+      const btn = $("stakeCoachToggle");
+      if (!details || !btn) return;
+      const hidden = details.hasAttribute("hidden");
+      if (hidden) {
+        details.removeAttribute("hidden");
+        btn.textContent = "Hide";
+        btn.setAttribute("aria-expanded", "true");
+      } else {
+        details.setAttribute("hidden", "");
+        btn.textContent = "Why?";
+        btn.setAttribute("aria-expanded", "false");
+      }
     });
 
     $("backToBotsBtn").addEventListener("click", () => {
@@ -2784,6 +2982,7 @@
         state.config.takeProfit = Number.isFinite(tp) ? tp : state.config.takeProfit;
         state.config.stopLoss = Number.isFinite(sl) ? sl : state.config.stopLoss;
         state.config.martingaleMultiplier = Number.isFinite(mg) ? mg : state.config.martingaleMultiplier;
+        if (id === "stakeInput") updateStakeCoachDisplay();
       });
     });
 
@@ -2825,9 +3024,14 @@
       loadAccountsByMode(token)
         .then(() => {
           updateAccountModeAvailability();
-          showBotListView({ fromHistory: true });
           startBalanceWatch();
-          restoreBotFromHash();
+          if (shouldRunTradingWelcome()) {
+            showTradingWelcomeOverlay();
+            renderBotListView();
+          } else {
+            showBotListView({ fromHistory: true });
+            restoreBotFromHash();
+          }
         })
         .catch(() => {
           setNotice("Connected, but failed to load account mode details.", true);

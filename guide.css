@@ -1,0 +1,328 @@
+/* Magic Bots Lab — onboarding & stake coach (shared) */
+
+.guide-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.guide-steps li {
+  flex: 1 1 140px;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(15, 23, 42, 0.55);
+  font-size: 11px;
+  line-height: 1.35;
+  color: rgba(203, 213, 225, 0.9);
+}
+
+.guide-steps li strong {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.95);
+  margin-bottom: 3px;
+}
+
+.guide-steps li.is-active {
+  border-color: rgba(0, 210, 255, 0.45);
+  background: rgba(0, 210, 255, 0.08);
+}
+
+.guide-steps li.is-done {
+  border-color: rgba(36, 217, 112, 0.35);
+}
+
+.guide-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(5px);
+}
+
+.guide-overlay.show {
+  display: flex;
+}
+
+.guide-modal {
+  width: 100%;
+  max-width: 440px;
+  max-height: min(90vh, 640px);
+  overflow-y: auto;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #171b24;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  padding: 22px;
+  position: relative;
+}
+
+.guide-modal__kicker {
+  margin: 0 0 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #00d2ff;
+}
+
+.guide-modal h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #f5f7ff;
+  line-height: 1.25;
+}
+
+.guide-modal p {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #98a2bd;
+}
+
+.guide-modal p:last-of-type {
+  margin-bottom: 0;
+}
+
+.guide-modal__note {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  background: rgba(251, 191, 36, 0.08);
+  font-size: 12px;
+  color: rgba(254, 243, 199, 0.95);
+  line-height: 1.45;
+}
+
+.guide-modal__actions {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.guide-btn {
+  flex: 1;
+  min-width: 120px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #f5f7ff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guide-btn--primary {
+  border-color: rgba(0, 210, 255, 0.5);
+  background: linear-gradient(135deg, rgba(0, 210, 255, 0.25), rgba(0, 210, 255, 0.1));
+  color: #00d2ff;
+}
+
+.guide-btn--ghost {
+  background: transparent;
+}
+
+.guide-dismiss {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #98a2bd;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.guide-dismiss:hover {
+  color: #f5f7ff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.bot-card--recommended {
+  outline: 2px solid rgba(0, 210, 255, 0.45);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 210, 255, 0.15), 0 12px 32px rgba(0, 210, 255, 0.12);
+}
+
+.bot-badge--recommended-start {
+  border-color: rgba(0, 210, 255, 0.45);
+  background: rgba(0, 210, 255, 0.12);
+  color: #7dd3fc;
+}
+
+.stake-coach {
+  margin-top: 4px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 210, 255, 0.2);
+  background: rgba(0, 210, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stake-coach[hidden] {
+  display: none !important;
+}
+
+.stake-coach__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.stake-coach__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #f5f7ff;
+}
+
+.stake-coach__toggle {
+  border: 0;
+  background: transparent;
+  color: #00d2ff;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.stake-coach__lead {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #98a2bd;
+}
+
+.stake-coach__result {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: #cbd5e1;
+}
+
+.stake-coach__result--good {
+  border-color: rgba(36, 217, 112, 0.35);
+  background: rgba(36, 217, 112, 0.08);
+  color: #bbf7d0;
+}
+
+.stake-coach__result--warn {
+  border-color: rgba(251, 191, 36, 0.35);
+  background: rgba(251, 191, 36, 0.08);
+  color: #fde68a;
+}
+
+.stake-coach__result--tight {
+  border-color: rgba(255, 95, 109, 0.3);
+  background: rgba(255, 95, 109, 0.08);
+  color: #fecdd3;
+}
+
+.stake-coach__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.stake-coach__apply {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 210, 255, 0.45);
+  background: rgba(0, 210, 255, 0.12);
+  color: #00d2ff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.stake-coach__apply:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.stake-coach__details {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: rgba(152, 162, 189, 0.9);
+}
+
+.stake-coach__details[hidden] {
+  display: none;
+}
+
+.low-balance-recommend-stake {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 210, 255, 0.22);
+  background: rgba(0, 210, 255, 0.06);
+  font-size: 12px;
+  line-height: 1.45;
+  color: #cbd5e1;
+}
+
+.low-balance-recommend-stake strong {
+  color: #00d2ff;
+}
+
+@media (max-width: 620px) {
+  .guide-modal {
+    padding: 18px 16px;
+    border-radius: 14px;
+  }
+
+  .guide-modal h2 {
+    font-size: 16px;
+    padding-right: 28px;
+  }
+
+  .guide-steps li {
+    flex: 1 1 100%;
+  }
+
+  .guide-modal__actions {
+    flex-direction: column;
+  }
+
+  .guide-btn {
+    width: 100%;
+    min-width: 0;
+  }
+}

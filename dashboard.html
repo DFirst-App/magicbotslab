@@ -570,6 +570,7 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="guide.css" />
 </head>
 <body>
   <div class="wrap">
@@ -690,6 +691,21 @@
     </div>
   </div>
 
+  <div class="guide-overlay" id="dashboardGuideOverlay" aria-hidden="true">
+    <div class="guide-modal" role="dialog" aria-labelledby="dashboardGuideTitle">
+      <button type="button" class="guide-dismiss" id="dashboardGuideDismiss" aria-label="Close">×</button>
+      <p class="guide-modal__kicker">Step 2 · You're connected</p>
+      <h2 id="dashboardGuideTitle">Ready for automated trading?</h2>
+      <p>Your Deriv account is linked. Next, open <strong>Deriv Bots</strong> and we'll guide you to our recommended starter bot—no need to pick from every strategy on day one.</p>
+      <p>Rome wasn't built in a day. Steady sessions and sensible stake sizing help you stay in the game longer.</p>
+      <div class="guide-modal__actions">
+        <button type="button" class="guide-btn guide-btn--primary" id="dashboardGuideGo">Open Deriv Bots</button>
+        <button type="button" class="guide-btn guide-btn--ghost" id="dashboardGuideLater">Explore dashboard first</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="guide.js"></script>
   <script>
     const DERIV_OAUTH_CLIENT_ID = "338udJBKn1EbT7Tc29Snv";
     const DERIV_ACCESS_TOKEN_KEY = "deriv_access_token";
@@ -1176,13 +1192,15 @@
       window.location.href = "index.html";
     });
 
-    $("tradingBotsBtn").addEventListener("click", () => {
-      window.location.href = "trading-dashboard.html";
-    });
+    function goToTradingBots() {
+      const guide = window.MBLGuide;
+      const firstTime = guide && !guide.isDone(guide.KEYS.dashboardBots);
+      if (firstTime) guide.mark(guide.KEYS.dashboardBots);
+      window.location.href = firstTime ? "trading-dashboard.html?guide=1" : "trading-dashboard.html";
+    }
 
-    $("startTradingBtn").addEventListener("click", () => {
-      window.location.href = "trading-dashboard.html";
-    });
+    $("tradingBotsBtn").addEventListener("click", goToTradingBots);
+    $("startTradingBtn").addEventListener("click", goToTradingBots);
 
     const dashboardMeta = $("dashboardMeta");
     const detailsToggle = $("detailsToggle");
@@ -1192,7 +1210,37 @@
       detailsToggle.textContent = open ? "Hide" : "Details";
     });
 
+    function showDashboardGuide() {
+      const overlay = document.getElementById("dashboardGuideOverlay");
+      if (!overlay) return;
+      overlay.classList.add("show");
+      overlay.setAttribute("aria-hidden", "false");
+    }
+
+    function hideDashboardGuide() {
+      const overlay = document.getElementById("dashboardGuideOverlay");
+      if (!overlay) return;
+      overlay.classList.remove("show");
+      overlay.setAttribute("aria-hidden", "true");
+    }
+
+    document.getElementById("dashboardGuideDismiss")?.addEventListener("click", hideDashboardGuide);
+    document.getElementById("dashboardGuideLater")?.addEventListener("click", hideDashboardGuide);
+    document.getElementById("dashboardGuideGo")?.addEventListener("click", () => {
+      hideDashboardGuide();
+      goToTradingBots();
+    });
+    document.getElementById("dashboardGuideOverlay")?.addEventListener("click", (e) => {
+      if (e.target === e.currentTarget) hideDashboardGuide();
+    });
+
     loadDashboard();
+
+    const welcome = new URLSearchParams(window.location.search).get("welcome") === "1";
+    const guide = window.MBLGuide;
+    if (welcome && guide && !guide.isDone(guide.KEYS.dashboardBots)) {
+      setTimeout(showDashboardGuide, 600);
+    }
   </script>
 </body>
 </html>

@@ -444,7 +444,14 @@
       .landing-badge__text { font-size: 11px; }
       .landing-social-icon img { width: 26px; height: 26px; }
     }
+
+    .landing .guide-steps {
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
   </style>
+  <link rel="stylesheet" href="guide.css" />
 </head>
 <body>
   <main class="landing">
@@ -464,12 +471,19 @@
       <p class="landing-badge__hint"><strong>Log out of your old Deriv account</strong> before signing up, <strong>or use a new browser</strong>—so you do not clash with an existing Deriv login.</p>
     </div>
 
+    <ol class="guide-steps" aria-label="Getting started steps">
+      <li class="is-active" id="guideStepConnect"><strong>Step 1</strong>Connect your Deriv account below</li>
+      <li id="guideStepDashboard"><strong>Step 2</strong>Open your dashboard</li>
+      <li id="guideStepBots"><strong>Step 3</strong>Start with our recommended bot</li>
+    </ol>
+
     <section class="hero-copy">
       <h1>Automated Trading Bots</h1>
       <p>Connect your Deriv account to run Magic Bots Lab automations, access MT5 bot downloads, and manage fully automated trading systems from one control dashboard.</p>
       <div class="status" id="statusText"></div>
       <div class="hero-cta-row">
         <button type="button" class="hero-connect connect-trigger" id="connectBtn">Connect</button>
+        <button type="button" class="ghost-btn" id="connectHelpLink" style="margin-top:8px;font-size:12px;">Can't connect?</button>
         <div class="hero-social-icons" aria-label="Community updates">
           <a class="landing-social-icon" href="https://whatsapp.com/channel/0029Vb6sxFG9xVJWbyIwL110" target="_blank" rel="noopener noreferrer" title="WhatsApp channel">
             <img src="social-whatsapp.png" width="28" height="28" alt="WhatsApp" loading="lazy" decoding="async" />
@@ -518,6 +532,23 @@
     <span class="dot d"></span>
 
   </main>
+
+  <div class="guide-overlay" id="connectHelpOverlay" aria-hidden="true">
+    <div class="guide-modal" role="dialog" aria-labelledby="connectHelpTitle">
+      <button type="button" class="guide-dismiss" id="connectHelpDismiss" aria-label="Close">×</button>
+      <p class="guide-modal__kicker">Connection help</p>
+      <h2 id="connectHelpTitle">Can't connect your account?</h2>
+      <p>Most Deriv accounts created before <strong>1 May 2026</strong> may not work with our bots. We use Deriv's newer dashboard flow.</p>
+      <p>Create a fresh Deriv account with a <strong>new email</strong>, then connect again from this page.</p>
+      <div class="guide-modal__note"><strong>Log out of your old Deriv account</strong> before signing up, or use a <strong>new browser</strong> so logins do not clash.</div>
+      <div class="guide-modal__actions">
+        <a class="guide-btn guide-btn--primary" id="connectHelpPartner" href="https://track.deriv.com/_30qaRjl291dMjdsyM5hasGNd7ZgqdRLk/1/" target="_blank" rel="noopener noreferrer">Create Deriv account</a>
+        <button type="button" class="guide-btn guide-btn--ghost" id="connectHelpRetry">Try connecting again</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="guide.js"></script>
   <script>
     const DERIV_OAUTH_CLIENT_ID = "338udJBKn1EbT7Tc29Snv";
     const OAUTH_URL = "https://auth.deriv.com/oauth2/auth";
@@ -664,7 +695,8 @@
       const returnedState = params.get("state");
 
       if (error) {
-        setStatus("Authorization was cancelled or failed.", "error");
+        setStatus("Authorization was cancelled or failed. See connection help below.", "error");
+        showConnectHelp();
         return;
       }
 
@@ -673,23 +705,52 @@
       const storedState = sessionStorage.getItem(OAUTH_STATE_KEY);
       if (!storedState || returnedState !== storedState) {
         setStatus("OAuth state verification failed. Please reconnect.", "error");
+        showConnectHelp();
         return;
       }
 
       setStatus("Authorization successful. Preparing dashboard...", "success");
       try {
         await exchangeCodeForToken(code);
-        window.location.href = "dashboard.html";
+        if (window.MBLGuide) MBLGuide.mark(MBLGuide.KEYS.indexConnect);
+        window.location.href = "dashboard.html?welcome=1";
       } catch (e) {
         setStatus("Connected but token exchange failed. Please try again.", "error");
+        showConnectHelp();
       }
     }
+
+    function showConnectHelp() {
+      const overlay = document.getElementById("connectHelpOverlay");
+      if (!overlay) return;
+      overlay.classList.add("show");
+      overlay.setAttribute("aria-hidden", "false");
+    }
+
+    function hideConnectHelp() {
+      const overlay = document.getElementById("connectHelpOverlay");
+      if (!overlay) return;
+      overlay.classList.remove("show");
+      overlay.setAttribute("aria-hidden", "true");
+    }
+
+    document.getElementById("connectHelpLink")?.addEventListener("click", showConnectHelp);
+    document.getElementById("connectHelpDismiss")?.addEventListener("click", hideConnectHelp);
+    document.getElementById("connectHelpRetry")?.addEventListener("click", () => {
+      hideConnectHelp();
+      startOAuthLogin();
+    });
+    document.getElementById("connectHelpOverlay")?.addEventListener("click", (e) => {
+      if (e.target === e.currentTarget) hideConnectHelp();
+    });
 
     document.querySelectorAll(".connect-trigger").forEach((btn) => {
       btn.addEventListener("click", startOAuthLogin);
     });
     if (!maybeRedirectConnectedUser()) {
       handleOAuthCallback();
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("error")) showConnectHelp();
     }
   </script>
 </body>
