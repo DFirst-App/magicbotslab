@@ -35,6 +35,12 @@ interface TradeControlsProps {
   isClosing?: boolean;
   /** Whether the user is authenticated — shows the View your positions link when true. */
   isAuthenticated?: boolean;
+  botRunning?: boolean;
+  botPhase?: string;
+  botStatus?: string;
+  onStartBot?: () => void;
+  onStopBot?: () => void;
+  onStopAndClose?: () => void;
 }
 
 export function TradeControls({
@@ -56,7 +62,14 @@ export function TradeControls({
   onClose,
   isClosing,
   isAuthenticated,
+  botRunning = false,
+  botPhase = 'idle',
+  botStatus = '',
+  onStartBot,
+  onStopBot,
+  onStopAndClose,
 }: TradeControlsProps) {
+  const controlsLocked = botRunning;
   useEffect(() => {
     if (buyError) {
       toast.error('Purchase Failed', { description: buyError });
@@ -75,6 +88,27 @@ export function TradeControls({
 
   return (
     <div className="w-full space-y-3 lg:max-w-[400px] lg:space-y-4">
+      <div className="rounded-md border border-border bg-muted/20 p-3 space-y-2">
+        <div className="flex items-center justify-between gap-2">
+          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Auto accumulator bot
+          </Label>
+          <span
+            className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${
+              botRunning
+                ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+                : 'bg-muted text-muted-foreground'
+            }`}
+          >
+            {botRunning ? botPhase : 'idle'}
+          </span>
+        </div>
+        <p className="text-[11px] leading-relaxed text-muted-foreground min-h-[2.5rem]">
+          {botStatus ||
+            'Opens on this chart when price action is calm, grows your stake, and closes when profit is secured or risk rises.'}
+        </p>
+      </div>
+
       {/* Growth Rate selector */}
       <div className="space-y-1.5">
         <div className="flex items-center gap-1.5">
@@ -99,6 +133,7 @@ export function TradeControls({
           onValueChange={(value) => {
             onGrowthRateChange(parseFloat(value));
           }}
+          disabled={controlsLocked}
         >
           <SelectTrigger>
             <SelectValue />
@@ -127,6 +162,7 @@ export function TradeControls({
           min={0}
           step="0.01"
           labelRight="USD"
+          disabled={controlsLocked}
         />
       </div>
 
@@ -161,6 +197,7 @@ export function TradeControls({
           step="0.01"
           placeholder="-"
           labelRight="USD"
+          disabled={controlsLocked}
         />
       </div>
 
@@ -226,20 +263,45 @@ export function TradeControls({
         </div>
       )}
 
-      {/* Buy / Close button — inline on desktop, fixed above footer on mobile */}
-      <div className="max-lg:fixed max-lg:bottom-[calc(env(safe-area-inset-bottom)+3.2rem)] max-lg:left-3 max-lg:right-3 lg:static">
-        {!activePosition && (
+      {/* Bot controls — inline on desktop, fixed above footer on mobile */}
+      <div className="max-lg:fixed max-lg:bottom-[calc(env(safe-area-inset-bottom)+3.2rem)] max-lg:left-3 max-lg:right-3 lg:static space-y-2">
+        {!botRunning && !activePosition && (
           <Button
             className="w-full rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
             size="lg"
-            disabled={!isConnected || !proposal || isBuying}
-            onClick={onBuy}
+            disabled={!isConnected || !onStartBot}
+            onClick={onStartBot}
           >
-            {isBuying ? 'Purchasing...' : 'Buy'}
+            Start auto bot
           </Button>
         )}
 
-        {activePosition && onClose && (
+        {botRunning && (
+          <>
+            <Button
+              className="w-full rounded-full"
+              size="lg"
+              variant="outline"
+              disabled={!onStopBot}
+              onClick={onStopBot}
+            >
+              Stop bot
+            </Button>
+            {activePosition && onStopAndClose && (
+              <Button
+                className="w-full rounded-full border-destructive/40 text-destructive hover:bg-destructive/10"
+                size="lg"
+                variant="outline"
+                disabled={!isConnected || isClosing}
+                onClick={() => void onStopAndClose()}
+              >
+                {isClosing ? 'Closing…' : 'Stop & close trade'}
+              </Button>
+            )}
+          </>
+        )}
+
+        {!botRunning && activePosition && onClose && (
           <Button
             variant="outline"
             className="w-full rounded-full border-black bg-white text-black hover:bg-white hover:text-black dark:border-white dark:bg-transparent dark:text-white dark:hover:bg-white/10"
@@ -249,7 +311,7 @@ export function TradeControls({
           >
             {isClosing ? 'Closing...' : (
               <span className="flex flex-col items-center leading-tight gap-0.5">
-                <span>Close </span>
+                <span>Close trade</span>
                 <span className="text-xs font-normal opacity-90">
                   {(parseFloat(activePosition.buy_price) + parseFloat(activePosition.profit)).toFixed(2)} {activePosition.currency}
                 </span>

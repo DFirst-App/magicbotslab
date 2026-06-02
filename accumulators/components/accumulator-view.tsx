@@ -85,6 +85,12 @@ export interface AccumulatorViewProps {
   logoSrc?: string;
   appName?: string;
   embeddedMode?: boolean;
+  botRunning?: boolean;
+  botPhase?: string;
+  botStatus?: string;
+  onStartBot?: () => void;
+  onStopBot?: () => void;
+  onStopAndClose?: () => void;
 }
 
 export function AccumulatorView({
@@ -125,14 +131,19 @@ export function AccumulatorView({
   logoSrc,
   appName,
   embeddedMode = false,
+  botRunning = false,
+  botPhase = 'idle',
+  botStatus = '',
+  onStartBot,
+  onStopBot,
+  onStopAndClose,
 }: AccumulatorViewProps) {
   const isMobile = useIsMobile();
   const contractMarkers = useContractMarkers(openPositions, activeSymbol?.underlying_symbol, isMobile);
 
-  // Accumulators only allow 1 trade at a time — find the active ACCU position for the current symbol
-  const activeAccuPosition = openPositions.find(
-    (p) => p.contract_type === 'ACCU' && p.underlying_symbol === activeSymbol?.underlying_symbol
-  ) ?? null;
+  // One ACCU trade at a time (any open accumulator contract)
+  const activeAccuPosition =
+    openPositions.find((p) => p.contract_type === 'ACCU' && !p.is_sold && !p.is_expired) ?? null;
 
   // Barrier color: blue (#008832) when tick is inside, red (#cc2e3d) when crossed.
   const barrierColor = proposal?.hasCrossedBarrier ? '#cc2e3d' : '#008832';
@@ -245,6 +256,12 @@ export function AccumulatorView({
                     onClose={sellContract}
                     isClosing={sellingId === activeAccuPosition?.contract_id}
                     isAuthenticated={authState === 'authenticated'}
+                    botRunning={botRunning}
+                    botPhase={botPhase}
+                    botStatus={botStatus}
+                    onStartBot={onStartBot}
+                    onStopBot={onStopBot}
+                    onStopAndClose={onStopAndClose}
                   />
                 </CardContent>
               </Card>

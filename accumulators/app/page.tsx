@@ -3,6 +3,7 @@
 import { useSmartChartsApi } from '@/hooks/use-smartcharts-api';
 import { useSmartChartChartData } from '@/hooks/use-smartchart-chart-data';
 import { useAccumulatorTrading } from '../hooks/use-accumulator-trading';
+import { useAccumulatorBot } from '../hooks/use-accumulator-bot';
 import { useDerivWSContext } from '@/components/custom/deriv-ws-provider';
 import { useLogoSrc } from '@/components/custom/logo-src-provider';
 import { AccumulatorView } from '../components/accumulator-view';
@@ -13,6 +14,19 @@ export default function AccumulatorPage() {
   const { authState, accounts, activeAccount, login, signUp, logout, switchAccount, embeddedMode } = auth;
 
   const trading = useAccumulatorTrading({ ws, isConnected, isExhausted, isAuthenticated: !!auth.wsUrl, onAuthWSFailed: logout });
+
+  const bot = useAccumulatorBot({
+    isConnected: trading.isConnected,
+    activeSymbol: trading.activeSymbol?.underlying_symbol ?? null,
+    prices: trading.prices,
+    stake: trading.stake,
+    proposal: trading.proposal,
+    buyContract: trading.buyContract,
+    isBuying: trading.isBuying,
+    openPositions: trading.openPositions,
+    sellContract: trading.sellContract,
+    sellingId: trading.sellingId,
+  });
 
   const { chartData } = useSmartChartChartData(trading.ws, trading.isConnected, trading.symbols);
   const { getQuotes, subscribeQuotes, unsubscribeQuotes } = useSmartChartsApi(trading.ws);
@@ -53,6 +67,12 @@ export default function AccumulatorPage() {
       getQuotes={getQuotes}
       subscribeQuotes={subscribeQuotes}
       unsubscribeQuotes={unsubscribeQuotes}
+      botRunning={bot.botRunning}
+      botPhase={bot.botPhase}
+      botStatus={bot.botStatus}
+      onStartBot={bot.startBot}
+      onStopBot={bot.stopBot}
+      onStopAndClose={bot.stopAndClose}
     />
   );
 }
