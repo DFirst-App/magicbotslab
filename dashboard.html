@@ -35,20 +35,17 @@
       color: var(--text);
       -webkit-font-smoothing: antialiased;
       background-color: var(--bg);
-      background-image:
-        radial-gradient(circle at 12% -6%, rgba(97, 165, 255, 0.16), transparent 42%),
-        radial-gradient(circle at 92% 4%, rgba(183, 148, 244, 0.14), transparent 40%),
-        radial-gradient(var(--dot) 1px, transparent 1px);
-      background-size: auto, auto, 24px 24px;
-      background-position: 0 0, 0 0, 0 0;
-      background-repeat: no-repeat, no-repeat, repeat;
-      background-attachment: fixed, fixed, fixed;
+      background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+      background-size: 24px 24px;
+      background-position: 0 0;
+      background-repeat: repeat;
+      background-attachment: fixed;
     }
 
     .wrap {
-      width: min(1180px, 100%);
-      margin: 0 auto;
-      padding: clamp(14px, 3vw, 28px) clamp(14px, 3vw, 24px) 48px;
+      width: 100%;
+      margin: 0;
+      padding: clamp(14px, 2.4vw, 28px) clamp(16px, 4vw, 64px) 48px;
     }
 
     /* ---------- Topbar ---------- */
