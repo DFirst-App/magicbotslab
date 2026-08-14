@@ -9,15 +9,17 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,500;0,9..40,600;0,9..40,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #16181d;
-      --surface: #1e2229;
-      --surface-2: #252b34;
-      --surface-3: #2d3440;
-      --border: rgba(255, 255, 255, 0.1);
+      --bg: #101216;
+      --dot: rgba(255, 255, 255, 0.07);
+      --surface: rgba(255, 255, 255, 0.035);
+      --surface-2: rgba(255, 255, 255, 0.055);
+      --surface-solid: #1a1e26;
+      --border: rgba(255, 255, 255, 0.09);
+      --border-strong: rgba(255, 255, 255, 0.16);
       --text: #f3f6fb;
-      --muted: #a8b1c2;
+      --muted: #99a2b6;
       --blue: #61a5ff;
-      --green: #68d391;
+      --green: #4ade80;
       --orange: #f6ad55;
       --violet: #b794f4;
       --red: #fc8181;
@@ -30,33 +32,36 @@
       min-height: 100vh;
       font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
       font-feature-settings: "tnum" 1;
-      background: radial-gradient(circle at 10% -10%, rgba(97, 165, 255, 0.14), transparent 40%),
-                  radial-gradient(circle at 92% 0%, rgba(183, 148, 244, 0.12), transparent 36%),
-                  var(--bg);
       color: var(--text);
       -webkit-font-smoothing: antialiased;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(circle at 12% -6%, rgba(97, 165, 255, 0.16), transparent 42%),
+        radial-gradient(circle at 92% 4%, rgba(183, 148, 244, 0.14), transparent 40%),
+        radial-gradient(var(--dot) 1px, transparent 1px);
+      background-size: auto, auto, 24px 24px;
+      background-position: 0 0, 0 0, 0 0;
+      background-repeat: no-repeat, no-repeat, repeat;
+      background-attachment: fixed, fixed, fixed;
     }
 
     .wrap {
-      width: min(1400px, 100%);
+      width: min(1180px, 100%);
       margin: 0 auto;
-      padding: 24px 22px 56px;
+      padding: clamp(14px, 3vw, 28px) clamp(14px, 3vw, 24px) 48px;
     }
 
+    /* ---------- Topbar ---------- */
     .topbar {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      gap: 16px;
-      margin-bottom: 16px;
-      padding: 16px 18px;
-      border-radius: 16px;
-      background: linear-gradient(140deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
-      border: 1px solid var(--border);
-      backdrop-filter: blur(2px);
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
     }
 
-    .brand-block { display: flex; flex-direction: column; gap: 4px; }
+    .brand-block { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
     .brand-kicker {
       margin: 0;
       font-size: 10px;
@@ -68,19 +73,11 @@
     .brand-title {
       margin: 0;
       font-family: "Inter", "Plus Jakarta Sans", system-ui, sans-serif;
-      font-size: clamp(16px, 2vw, 20px);
+      font-size: 15px;
       line-height: 1.1;
       font-weight: 700;
       letter-spacing: -0.01em;
       color: #9fc4ff;
-    }
-    .brand-sub {
-      margin-top: 2px;
-      color: var(--muted);
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-weight: 600;
     }
 
     .topbar-actions {
@@ -88,118 +85,97 @@
       flex-wrap: wrap;
       align-items: center;
       justify-content: flex-end;
-      gap: 10px;
+      gap: 8px;
     }
 
-    .primary-btn,
-    .logout-btn,
-    .start-trading-btn,
-    .fund-btn,
-    .social-btn {
-      border-radius: 11px;
+    .btn {
+      appearance: none;
+      border-radius: 10px;
       border: 1px solid var(--border);
       font-family: inherit;
       cursor: pointer;
       text-decoration: none;
       font-weight: 700;
-      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
-    }
-
-    .primary-btn {
-      background: linear-gradient(130deg, #2d3b4f, #223042);
-      color: #e8f2ff;
-      padding: 10px 14px;
+      font-size: 12.5px;
+      padding: 9px 13px;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      box-shadow: 0 8px 20px rgba(12, 16, 25, 0.45);
+      gap: 7px;
+      transition: transform 0.12s ease, border-color 0.12s ease, filter 0.12s ease;
+      white-space: nowrap;
     }
-    .primary-btn--mt5 {
-      background: linear-gradient(130deg, #4a3568, #352850);
-      color: #f0e8ff;
-      border-color: rgba(183, 148, 244, 0.45);
-      box-shadow: 0 8px 20px rgba(40, 28, 60, 0.45);
-    }
-    .primary-btn--mt5:hover { filter: brightness(1.06); }
-    .primary-btn:hover,
-    .primary-btn--mt5:hover,
-    .logout-btn:hover,
-    .fund-btn:hover,
-    .start-trading-btn:hover,
-    .social-btn:hover { transform: translateY(-1px); }
+    .btn:hover { transform: translateY(-1px); }
 
-    .primary-btn__label { white-space: nowrap; }
-    .primary-btn__badges { display: inline-flex; gap: 5px; }
-    .bot-badge {
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 5px 9px;
-      border-radius: 7px;
-      border: 1px solid var(--border);
-      line-height: 1;
+    .btn--mt5 {
+      background: linear-gradient(135deg, rgba(183, 148, 244, 0.22), rgba(139, 92, 246, 0.1));
+      color: #e9dcff;
+      border-color: rgba(183, 148, 244, 0.4);
     }
-    .bot-badge--deriv { background: rgba(97, 165, 255, 0.15); color: #a9d0ff; }
-    .bot-badge--mt5 { background: rgba(183, 148, 244, 0.15); color: #dcc6ff; }
-
-    .logout-btn {
-      background: #2b313b;
+    .btn--ghost {
+      background: var(--surface-2);
       color: #e4ebf7;
-      padding: 10px 14px;
-      font-size: 13px;
     }
+    .btn--ghost:hover { background: rgba(255, 255, 255, 0.09); }
 
-    .overview {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-
-    .overview-main,
-    .balance-panel,
-    .meta-grid .card,
-    .accounts-panel,
-    .status {
-      background: linear-gradient(150deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+    /* ---------- Hero ---------- */
+    .hero {
+      position: relative;
+      border-radius: 20px;
       border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: 0 14px 35px rgba(8, 12, 19, 0.35);
+      background: linear-gradient(155deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+      box-shadow: 0 18px 44px rgba(4, 6, 10, 0.4);
+      padding: clamp(18px, 3.4vw, 28px);
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: clamp(16px, 3vw, 32px);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 100% 0%, rgba(97, 165, 255, 0.12), transparent 55%);
+      pointer-events: none;
     }
 
-    .overview-main {
-      padding: 20px 22px;
-      display: grid;
-      gap: 8px;
-    }
-    .overview-main .eyebrow {
+    .hero-identity { display: flex; flex-direction: column; justify-content: center; gap: 8px; min-width: 0; }
+    .eyebrow {
       color: var(--muted);
       font-size: 10px;
       text-transform: uppercase;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.15em;
       font-weight: 700;
     }
-    .overview-main .name {
+    .hero-identity .name {
       margin: 0;
-      font-size: clamp(24px, 4vw, 36px);
+      font-size: clamp(21px, 3.4vw, 30px);
       font-weight: 800;
-      letter-spacing: -0.03em;
-      line-height: 1.08;
+      letter-spacing: -0.02em;
+      line-height: 1.12;
+      overflow-wrap: anywhere;
     }
-    .overview-main .account-type {
-      color: #d4dbeb;
-      font-size: 14px;
-      font-weight: 600;
+    .account-type {
+      width: fit-content;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: var(--surface-2);
     }
-    .overview-main .account-type.account-type--real { color: #9be6b6; }
-    .overview-main .account-type.account-type--demo { color: #fbd38d; }
+    .account-type.account-type--real { color: #86efac; border-color: rgba(134, 239, 172, 0.32); background: rgba(74, 222, 128, 0.1); }
+    .account-type.account-type--demo { color: #fbd38d; border-color: rgba(251, 211, 141, 0.32); background: rgba(246, 173, 85, 0.1); }
 
-    .balance-panel {
-      padding: 20px 22px;
-      display: grid;
+    .hero-balance {
+      position: relative;
+      display: flex;
+      flex-direction: column;
       gap: 10px;
-      align-content: start;
+      padding-left: clamp(16px, 3vw, 32px);
+      border-left: 1px solid var(--border);
+      min-width: 0;
     }
     .balance-label {
       color: var(--muted);
@@ -209,149 +185,158 @@
       font-weight: 700;
     }
     .balance-value {
-      font-size: clamp(30px, 4.8vw, 42px);
+      font-size: clamp(26px, 4.2vw, 36px);
       font-weight: 800;
       letter-spacing: -0.03em;
       color: #f4f8ff;
-      line-height: 1.03;
+      line-height: 1.05;
+      overflow-wrap: anywhere;
     }
     .live-pill {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       width: fit-content;
       border-radius: 999px;
-      border: 1px solid rgba(104, 211, 145, 0.35);
-      background: rgba(104, 211, 145, 0.12);
+      border: 1px solid rgba(74, 222, 128, 0.32);
+      background: rgba(74, 222, 128, 0.1);
       color: #b6efcb;
-      padding: 6px 11px;
+      padding: 5px 10px;
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: 0.02em;
     }
     .live-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: var(--green);
-      box-shadow: 0 0 0 3px rgba(104, 211, 145, 0.28);
+      box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.25);
     }
 
     .balance-actions {
       margin-top: 4px;
-      padding-top: 14px;
+      padding-top: 12px;
       border-top: 1px solid var(--border);
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       gap: 8px 10px;
     }
-    .fund-actions {
-      display: inline-flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+    .fund-actions { display: inline-flex; gap: 8px; flex-wrap: wrap; }
     .fund-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
       font-size: 11px;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.03em;
       padding: 9px 13px;
     }
     .fund-btn--deposit {
-      background: linear-gradient(135deg, #2f8159, #225d42);
-      color: #ecfff5;
-      border-color: rgba(104, 211, 145, 0.45);
-      box-shadow: 0 8px 20px rgba(24, 73, 54, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      background: linear-gradient(135deg, rgba(74, 222, 128, 0.2), rgba(34, 197, 94, 0.08));
+      color: #d3ffe6;
+      border-color: rgba(74, 222, 128, 0.35);
     }
     .fund-btn--withdraw {
-      background: linear-gradient(135deg, #a4622e, #70411d);
-      color: #fff3e4;
-      border-color: rgba(246, 173, 85, 0.4);
-      box-shadow: 0 8px 20px rgba(86, 50, 21, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      background: linear-gradient(135deg, rgba(246, 173, 85, 0.22), rgba(217, 119, 6, 0.08));
+      color: #ffe9cf;
+      border-color: rgba(246, 173, 85, 0.35);
     }
     .start-trading-btn {
-      display: inline-flex;
-      align-items: center;
+      flex: 1 1 auto;
       justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      min-height: 44px;
+      min-height: 42px;
       padding: 10px 16px;
       font-size: 12px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      letter-spacing: 0.03em;
       color: #eef6ff;
-      background: linear-gradient(135deg, #356cb4, #3a73bf);
+      background: linear-gradient(135deg, #3568b8, #2a7dc4);
       border-color: rgba(97, 165, 255, 0.45);
-      box-shadow: 0 8px 22px rgba(27, 55, 97, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      box-shadow: 0 8px 20px rgba(27, 55, 97, 0.35);
     }
-    .start-trading-btn__label { white-space: nowrap; font-weight: 800; }
-    .start-trading-btn .primary-btn__badges { gap: 6px; }
-    .start-trading-btn .bot-badge {
-      font-size: 11px;
-      padding: 6px 10px;
-      border-radius: 8px;
-      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12);
-    }
-    .start-trading-btn .bot-badge--deriv {
-      background: linear-gradient(135deg, rgba(97, 165, 255, 0.45), rgba(59, 130, 246, 0.28));
-      color: #ffffff;
-      border-color: rgba(147, 197, 253, 0.65);
-    }
-    .start-trading-btn .bot-badge--mt5 {
-      background: linear-gradient(135deg, rgba(183, 148, 244, 0.45), rgba(139, 92, 246, 0.28));
-      color: #ffffff;
-      border-color: rgba(216, 180, 254, 0.65);
+    .start-trading-btn .badges { display: inline-flex; gap: 5px; }
+    .chip {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 3px 7px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.14);
     }
     .balance-hint {
       margin-top: -2px;
       font-size: 11px;
-      color: #aeb8cd;
-      line-height: 1.35;
-      max-width: 42ch;
+      color: #9aa4ba;
+      line-height: 1.4;
     }
 
-    .meta-grid {
-      margin-bottom: 14px;
-      display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-      gap: 10px;
+    /* ---------- Details panel ---------- */
+    .details-panel {
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      margin-bottom: 16px;
+      overflow: hidden;
     }
-    .meta-grid .card {
-      padding: 14px 14px 12px;
-      min-height: 85px;
-      display: grid;
-      align-content: start;
-      gap: 8px;
+    .details-panel__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
     }
-    .meta-grid .card h3 {
+    .details-panel__header h2 {
       margin: 0;
-      font-size: 9px;
+      font-size: 11px;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      letter-spacing: 0.13em;
       color: var(--muted);
       font-weight: 700;
     }
-    .value {
-      font-size: 15px;
-      font-weight: 700;
-      color: #f2f6ff;
-      line-height: 1.35;
-    }
-    .value.small { font-size: 14px; font-weight: 650; }
-    .platform-brand {
-      display: inline-flex;
+    .details-toggle {
+      display: none;
       align-items: center;
-      gap: 7px;
-      color: #f2f6ff;
+      justify-content: center;
+      padding: 7px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: #dbe7ff;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .details-toggle:hover { background: rgba(255, 255, 255, 0.1); }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+    .stat {
+      padding: 14px 18px;
+      display: grid;
+      gap: 6px;
+      align-content: start;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      min-width: 0;
+    }
+    .stat h3 {
+      margin: 0;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
       font-weight: 700;
     }
+    .stat .value {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f2f6ff;
+      line-height: 1.3;
+      overflow-wrap: anywhere;
+    }
+    .platform-brand { display: inline-flex; align-items: center; gap: 6px; }
     .platform-brand__icon {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
+      width: 7px; height: 7px; border-radius: 50%;
       background: #ff444f;
       box-shadow: 0 0 0 3px rgba(255, 68, 79, 0.2);
       flex-shrink: 0;
@@ -359,244 +344,137 @@
     .platform-brand__word {
       color: #ff5a64;
       text-transform: lowercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
       font-weight: 800;
-      font-size: 14px;
-      line-height: 1;
     }
-    .platform-card__row {
+    .country-value { display: inline-flex; align-items: center; gap: 7px; }
+
+    /* ---------- Balances ---------- */
+    .balances-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .balances-panel {
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 16px;
+      min-width: 0;
+    }
+    .panel-title-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
+      margin-bottom: 12px;
     }
-    .platform-card__main {
-      display: grid;
-      gap: 8px;
-      min-width: 0;
-    }
-    .details-toggle {
-      display: none;
-      flex-shrink: 0;
-      align-items: center;
-      justify-content: center;
-      padding: 8px 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--surface-2);
-      color: #dbe7ff;
-      font-family: inherit;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      cursor: pointer;
-    }
-    .details-toggle:hover {
-      background: var(--surface-3);
-    }
-    .dashboard-meta { margin-bottom: 14px; }
-    .mobile-bottom { margin-top: 0; }
-    .ok { color: #9be6b6; }
-
-    .accounts-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-    .accounts-panel { padding: 16px; }
     .panel-title {
-      margin: 0 0 12px;
-      font-size: 12px;
-      letter-spacing: 0.12em;
+      margin: 0;
+      font-size: 11px;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--muted);
       font-weight: 700;
     }
+    .panel-count {
+      font-size: 11px;
+      font-weight: 800;
+      color: #cfe0ff;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 2px 9px;
+      min-width: 20px;
+      text-align: center;
+    }
     .accounts-grid {
       display: grid;
       gap: 8px;
-      max-height: 340px;
+      max-height: 300px;
       overflow: auto;
       padding-right: 2px;
     }
     .acct-item {
       background: var(--surface-2);
       border: 1px solid var(--border);
-      border-radius: 11px;
+      border-radius: 12px;
       padding: 10px 12px;
       display: grid;
       gap: 6px;
     }
-    .acct-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      font-size: 12px;
-    }
-    .acct-id { font-weight: 700; color: #ebf1ff; }
+    .acct-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 12px; }
+    .acct-id { font-weight: 700; color: #ebf1ff; overflow-wrap: anywhere; }
     .acct-type {
+      flex-shrink: 0;
       font-size: 10px;
       text-transform: uppercase;
-      letter-spacing: 0.09em;
+      letter-spacing: 0.07em;
       padding: 3px 6px;
       border-radius: 999px;
       border: 1px solid var(--border);
       color: var(--muted);
-      background: rgba(255, 255, 255, 0.03);
     }
-    .acct-balance {
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: #e6eeff;
-    }
-    .acct-meta {
-      font-size: 11px;
-      color: #acb5c7;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+    .acct-balance { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; color: #e6eeff; }
+    .acct-meta { font-size: 11px; color: #98a2b8; display: flex; gap: 10px; flex-wrap: wrap; }
     .accent-options { border-left: 3px solid rgba(97, 165, 255, 0.85); }
     .accent-mt5 { border-left: 3px solid rgba(183, 148, 244, 0.9); }
 
+    /* ---------- Status + footer ---------- */
     .status {
-      font-size: 13px;
-      color: #cad3e6;
-      padding: 12px 14px;
+      font-size: 12.5px;
+      color: #b3bcd1;
+      padding: 12px 16px;
       line-height: 1.5;
-      margin-top: 0;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
     }
 
     .dash-footer {
       margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       gap: 10px;
     }
     .social-btn {
-      display: inline-flex;
-      align-items: center;
       justify-content: center;
-      padding: 10px 14px;
+      padding: 9px 14px;
       font-size: 11px;
-      letter-spacing: 0.05em;
     }
-    .social-btn--whatsapp {
-      background: linear-gradient(135deg, #2d7b56, #1f6a48);
-      color: #ecfff5;
-      border-color: rgba(104, 211, 145, 0.45);
-    }
-    .social-btn--telegram {
-      background: linear-gradient(135deg, #2d5f95, #244f7d);
-      color: #e8f1ff;
-      border-color: rgba(97, 165, 255, 0.45);
+    .social-btn--whatsapp { background: linear-gradient(135deg, rgba(74, 222, 128, 0.18), rgba(22, 163, 74, 0.06)); color: #d3ffe6; border-color: rgba(74, 222, 128, 0.35); }
+    .social-btn--telegram { background: linear-gradient(135deg, rgba(97, 165, 255, 0.2), rgba(37, 99, 235, 0.06)); color: #dbe9ff; border-color: rgba(97, 165, 255, 0.35); }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 860px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-balance { padding-left: 0; border-left: 0; padding-top: 16px; border-top: 1px solid var(--border); }
+      .balances-layout { grid-template-columns: 1fr; }
     }
 
-    @media (max-width: 1180px) {
-      .meta-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .accounts-layout { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 620px) {
+      .wrap { padding: 12px 12px 28px; }
+      .brand-title { font-size: 14px; }
+      .btn { padding: 8px 11px; font-size: 11.5px; }
+      .hero { padding: 16px; border-radius: 16px; }
+      .details-panel, .balances-panel, .status { border-radius: 14px; }
+      .details-grid { grid-template-columns: repeat(2, 1fr); }
+      .stat { padding: 12px 14px; }
 
-    @media (max-width: 900px) {
-      .overview { grid-template-columns: 1fr; }
-      .topbar { flex-direction: column; }
-      .topbar-actions { justify-content: flex-start; }
-    }
-
-    @media (max-width: 640px) {
-      .wrap {
-        padding: 12px 12px 16px;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-      }
-      .topbar {
-        margin-bottom: 10px;
-        padding: 12px 14px;
-      }
-      .overview {
-        margin-bottom: 10px;
-        gap: 10px;
-      }
-      .overview-main,
-      .balance-panel {
-        padding: 16px 18px;
-      }
-      .overview-main .name {
-        font-size: 22px;
-      }
-      .balance-value { font-size: 28px; }
-      .balance-hint { display: none; }
-      .live-pill { display: none; }
-      .primary-btn, .logout-btn { padding: 8px 10px; font-size: 11px; }
-      .dashboard-meta {
-        margin-bottom: 0;
-        flex: 1 1 auto;
-      }
-      .meta-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 0;
-        margin-bottom: 0;
-      }
-      #platformCard {
-        order: -1;
-        margin-bottom: 0;
-      }
-      .dashboard-meta:not(.details-open) .meta-grid .card:not(#platformCard) {
+      .details-toggle { display: inline-flex; }
+      #dashboardMeta:not(.details-open) .details-grid,
+      #dashboardMeta:not(.details-open) .balances-layout {
         display: none;
       }
-      .dashboard-meta:not(.details-open) .accounts-layout {
-        display: none;
-      }
-      .dashboard-meta.details-open .meta-grid {
-        gap: 8px;
-        margin-bottom: 10px;
-      }
-      .dashboard-meta.details-open .meta-grid .card {
-        min-height: auto;
-      }
-      .dashboard-meta.details-open .accounts-layout {
-        display: grid;
-        margin-bottom: 10px;
-      }
-      .details-toggle {
-        display: inline-flex;
-      }
-      .mobile-bottom {
-        margin-top: auto;
-        padding-top: 12px;
-      }
-      .status {
-        margin-top: 0;
-        margin-bottom: 10px;
-        font-size: 12px;
-        padding: 10px 12px;
-      }
-      .dash-footer {
-        margin-top: 0;
-        padding-top: 0;
-        border-top: 0;
-      }
-      .social-btn {
-        flex: 1 1 calc(50% - 5px);
-        justify-content: center;
-      }
+      #dashboardMeta.details-open .balances-layout { margin-top: 14px; }
     }
 
-    @media (max-width: 460px) {
-      .fund-actions { width: 100%; }
-      .fund-btn, .start-trading-btn { width: 100%; }
-      .balance-actions {
-        flex-direction: column;
-        align-items: stretch;
-      }
+    @media (max-width: 380px) {
+      .details-grid { grid-template-columns: 1fr 1fr; }
+      .fund-actions, .start-trading-btn { width: 100%; }
+      .balance-actions { flex-direction: column; align-items: stretch; }
     }
   </style>
   <link rel="stylesheet" href="guide.css" />
@@ -606,36 +484,34 @@
     <div class="topbar">
       <div class="brand-block">
         <p class="brand-kicker">Magic Bots Lab</p>
-        <h1 class="brand-title">Dashboard</h1>
+        <p class="brand-title">Dashboard</p>
       </div>
       <div class="topbar-actions">
-        <a class="primary-btn primary-btn--mt5" id="createMt5AccountBtn" href="https://partner-tracking.deriv.com/click?a=18562&o=1&c=3&link_id=1" target="_blank" rel="noopener noreferrer sponsored">
-          <span class="primary-btn__label">Create MT5 account</span>
-        </a>
-        <button class="logout-btn" id="logoutBtn" type="button">Disconnect</button>
+        <a class="btn btn--mt5" id="createMt5AccountBtn" href="https://partner-tracking.deriv.com/click?a=18562&o=1&c=3&link_id=1" target="_blank" rel="noopener noreferrer sponsored">Create MT5 account</a>
+        <button class="btn btn--ghost" id="logoutBtn" type="button">Disconnect</button>
       </div>
     </div>
 
-    <section class="overview">
-      <div class="overview-main">
+    <section class="hero">
+      <div class="hero-identity">
         <div class="eyebrow">Account Holder</div>
-        <h2 class="name" id="fullName">Loading...</h2>
+        <h1 class="name" id="fullName">Loading...</h1>
         <div class="account-type" id="accountType">--</div>
       </div>
-      <div class="balance-panel">
+      <div class="hero-balance">
         <div class="balance-label">Live Balance</div>
         <div class="balance-value" id="balance">--</div>
         <div class="live-pill"><span class="live-dot"></span><span id="connectionState">Connected</span></div>
         <div class="balance-actions">
           <div class="fund-actions">
-            <a class="fund-btn fund-btn--deposit" href="https://partner-tracking.deriv.com/click?a=18562&o=1&c=4&link_id=1" target="_blank" rel="noopener noreferrer sponsored">Deposit</a>
-            <a class="fund-btn fund-btn--withdraw" href="https://partner-tracking.deriv.com/click?a=18562&o=1&c=4&link_id=1" target="_blank" rel="noopener noreferrer sponsored">Withdraw</a>
+            <a class="btn fund-btn fund-btn--deposit" href="https://partner-tracking.deriv.com/click?a=18562&o=1&c=4&link_id=1" target="_blank" rel="noopener noreferrer sponsored">Deposit</a>
+            <a class="btn fund-btn fund-btn--withdraw" href="https://partner-tracking.deriv.com/click?a=18562&o=1&c=4&link_id=1" target="_blank" rel="noopener noreferrer sponsored">Withdraw</a>
           </div>
-          <button class="start-trading-btn" id="startTradingBtn" type="button">
-            <span class="start-trading-btn__label">Open AI bots</span>
-            <span class="primary-btn__badges">
-              <span class="bot-badge bot-badge--deriv">Deriv</span>
-              <span class="bot-badge bot-badge--mt5">MT5</span>
+          <button class="btn start-trading-btn" id="startTradingBtn" type="button">
+            <span>Open AI bots</span>
+            <span class="badges">
+              <span class="chip">Deriv</span>
+              <span class="chip">MT5</span>
             </span>
           </button>
         </div>
@@ -643,83 +519,63 @@
       </div>
     </section>
 
-    <section class="dashboard-meta" id="dashboardMeta">
-    <div class="meta-grid">
-      <div class="card">
-        <h3>Account ID</h3>
-        <div class="value small" id="accountId">--</div>
+    <section class="details-panel" id="dashboardMeta">
+      <div class="details-panel__header">
+        <h2>Account details</h2>
+        <button type="button" class="details-toggle" id="detailsToggle" aria-expanded="false" aria-controls="dashboardMeta">Details</button>
       </div>
-      <div class="card">
-        <h3>Currency</h3>
-        <div class="value small" id="currency">--</div>
-      </div>
-      <div class="card">
-        <h3>Connection Quality</h3>
-        <div class="value small ok" id="connectionStateMirror">Live</div>
-      </div>
-      <div class="card">
-        <h3>Account Category</h3>
-        <div class="value small" id="accountCategory">--</div>
-      </div>
-      <div class="card platform-card" id="platformCard">
-        <div class="platform-card__row">
-          <div class="platform-card__main">
-            <h3>Platform</h3>
-            <div class="value small" id="platform">--</div>
-          </div>
-          <button type="button" class="details-toggle" id="detailsToggle" aria-expanded="false" aria-controls="dashboardMeta">Details</button>
+
+      <div class="details-grid">
+        <div class="stat">
+          <h3>Account ID</h3>
+          <div class="value" id="accountId">--</div>
+        </div>
+        <div class="stat">
+          <h3>Currency</h3>
+          <div class="value" id="currency">--</div>
+        </div>
+        <div class="stat" id="platformCard">
+          <h3>Platform</h3>
+          <div class="value" id="platform">--</div>
+        </div>
+        <div class="stat">
+          <h3>MT5 Access</h3>
+          <div class="value" id="mt5Access">--</div>
+        </div>
+        <div class="stat" id="countryCard">
+          <h3>Country</h3>
+          <div class="value country-value"><span id="countryFlag"></span><span id="countryName">--</span></div>
+        </div>
+        <div class="stat">
+          <h3>Account Status</h3>
+          <div class="value" id="accountStatus">--</div>
         </div>
       </div>
-      <div class="card">
-        <h3>MT5 Access</h3>
-        <div class="value small" id="mt5Access">--</div>
-      </div>
-      <div class="card" id="countryCard">
-        <h3>Country</h3>
-        <div class="value small" id="countryName">--</div>
-      </div>
-      <div class="card">
-        <h3>Account Status</h3>
-        <div class="value small" id="accountStatus">--</div>
-      </div>
-      <div class="card" id="flagCard">
-        <h3>Flag</h3>
-        <div class="value small" id="countryFlag">--</div>
-      </div>
-      <div class="card">
-        <h3>Total Live Accounts</h3>
-        <div class="value small" id="totalAccounts">--</div>
-      </div>
-      <div class="card">
-        <h3>Options Accounts</h3>
-        <div class="value small" id="optionsAccountsCount">--</div>
-      </div>
-      <div class="card">
-        <h3>MT5/CFD Accounts</h3>
-        <div class="value small" id="mt5AccountsCount">--</div>
-      </div>
-    </div>
 
-    <section class="accounts-layout">
-      <div class="accounts-panel">
-        <h3 class="panel-title">Live Options Balances</h3>
-        <div class="accounts-grid" id="optionsAccountsGrid"></div>
-      </div>
-      <div class="accounts-panel">
-        <h3 class="panel-title">Live MT5 / CFD Balances</h3>
-        <div class="accounts-grid" id="mt5AccountsGrid"></div>
-      </div>
-    </section>
+      <section class="balances-layout" style="padding: 0 18px 18px; margin: 14px 0 0;">
+        <div class="balances-panel">
+          <div class="panel-title-row">
+            <h3 class="panel-title">Live Options Balances</h3>
+            <span class="panel-count" id="optionsAccountsCount">0</span>
+          </div>
+          <div class="accounts-grid" id="optionsAccountsGrid"></div>
+        </div>
+        <div class="balances-panel">
+          <div class="panel-title-row">
+            <h3 class="panel-title">Live MT5 / CFD Balances</h3>
+            <span class="panel-count" id="mt5AccountsCount">0</span>
+          </div>
+          <div class="accounts-grid" id="mt5AccountsGrid"></div>
+        </div>
+      </section>
     </section>
 
-    <div class="mobile-bottom">
     <div class="status" id="statusText"></div>
 
     <footer class="dash-footer">
-      <a class="social-btn social-btn--whatsapp" href="https://whatsapp.com/channel/0029Vb6sxFG9xVJWbyIwL110" target="_blank" rel="noopener noreferrer">Join WhatsApp</a>
-      <a class="social-btn social-btn--telegram" href="https://t.me/magicabofficialchannel" target="_blank" rel="noopener noreferrer">Join Telegram</a>
+      <a class="btn social-btn social-btn--whatsapp" href="https://whatsapp.com/channel/0029Vb6sxFG9xVJWbyIwL110" target="_blank" rel="noopener noreferrer">Join WhatsApp</a>
+      <a class="btn social-btn social-btn--telegram" href="https://t.me/magicabofficialchannel" target="_blank" rel="noopener noreferrer">Join Telegram</a>
     </footer>
-    </div>
   </div>
 
   <div class="guide-overlay" id="dashboardGuideOverlay" aria-hidden="true">
