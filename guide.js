@@ -1,6 +1,6 @@
 (() => {
-  const DERIV_PARTNER_URL = "https://partner-tracking.deriv.com/click?a=18562&o=1&c=4&link_id=1";
-  const DERIV_MT5_PARTNER_URL = "https://partner-tracking.deriv.com/click?a=18562&o=1&c=3&link_id=1";
+  const DERIV_PARTNER_URL = "https://t.deriv.link?t=5HBLVPVNNFJ8";
+  const DERIV_MT5_PARTNER_URL = "https://t.deriv.link?t=5HBLVPVNNFJ8";
   const STORAGE_PREFIX = "mbl_guide_";
 
   const KEYS = {
