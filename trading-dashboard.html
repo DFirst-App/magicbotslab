@@ -1643,7 +1643,24 @@
           <div class="bot-panel-grid">
             <div class="bot-column">
               <div class="bot-config" id="botConfig">
-                <h4>Configuration</h4>
+                <h4 style="display:flex;align-items:center;gap:8px;">
+                  Configuration
+                  <!-- Automation switch. Only shown for the automated bot, and only
+                       while nothing is running, so it cannot be flipped mid-trade. -->
+                  <button type="button" id="automationToggle" role="switch" aria-checked="true"
+                          aria-label="Automated trading" hidden
+                          style="width:15px;height:15px;padding:0;border-radius:5px;border:1px solid rgba(255,255,255,0.18);background:transparent;display:grid;place-items:center;cursor:pointer;flex:0 0 auto;transition:background .15s,border-color .15s;">
+                    <svg id="automationTick" width="10" height="10" viewBox="0 0 24 24" fill="none"
+                         stroke="#04121f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" hidden>
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </button>
+                </h4>
+                <div id="automationBanner" hidden
+                     style="margin:0 0 12px;padding:10px 12px;border:1px solid rgba(36,217,112,0.35);background:rgba(36,217,112,0.06);border-radius:12px;">
+                  <div id="automationBannerHead" style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#24d970;"></div>
+                  <div id="automationBannerBody" style="margin-top:6px;font-size:11.5px;line-height:1.5;color:var(--muted);"></div>
+                </div>
                 <div class="config-grid">
                   <div class="input-group">
                     <label for="stakeInput">Initial Stake (USD)</label>
@@ -1934,6 +1951,7 @@
   </div>
 
   <script src="guide.js"></script>
+  <script src="automation.js"></script>
   <script src="popup-notifications.js"></script>
   <script src="bots/smartRecoveryDiffer.js"></script>
   <script src="bots/allMarketsDiffer.js"></script>
@@ -2057,6 +2075,11 @@
         const el = $(id);
         if (el) el.disabled = !!running;
       });
+
+      // Let the automation know a bot started or stopped, so it can tell its own
+      // runs from a hand-driven one and schedule the next one.
+      try { window.MBLAutomation && window.MBLAutomation.notifyRunning(!!running); } catch (_) {}
+      try { renderAutomation(); } catch (_) {}
 
       // Mode toggle is on the Account & Mode card
       const realBtn = $("realModeBtn");
@@ -2501,6 +2524,9 @@
           .then(() => showLowBalanceRecommendPopupIfNeeded(activeBotKey))
           .catch(() => {});
       }
+
+      // The automation switch belongs to this bot, so refresh it on every open.
+      try { renderAutomation(); } catch (_) {}
     }
 
     async function startBot() {
@@ -2916,6 +2942,98 @@
     $("tradingWelcomeOverlay")?.addEventListener("click", (e) => {
       if (e.target === $("tradingWelcomeOverlay")) completeTradingWelcome(false);
     });
+
+    // ── Autonomous trading ──────────────────────────────────────────────────
+    // The automation owns no engine of its own: it fills these very inputs and
+    // calls startBot(), so an automated run takes exactly the same path as one
+    // started by hand. Everything it needs from this page is passed in here.
+
+    let automationSnap = null;
+
+    function automationSetInputs(cfg) {
+      if ($("stakeInput")) $("stakeInput").value = String(cfg.initialStake);
+      if ($("takeProfitInput")) $("takeProfitInput").value = String(cfg.takeProfit);
+      if ($("stopLossInput")) $("stopLossInput").value = String(cfg.stopLoss);
+      if ($("martingaleInput")) $("martingaleInput").value = String(cfg.martingaleMultiplier);
+      const s = ensureBotState(RECOMMENDED_BOT_KEY);
+      if (s) {
+        s.config.initialStake = cfg.initialStake;
+        s.config.takeProfit = cfg.takeProfit;
+        s.config.stopLoss = cfg.stopLoss;
+        s.config.martingaleMultiplier = cfg.martingaleMultiplier;
+      }
+    }
+
+    function renderAutomation() {
+      const auto = window.MBLAutomation;
+      const toggle = $("automationToggle");
+      const tick = $("automationTick");
+      const banner = $("automationBanner");
+      if (!auto || !toggle || !banner) return;
+
+      const snap = automationSnap || auto.snapshot();
+      const onThisBot = activeBotKey === auto.BOT_KEY;
+
+      // Switch: only on the automated bot, and only while nothing is running.
+      toggle.hidden = !onThisBot || !!botRunning;
+      toggle.setAttribute("aria-checked", snap.active ? "true" : "false");
+      toggle.style.background = snap.active ? "#24d970" : "transparent";
+      toggle.style.borderColor = snap.active ? "#24d970" : "rgba(255,255,255,0.18)";
+      toggle.title = snap.active
+        ? "Automated trading is on — switch off to trade by hand for an hour"
+        : "Automated trading is off — back on at " +
+          (snap.optedOutUntil ? new Date(snap.optedOutUntil).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "");
+      if (tick) tick.hidden = !snap.active;
+
+      // Switched off, the card carries no trace of the automation at all.
+      const trading = snap.active && onThisBot && snap.phase === "running";
+      const resting = snap.active && onThisBot && snap.phase === "cooldown" && !botRunning;
+      banner.hidden = !(trading || resting);
+      if (banner.hidden) return;
+
+      const cur = snap.currency || "USD";
+      $("automationBannerHead").textContent = trading ? "Trading for you" : "Automated · resting";
+      if (trading) {
+        $("automationBannerBody").innerHTML =
+          "Staking <strong>" + snap.stake.toFixed(2) + " " + cur + "</strong> a trade, aiming for <strong>" +
+          snap.target.toFixed(2) + " " + cur + "</strong> this run.";
+      } else {
+        const left = Math.max(0, (snap.nextRunAt || 0) - Date.now());
+        const mm = String(Math.floor(left / 60000)).padStart(2, "0");
+        const ss = String(Math.floor((left % 60000) / 1000)).padStart(2, "0");
+        $("automationBannerBody").innerHTML =
+          "Next run in <strong>" + mm + ":" + ss + "</strong>, sized from your balance at the time.";
+      }
+      if (!snap.online) {
+        $("automationBannerBody").innerHTML +=
+          '<br><span style="color:#f5c451;">Offline — it resumes on its own when the connection is back.</span>';
+      }
+    }
+
+    $("automationToggle")?.addEventListener("click", () => {
+      const auto = window.MBLAutomation;
+      if (!auto) return;
+      auto.setActive(!auto.snapshot().active);
+    });
+
+    if (window.MBLAutomation) {
+      window.MBLAutomation.subscribe((s) => { automationSnap = s; renderAutomation(); });
+      window.MBLAutomation.init({
+        hasToken: () => !!getToken(),
+        getBalance: () => lastKnownBalance,
+        getCurrency: () => lastKnownCurrency,
+        isRunning: () => botRunning,
+        getActiveBotKey: () => activeBotKey,
+        getDefaults: () => BOT_DEFAULTS,
+        getDefaultMartingale: () => (BOT_DEFS[RECOMMENDED_BOT_KEY] || {}).defaultMartingale || BOT_DEFAULTS.martingaleMultiplier,
+        openBot: (key) => openBot(key),
+        setInputs: automationSetInputs,
+        start: () => { startBot(); },
+        stop: () => { stopBot(); },
+      });
+      // Keeps the resting countdown moving without touching anything else.
+      setInterval(() => { if (!$("automationBanner")?.hidden) renderAutomation(); }, 1000);
+    }
 
     $("stakeCoachApply")?.addEventListener("click", applySuggestedStakeToConfig);
     $("lowBalanceRecommendApply")?.addEventListener("click", () => {
