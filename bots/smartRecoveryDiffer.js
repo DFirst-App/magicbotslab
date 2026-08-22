@@ -15,6 +15,13 @@
     }
 
     resetState() {
+      this.stopKeepAlive();
+      this.clearTradeWatchdog();
+      if (this.resumeTimer) { clearTimeout(this.resumeTimer); }
+      this.keepAliveTimer = null;
+      this.tradeWatchdog = null;
+      this.resumeTimer = null;
+      this.tradeStartedAt = 0;
       this.ws = null;
       this.isRunning = false;
       this.stopRequested = false;
@@ -102,6 +109,7 @@
       this.ws.onopen = () => {
         this.reconnectAttempts = 0;
         this.isReconnecting = false;
+        this.startKeepAlive();
         if (this.reconnectTimeout) {
           clearTimeout(this.reconnectTimeout);
           this.reconnectTimeout = null;
@@ -193,6 +201,12 @@
       this.isRunning = false;
       this.tradeInProgress = false;
       this.activeContractId = null;
+      this.stopKeepAlive();
+      this.clearTradeWatchdog();
+      if (this.resumeTimer) {
+        clearTimeout(this.resumeTimer);
+        this.resumeTimer = null;
+      }
       if (this.runningTimer) {
         clearInterval(this.runningTimer);
         this.runningTimer = null;
@@ -251,6 +265,18 @@
           
           console.error('Deriv API error:', data.error);
           this.ui.showStatus(message, 'error');
+
+          // An error answering a proposal or a buy leaves the trade half-placed.
+          // The next trade is only ever scheduled from the settle handler, so if
+          // tradeInProgress is left set here nothing reschedules and the bot sits
+          // idle for good. Release it and pick the loop back up.
+          const req = data.echo_req || {};
+          const answeringTrade = data.msg_type === 'proposal' || data.msg_type === 'buy' ||
+            req.proposal !== undefined || req.buy !== undefined;
+          if (answeringTrade) {
+            this.releaseTrade();
+            this.resumeTrading(1500);
+          }
           return;
         }
 
@@ -449,6 +475,80 @@
       return { market: bestMarket, tradeType: bestTradeType };
     }
 
+    /**
+     * Recovery helpers. The trade loop is driven entirely by contract
+     * settlements, so anything that stops a settlement arriving stops the bot
+     * for good. These put it back on its feet without touching how it trades.
+     */
+
+    /** Clear the in-flight trade so the loop is allowed to run again. */
+    releaseTrade() {
+      this.tradeInProgress = false;
+      this.activeContractId = null;
+      this.clearTradeWatchdog();
+    }
+
+    /** Ask for the next trade after a pause, the same way a settle does. */
+    resumeTrading(delay) {
+      if (!this.isRunning || this.stopRequested) return;
+      if (this.resumeTimer) clearTimeout(this.resumeTimer);
+      this.resumeTimer = setTimeout(() => {
+        this.resumeTimer = null;
+        if (this.isRunning && !this.stopRequested && !this.tradeInProgress) {
+          this.queueNextTrade();
+        }
+      }, delay || 900);
+    }
+
+    /** Deriv drops idle sockets. Without traffic the connection can die quietly,
+     *  and a half-dead socket never fires onclose, so nothing reconnects. */
+    startKeepAlive() {
+      this.stopKeepAlive();
+      this.keepAliveTimer = setInterval(() => {
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+          try { this.ws.send(JSON.stringify({ ping: 1 })); } catch (_) {}
+        }
+      }, 20000);
+    }
+
+    stopKeepAlive() {
+      if (this.keepAliveTimer) {
+        clearInterval(this.keepAliveTimer);
+        this.keepAliveTimer = null;
+      }
+    }
+
+    /** If a contract update never arrives — a dropped subscription, a missed
+     *  message — re-ask for it, and if it is still silent, let the loop go on. */
+    armTradeWatchdog() {
+      this.clearTradeWatchdog();
+      this.tradeStartedAt = Date.now();
+      this.tradeWatchdog = setTimeout(() => {
+        if (!this.isRunning || this.stopRequested || !this.tradeInProgress) return;
+        this.ui.showStatus('Trade update is late — re-syncing...', 'warning');
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+          try {
+            this.ws.send(JSON.stringify(this.activeContractId
+              ? { proposal_open_contract: 1, contract_id: this.activeContractId, subscribe: 1 }
+              : { proposal_open_contract: 1, subscribe: 1 }));
+          } catch (_) {}
+        }
+        this.tradeWatchdog = setTimeout(() => {
+          if (this.isRunning && !this.stopRequested && this.tradeInProgress) {
+            this.releaseTrade();
+            this.resumeTrading(1500);
+          }
+        }, 5000);
+      }, 30000);
+    }
+
+    clearTradeWatchdog() {
+      if (this.tradeWatchdog) {
+        clearTimeout(this.tradeWatchdog);
+        this.tradeWatchdog = null;
+      }
+    }
+
     queueNextTrade() {
       if (!this.isRunning || this.tradeInProgress) {
         return;
@@ -494,6 +594,7 @@
       }
 
       this.tradeInProgress = true;
+      this.armTradeWatchdog();
       this.currentMarket = market;
       this.currentDigit = digit;
       this.ui.updateTargets(market, displayTarget);
@@ -544,6 +645,7 @@
         this.totalTrades += 1;
         this.tradeInProgress = false;
         this.activeContractId = null;
+        this.clearTradeWatchdog();
 
         if (isWin) {
           this.wins += 1;
