@@ -28,18 +28,20 @@
   const TICK_MS = 20 * 1000;          // heartbeat
   const RETRY_MS = 60 * 1000;         // a run that failed to get going
   const COOLDOWN_MS = 90 * 60 * 1000; // quiet period after a completed run
-  const OPT_OUT_MS = 60 * 60 * 1000;  // how long the switch stays off
   const MIN_BALANCE = 100;            // balance at which the automation arms
   const PROFIT_TARGET_PCT = 0.1;      // target for one run
   const SHORT_RUN_MS = 30 * 1000;     // shorter than this and the run never started properly
 
   const BLANK = {
     enabled: false,
-    greeted: false,
+    // The person's answer to "may I trade for you": null until asked, true once
+    // allowed, false once switched off. False is permanent — only they can undo
+    // it. The automation is on by default, which is not the same as being
+    // cleared to trade: the first run still waits for a yes.
+    allowed: null,
     phase: "off",          // off | idle | running | cooldown
     nextRunAt: null,
     lastTradeAt: null,
-    optedOutUntil: null,
   };
 
   let p = Object.assign({}, BLANK);
@@ -53,7 +55,10 @@
   let claiming = false;
   let runCfg = null;
   let runStartedAt = 0;
-  let justActivated = false;
+  /** Waiting on their answer right now. */
+  let needsConsent = false;
+  /** They chose Not now: stay quiet this visit, ask again next time. */
+  let dismissed = false;
   const listeners = [];
 
   function load() {
@@ -86,9 +91,16 @@
     return Number.isFinite(Number(balance)) && Number(balance) >= MIN_BALANCE;
   }
 
-  /** Off only while the switch is held down; it comes back on its own. */
+  /** On unless they switched it off. On by default, and it never turns itself
+   *  back on after being switched off — only they can do that. */
   function isActive() {
-    return p.optedOutUntil == null || Date.now() >= p.optedOutUntil;
+    return p.allowed !== false;
+  }
+
+  /** unasked → on by default but not yet cleared to trade; allowed → cleared;
+   *  off → switched off and staying off. */
+  function consentState() {
+    return p.allowed === true ? "allowed" : p.allowed === false ? "off" : "unasked";
   }
 
   function isDue(now) {
@@ -104,7 +116,7 @@
       enabled: p.enabled,
       phase: p.phase,
       active: isActive(),
-      optedOutUntil: p.optedOutUntil,
+      consent: consentState(),
       balance: Number.isFinite(Number(bal)) ? Number(bal) : null,
       currency: host && typeof host.getCurrency === "function" ? host.getCurrency() : "USD",
       // Mid-run these are the figures the run began with and never move; between
@@ -114,7 +126,7 @@
       nextRunAt: p.nextRunAt,
       lastTradeAt: p.lastTradeAt,
       online: typeof navigator === "undefined" ? true : navigator.onLine,
-      justActivated: justActivated,
+      needsConsent: needsConsent,
       minBalance: MIN_BALANCE,
     };
   }
@@ -136,30 +148,44 @@
     };
   }
 
-  function acknowledgeActivation() {
-    justActivated = false;
-    p.greeted = true;
-    save();
+  /** They said yes: from here the automation may trade for them. */
+  function allow() {
+    needsConsent = false;
+    dismissed = false;
+    p.allowed = true;
+    save(); emit(); tick();
+  }
+
+  /** Not now: nothing is switched on, and we ask again on their next visit
+   *  rather than recording a refusal they did not give. */
+  function declineForNow() {
+    needsConsent = false;
+    dismissed = true;
     emit();
   }
 
   /**
-   * Switch the automation on or off. Off is deliberately temporary — an hour, long
-   * enough to trade by hand without it stepping in, then it returns. On is the
-   * default, so a cleared browser is always automated.
+   * Switch the automation on or off.
+   *
+   * Off stays off. Nothing turns it back on but them switching it on again, so
+   * anyone who wants the bot to leave their account alone can rely on it.
+   * Switching it on is itself the go-ahead, so it does not ask again.
    */
   function setActive(on) {
     if (on) {
-      if (p.optedOutUntil == null) return;
-      p.optedOutUntil = null;
+      if (p.allowed === true) return;
+      needsConsent = false;
+      dismissed = false;
+      p.allowed = true;
       save(); emit(); tick();
       return;
     }
-    if (p.optedOutUntil != null) return;
-    p.optedOutUntil = Date.now() + OPT_OUT_MS;
+    if (p.allowed === false) return;
+    p.allowed = false;
     if (p.phase === "running" && host && typeof host.stop === "function") {
       try { host.stop(); } catch (_) {}
     }
+    needsConsent = false;
     runCfg = null;
     p.phase = "idle";
     save(); emit();
@@ -189,6 +215,13 @@
     }
 
     if (!wasOurs) { emit(); return; }
+
+    // Our run is over, so the figures it was using no longer apply: put the bot
+    // defaults back rather than leaving the card on a stake sized for a finished
+    // run. Anything typed by hand is untouched — we only undo what we wrote.
+    if (host && typeof host.restoreDefaults === "function") {
+      try { host.restoreDefaults(); } catch (_) {}
+    }
 
     // A run that ended almost immediately never really started (no account, socket
     // trouble): try again shortly. A real run rests the full quiet period, timed
@@ -235,25 +268,29 @@
         return;
       }
 
-      // Switched off by hand: stay quiet until the hour is up, then come back.
-      if (p.optedOutUntil != null) {
-        if (Date.now() < p.optedOutUntil) { emit(); return; }
-        p.optedOutUntil = null; save();
-      }
+      // Switched off by hand: nothing brings it back but them.
+      if (p.allowed === false) { emit(); return; }
 
       if (manual || host.isRunning()) { emit(); return; }
       if (typeof navigator !== "undefined" && !navigator.onLine) return;
 
       const bal = host.getBalance();
 
+      // Not yet allowed: once the balance is there, ask — with the figures a run
+      // would actually use — and place nothing until they say yes.
+      if (p.allowed !== true) {
+        if (!dismissed && isEligible(bal)) needsConsent = true;
+        emit();
+        return;
+      }
+
       if (!p.enabled) {
-        // Arms on connect, and equally the moment a balance first reaches the
-        // minimum — nobody has to reconnect to get here.
+        // Allowed and funded: arm, and equally the moment a balance first
+        // reaches the minimum — nobody has to reconnect to get here.
         if (isEligible(bal)) {
           p.enabled = true;
           p.phase = "idle";
           p.nextRunAt = null;
-          if (!p.greeted) justActivated = true;
           save(); emit();
         } else { emit(); return; }
       }
@@ -307,7 +344,8 @@
     snapshot,
     setActive,
     notifyRunning,
-    acknowledgeActivation,
+    allow,
+    declineForNow,
     BOT_KEY,
     MIN_BALANCE,
     PROFIT_TARGET_PCT,
