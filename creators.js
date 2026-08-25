@@ -100,6 +100,9 @@
     setTimeout(function () { el.remove(); }, 4200);
   }
 
+  // The share module lives in its own file and needs a way to say something.
+  window.MBL_TOAST = toast;
+
   function post(path, body) {
     return fetch(API + path, {
       method: "POST",
@@ -246,6 +249,15 @@
           " grace days, counted the honest way. Miss one and the finish moves out a day. You do not lose the month.</p>" +
         "</section>" +
 
+        '<a class="make-post" href="creators-practice.html">' +
+          '<span class="make-post__icon">' +
+            icon('<path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/>', 19) +
+          "</span>" +
+          "<span><span class=\"make-post__t\">See how a post is made</span>" +
+          '<span class="make-post__s">Practise on a real bot — record, talk over it, edit</span></span>' +
+          '<span class="make-post__go">' + icon('<path d="m9 18 6-6-6-6"/>', 18) + "</span>" +
+        "</a>" +
+
         '<section class="card">' +
           '<div class="eyebrow">' + icon(ICONS.earnings) + " Where it goes</div>" +
           '<div class="row">' + l.map(function (r) {
@@ -331,6 +343,17 @@
             "Make one video about Magic Bots Lab, post it to your three accounts, then log it in <b>Post log</b>.</p>" +
             '<button class="btn" data-go="log">Log my first video</button>') +
       "</section>" +
+
+      // The one thing that turns a dashboard into a day's work: making the
+      // video. It goes above the numbers, because the numbers follow from it.
+      '<a class="make-post" href="creators-practice.html">' +
+        '<span class="make-post__icon">' +
+          icon('<path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/>', 19) +
+        "</span>" +
+        "<span><span class=\"make-post__t\">Create a post</span>" +
+        '<span class="make-post__s">Practise on a real bot, then record, talk over it and edit</span></span>' +
+        '<span class="make-post__go">' + icon('<path d="m9 18 6-6-6-6"/>', 18) + "</span>" +
+      "</a>" +
 
       '<div class="grid g4">' +
         '<div class="stat"><div class="k">Your total earnings</div><div class="v ok">' + money(t.paidUsd) + '</div><div class="s">paid to you</div></div>' +
@@ -543,6 +566,16 @@
     "</div>";
   }
 
+  /** The creator's own short link — the thing every share is built around. */
+  function shareLink() {
+    return S.me ? location.origin + "/?ref=" + encodeURIComponent(S.me.creator.referral_code || "") : "";
+  }
+
+  function openShare(mode) {
+    if (!S.me || !window.MBLShare) return;
+    MBLShare.open(shareLink(), mode);
+  }
+
   function payoutLabel(k) {
     var p = M.PAYOUTS.filter(function (x) { return x.key === k; })[0];
     return p ? p.label : k;
@@ -571,7 +604,8 @@
         "comes out of what they earn.</p>" +
         '<div class="row" style="margin-top:12px">' +
           '<input class="field mono" style="flex:1;min-width:240px" readonly value="' + esc(link) + '" id="teamLink" />' +
-          '<button class="btn" data-act="copyLink">Copy link</button>' +
+          '<button class="btn" data-act="share">' + icon(ICONS.send, 15) + " Share &amp; invite</button>" +
+          '<button class="btn ghost" data-act="copyLink">Copy link</button>' +
           '<button class="btn ghost" data-act="copyCode">Code: ' + esc(c.referral_code || "—") + "</button>" +
         "</div>" +
       "</section>" +
@@ -810,7 +844,17 @@
     var el = e.target.closest("[data-go],[data-act],[data-drop],[data-pay],[data-lp],[data-undo],[data-day],[data-dir],[data-pick-country],[data-pick-platform]");
     if (!el) return;
 
-    if (el.dataset.go) { S.view = el.dataset.go; render(); document.getElementById("view").focus(); return; }
+    if (el.dataset.go) {
+      S.view = el.dataset.go;
+      render();
+      document.getElementById("view").focus();
+      // Opening Team is the moment somebody is thinking about their team, so
+      // it is the moment the day's nudge is worth something.
+      if (S.view === "team" && S.me && window.MBLShare && MBLShare.shouldPrompt()) {
+        setTimeout(function () { openShare("daily"); }, 450);
+      }
+      return;
+    }
 
     if (el.dataset.pickCountry) {
       Picker.open(el, (window.MBL_COUNTRIES || []).map(function (c) { return { value: c, label: c }; }),
@@ -876,9 +920,11 @@
     if (act === "register") return register();
     if (act === "log") return logPost();
 
+    if (act === "share") { openShare("chooser"); return; }
+
     if (act === "copyLink" || act === "copyCode") {
       var c = S.me.creator;
-      var value = act === "copyLink" ? location.origin + "/?ref=" + c.referral_code : c.referral_code;
+      var value = act === "copyLink" ? shareLink() : c.referral_code;
       navigator.clipboard.writeText(value).then(
         function () { toast(act === "copyLink" ? "Link copied — put it in your bio." : "Code copied."); },
         function () { toast("Could not copy — select it and copy by hand.", true); }

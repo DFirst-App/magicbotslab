@@ -1,0 +1,183 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   MAGIC BOTS LAB — the practice bot and the three steps.
+
+   Sits on top of creators.css, so the tokens, cards and buttons are already
+   here. What this adds is the guided setup: the field being asked for glows,
+   and nothing else does, so there is never a question about what to do next.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.topbar { gap: 14px; }
+.topbar h1 { font-size: 15px; }
+
+/* ── the balance gate ────────────────────────────────────────────────────── */
+
+.bal-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 10px 13px;
+  border: 1px solid var(--line-accent);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.35);
+}
+.bal-input:focus-within { border-color: var(--accent); }
+.bal-cur { font-size: 11px; font-weight: 800; letter-spacing: 0.1em; color: var(--faint); }
+.bal-input input {
+  flex: 1; min-width: 0;
+  border: 0; background: transparent; outline: none;
+  color: var(--text);
+  font-size: 19px; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.carry {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  margin-top: 11px; padding: 10px 12px;
+  border: 1px solid rgba(36, 217, 112, 0.35);
+  border-radius: 11px;
+  background: rgba(36, 217, 112, 0.07);
+  font-size: 12.5px; color: var(--muted);
+}
+
+/* ── the bot ─────────────────────────────────────────────────────────────── */
+
+.bot-wrap {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+  align-items: start;
+}
+@media (max-width: 900px) { .bot-wrap { grid-template-columns: minmax(0, 1fr); } }
+
+.bal-strip {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 9px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: rgba(0, 0, 0, 0.3);
+}
+.bal-strip-k { font-size: 10px; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: var(--faint); }
+.bal-strip-v { font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+.cfg-field { margin-top: 13px; padding: 11px; border: 1px solid transparent; border-radius: 12px; transition: border-color .2s, background .2s; }
+
+/* The one field being asked for, and only that one. A steady ring rather than
+   a flashing one — this sits on screen for as long as it takes to read. */
+.cfg-field.glow {
+  border-color: var(--accent);
+  background: rgba(0, 210, 255, 0.07);
+  box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.12);
+  animation: breathe 2.4s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.12); }
+  50%      { box-shadow: 0 0 0 6px rgba(0, 210, 255, 0.05); }
+}
+
+.cfg-hint { margin-top: 7px; font-size: 11.5px; line-height: 1.55; color: var(--muted); }
+.linky { border: 0; background: transparent; padding: 0; color: var(--accent); font-weight: 700; cursor: pointer; text-decoration: underline; }
+
+.cfg-locked {
+  display: flex; gap: 8px; align-items: flex-start;
+  margin-top: 13px; padding: 10px 12px;
+  border: 1px dashed var(--border);
+  border-radius: 11px;
+  font-size: 11.5px; line-height: 1.55; color: var(--faint);
+}
+.cfg-locked svg { margin-top: 2px; }
+
+.guide-msg {
+  display: flex; gap: 7px; align-items: flex-start;
+  margin-top: 12px; padding: 10px 12px;
+  border: 1px solid rgba(36, 217, 112, 0.4);
+  border-radius: 11px;
+  background: rgba(36, 217, 112, 0.08);
+  font-size: 12px; line-height: 1.55; color: var(--success);
+}
+
+.btn.go.glow {
+  animation: pulse 1.9s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(36, 217, 112, 0.5); }
+  50%      { box-shadow: 0 0 0 9px rgba(36, 217, 112, 0); }
+}
+
+.running-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; color: var(--accent);
+}
+
+.cfg-status { margin-top: 11px; font-size: 12px; line-height: 1.5; color: var(--muted); }
+.cfg-status.success { color: var(--success); }
+.cfg-status.error { color: var(--danger); }
+.cfg-status.warning { color: var(--warning); }
+
+/* ── trades ──────────────────────────────────────────────────────────────── */
+
+.trades { display: grid; gap: 5px; max-height: 420px; overflow-y: auto; }
+.trades-empty { padding: 20px 12px; text-align: center; font-size: 12.5px; color: var(--faint); }
+
+.trade {
+  display: grid;
+  grid-template-columns: 10px minmax(48px, 0.9fr) minmax(56px, 0.9fr) minmax(52px, 0.8fr) minmax(56px, 0.8fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: rgba(0, 0, 0, 0.24);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+}
+.trade-dot { width: 8px; height: 8px; border-radius: 999px; }
+.trade.win .trade-dot { background: var(--success); }
+.trade.loss .trade-dot { background: var(--danger); }
+.trade.win { border-color: rgba(36, 217, 112, 0.25); }
+.trade.loss { border-color: rgba(255, 95, 109, 0.25); }
+.trade-mkt { font-weight: 700; }
+.trade-dig, .trade-stake, .trade-time { color: var(--faint); }
+.trade-pl { font-weight: 800; }
+.trade.win .trade-pl { color: var(--success); }
+.trade.loss .trade-pl { color: var(--danger); }
+
+@media (max-width: 520px) {
+  /* The clock is the first thing that stops earning its place. */
+  .trade { grid-template-columns: 10px 1fr auto auto; }
+  .trade-dig, .trade-time { display: none; }
+}
+
+/* ── the three steps ─────────────────────────────────────────────────────── */
+
+.steps {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  margin-top: 12px;
+}
+
+.step-card { position: relative; padding-top: 16px; }
+.step-n {
+  display: grid; place-items: center;
+  width: 26px; height: 26px;
+  margin-bottom: 9px;
+  border-radius: 8px;
+  background: rgba(0, 210, 255, 0.16);
+  color: var(--accent);
+  font-size: 13px; font-weight: 800;
+}
+
+.tips { margin: 8px 0 0; padding-left: 18px; font-size: 12.5px; line-height: 1.75; color: var(--muted); }
+.tips li { margin-bottom: 4px; }
+
+.voice-box {
+  margin-top: 10px; padding: 11px;
+  border: 1px solid var(--line-accent);
+  border-radius: 11px;
+  background: rgba(0, 210, 255, 0.05);
+}
+.voice-head { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; }
+.voice-head .btn { margin-left: auto; }
+.voice-box audio { border-radius: 8px; }
