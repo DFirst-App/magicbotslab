@@ -47,16 +47,24 @@ Preview and Development**, then redeploy. None of them may be prefixed
 `NEXT_PUBLIC_`.
 
 ```
-SUPABASE_URL=https://fgxjscoirazdkckcyory.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=<the service_role key from Supabase → Project Settings → API>
+SUPABASE_URL=https://uiivntwsldsznpydcrvg.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=<the SECRET key — sb_secret_… — from Settings → API keys>
 TELEGRAM_BOT_TOKEN=<the @magicbotslabbot token from BotFather>
 TELEGRAM_CHAT_ID=<your numeric Telegram id>
 TELEGRAM_WEBHOOK_SECRET=<any long random string>
 ```
 
-`SUPABASE_URL` and the service role key come from the **Clunoid App** Supabase
-project — the same project, with `mbl_`-prefixed tables. The service role key
-bypasses every row-level rule, so it belongs only here, never in a page.
+`SUPABASE_SERVICE_ROLE_KEY` must be the **secret** key, not the publishable
+one. A publishable key (`sb_publishable_…`) is meant for browsers and is
+stopped by row-level security, which every `mbl_` table has switched on with
+no policies — it would read nothing and write nothing. The secret key bypasses
+those rules, which is exactly why it lives here and never in a page.
+
+Run `supabase/migrations/20260825120000_mbl_creator_program.sql` against
+whichever project you point `SUPABASE_URL` at — paste it into the SQL editor
+and run it once. It is idempotent, so running it twice is harmless. The same
+schema is already applied on the Clunoid App project if you would rather use
+that one; swap the URL and key and nothing else changes.
 
 ### 2. Press Start on the bot
 
