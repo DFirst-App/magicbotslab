@@ -40,12 +40,15 @@ module.exports = async (req, res) => {
     return json(res, 400, { error: `Choose exactly ${PLATFORMS_REQUIRED} platforms to post on.` });
   }
 
-  // Every chosen platform needs an account we can actually check.
+  // Handles are optional here. Somebody joining on their phone may not have
+  // their profile links to hand, and making them go and find three of them is
+  // how a registration gets abandoned. They are required before the first post
+  // is logged instead — which is the point they actually start to matter,
+  // because that is when we begin checking the accounts.
   const cleaned = {};
   for (const p of picked) {
     const h = normaliseHandle(handles[p]);
-    if (!h) return json(res, 400, { error: "Add your account link or handle for all three platforms." });
-    cleaned[p] = h;
+    if (h) cleaned[p] = h;
   }
 
   // Already registered? Say so plainly rather than creating a second seat.
@@ -86,7 +89,8 @@ module.exports = async (req, res) => {
   const creator = Array.isArray(created.data) ? created.data[0] : created.data;
 
   // The handles, in their own table so one account cannot hold two seats.
-  const rows = picked.map((p) => ({ creator_id: creator.id, platform: p, handle: cleaned[p] }));
+  // A row per chosen platform either way: the handle is filled in later.
+  const rows = picked.map((p) => ({ creator_id: creator.id, platform: p, handle: cleaned[p] || null }));
   const saved = await upsert("mbl_creator_handles", rows, "creator_id,platform");
 
   if (!saved.ok) {

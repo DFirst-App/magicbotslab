@@ -28,7 +28,7 @@
     view: "home",
     busy: false,
     // The registration form, while they are filling it in.
-    form: { name: "", email: "", country: "", newAccounts: false, payout: "", agreed: false },
+    form: { name: "", email: "", country: "", refCode: "", newAccounts: false, payout: "", agreed: false },
     platforms: ["tiktok", "instagram", "youtube"],
     handles: {},
     // The post-log composer.
@@ -302,6 +302,14 @@
         '<div><label class="lbl">Country</label>' +
           pickerButton('data-pick-country="1"', f.country, "Choose your country") + "</div>" +
 
+        // Somebody invited them, and the link did not carry the code — a
+        // WhatsApp forward loses it, a code read aloud never had it. One row,
+        // skippable, so the person who brought them still gets credited.
+        '<div><label class="lbl" for="f-ref">Invited by someone? ' +
+          '<span class="lbl-opt">optional</span></label>' +
+          '<input class="field mono" id="f-ref" data-f="refCode" value="' + esc(f.refCode || "") +
+          '" placeholder="Their team code" maxlength="12" autocapitalize="characters" spellcheck="false" /></div>' +
+
         "<div>" + platformPicker() + "</div>" +
 
         '<div><label class="lbl">How you want to be paid <span style="text-transform:none;letter-spacing:0">— optional, change it any time</span></label>' +
@@ -415,7 +423,8 @@
       "</div>";
     }).join("");
 
-    return '<label class="lbl">Where you post — pick ' + M.PLATFORMS_REQUIRED + "</label>" +
+    return '<label class="lbl">Where you post — pick ' + M.PLATFORMS_REQUIRED +
+      (S.me ? "" : ' <span class="lbl-opt">links optional for now</span>') + "</label>" +
       '<div class="plat">' + rows + "</div>" +
       '<div class="row" style="margin-top:8px">' +
         (rest.length
@@ -797,13 +806,11 @@
     if (!f.agreed) return toast("Tick the box to say you have read the rules.", true);
     if (S.platforms.length !== M.PLATFORMS_REQUIRED) return toast("Choose exactly " + M.PLATFORMS_REQUIRED + " platforms.", true);
 
-    for (var i = 0; i < S.platforms.length; i++) {
-      if (!(S.handles[S.platforms[i]] || "").trim()) return toast("Add your account link or handle for all three.", true);
-    }
-
     S.busy = true; render();
 
-    var ref = new URLSearchParams(location.search).get("ref") || localStorage.getItem("mbl_ref") || "";
+    var ref = (S.form.refCode || "").trim().toUpperCase() ||
+      new URLSearchParams(location.search).get("ref") ||
+      localStorage.getItem("mbl_ref") || "";
 
     post("register", {
       name: f.name, email: f.email, country: f.country,
@@ -834,7 +841,18 @@
     post("posts", { token: S.token, action: "log", day: S.log.day, platforms: S.log.platforms, link: S.log.link })
       .then(function (r) {
         S.busy = false;
-        if (!r.ok) { render(); return toast((r.data && r.data.error) || "Could not log that.", true); }
+        if (!r.ok) {
+          // Blocked for the one reason they can fix in ten seconds: take them
+          // to the fields rather than leaving them to find them.
+          if (r.data && r.data.needsHandles) {
+            S.view = "me";
+            render();
+            toast(r.data.error, true);
+            return;
+          }
+          render();
+          return toast((r.data && r.data.error) || "Could not log that.", true);
+        }
         S.log = { platforms: [], link: "", day: today() };
         toast("Logged. That day is counted.");
         return load();
@@ -979,7 +997,12 @@
     var el = e.target;
 
     if (el.dataset.f) {
-      S.form[el.dataset.f] = el.type === "checkbox" ? el.checked : el.value;
+      var v = el.type === "checkbox" ? el.checked : el.value;
+      if (el.dataset.f === "refCode" && typeof v === "string") {
+        v = v.toUpperCase().replace(/[^A-Z0-9]/g, "");
+        if (el.value !== v) el.value = v;
+      }
+      S.form[el.dataset.f] = v;
       return; // no re-render: it would take the cursor out of the field
     }
     if (el.dataset.l) { S.log[el.dataset.l] = el.value; return; }

@@ -812,8 +812,10 @@ table.t td { padding: 9px 0; font-size: 13px; border-top: 1px solid rgba(255,255
 }
 .bal-card-go.ghost:hover { background: rgba(0, 210, 255, 0.1); }
 
-.bal-card.is-empty { border-color: var(--border); background: rgba(0, 0, 0, 0.24); }
-.bal-card.is-empty .bal-card-k { color: var(--muted); }
+/* No balance to show. Not an error state — the same invitation, minus a
+   figure, so nobody is told about a failure they cannot act on. */
+.bal-card.is-plain .bal-card-k { color: var(--accent); }
+.bal-card.is-plain .bal-card-s { margin-top: 8px; }
 
 /* On a phone the rail is a strip you swipe, and a card does not belong in it. */
 @media (max-width: 900px) {
@@ -823,4 +825,14 @@ table.t td { padding: 9px 0; font-size: 13px; border-top: 1px solid rgba(255,255
   .bal-card-v { margin-top: 0; font-size: 15px; }
   .bal-card-s { display: none; }
   .bal-card-go { margin-top: 0; margin-left: auto; flex: none; }
+}
+
+/* "optional" beside a label, so a field can be skipped without a paragraph. */
+.lbl-opt {
+  margin-left: 4px;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  color: var(--faint);
 }

@@ -35,6 +35,22 @@ module.exports = async (req, res) => {
   const id = creator.id;
   const action = trim(body.action) || "log";
 
+  // Nothing counts until we can check it. Registration lets somebody in
+  // without their handles; the first day they claim is where that stops.
+  if ((action === "log" || action === "backfill") && !creator.first_post_at) {
+    const chosen = await select("mbl_creator_handles", `select=platform,handle&creator_id=eq.${id}`);
+    const rows = chosen.ok && Array.isArray(chosen.data) ? chosen.data : [];
+    const missing = rows.filter((h) => !h.handle || !String(h.handle).trim());
+
+    if (!rows.length || missing.length) {
+      return json(res, 428, {
+        error: "Add the link or handle for each of your accounts before your first post — that is what we check your videos against.",
+        needsHandles: true,
+        missing: missing.map((h) => h.platform),
+      });
+    }
+  }
+
   /* ── undo ──────────────────────────────────────────────────────────────── */
   if (action === "undo") {
     const postId = trim(body.postId);
