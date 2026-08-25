@@ -1,20 +1,25 @@
 /**
- * MAGIC BOTS LAB — create a post.
+ * MAGIC BOTS LAB — Smart Recovery Differ, for practice.
  *
- * Most creators arrive having never traded. They are asked to screen-record a
- * bot placing trades, and the first time they try it they are fumbling through
- * a platform they have never opened, which is exactly what the video shows.
+ * The same engine the simulator runs, in the same panel the trading dashboard
+ * draws, with the same defaults it ships: stake 1, take profit 100, stop loss
+ * 1000, martingale 3.1. A creator practising on a bot that looks or behaves
+ * differently would film a bot nobody else can find.
  *
- * So step one is the real thing: the same Smart Recovery Differ engine the
- * simulator runs, in the same panel the trading dashboard draws — same class
- * names, same layout, same live-performance list. A creator practising on a
- * different-looking bot would film a bot nobody else can find.
+ * Two things are added on top, and only two.
  *
- * The only thing added on top is the guiding. The stake box glows first with a
- * figure scaled to their balance; when it has a value the take profit glows;
- * when that has one, Start glows. Stop loss is passed as 0, which switches it
- * off in the engine, so a practice run always ends on the take profit — the
- * ending worth filming.
+ *   · **Guiding.** Nothing is filled in for them. The stake box glows first
+ *     with a figure suggested from their balance, then the take profit, then
+ *     Start. Three steps, in order, one at a time.
+ *   · **A stop loss that cannot fire.** The field shows the real default so
+ *     the panel matches the dashboard, but 0 is what reaches the engine, and
+ *     the engine only checks a stop loss when it is above zero. A practice run
+ *     therefore always ends on the take profit, which is the ending worth
+ *     filming.
+ *
+ * The balance survives between runs. Anything can be typed; only the shuffle
+ * is bounded, because its job is to look like a real account rather than to
+ * cap anybody.
  */
 
 (function () {
@@ -22,22 +27,13 @@
 
   var BAL_KEY = "simBalance";              // the same key the simulator uses
   var RECORD_KEY = "mbl_record_snooze";
-  var MIN_BALANCE = 1000;
-  /** The most someone may type from scratch. A balance they GREW is not capped. */
-  var MAX_TYPED = 92569.34;
 
-  var VOICE_SRC = "creators/blake-voice-example.mp3";
+  /** Shuffle picks inside this range. Typing is not limited by it. */
+  var SHUFFLE_MIN = 1000;
+  var SHUFFLE_MAX = 100000;
 
-  var STARTERS = [
-    "You have probably never seen a trading bot actually place a trade. This one is running by itself — and it is 100% free.",
-    "Everyone says trading bots are a scam. Watch this one work, then decide. I use this, it costs nothing.",
-    "I used to sit and watch charts all day. Now I use this instead — free bots that trade for you.",
-    "This took me 90 seconds to set up. I use Magic Bots Lab and every bot on it is free.",
-    "If you have MetaTrader 5, you can do this today. Free Expert Advisors, any broker.",
-    "Nobody explains what a synthetic index is, so watch a free bot trade one and I will tell you."
-  ];
-
-  /* ── helpers ───────────────────────────────────────────────────────────── */
+  /** Smart Recovery Differ's own defaults, from trading-dashboard.html. */
+  var DEFAULTS = { initialStake: 1, minStake: 0.35, takeProfit: 100, stopLoss: 1000, martingaleMultiplier: 3.1 };
 
   var esc = function (v) {
     return String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/</g, "&lt;")
@@ -56,6 +52,7 @@
 
   function toast(text, bad) {
     var host = document.getElementById("toasts");
+    if (!host) return;
     var el = document.createElement("div");
     el.className = "toast" + (bad ? " bad" : "");
     el.innerHTML = (bad ? "⚠ " : "✓ ") + esc(text);
@@ -70,8 +67,8 @@
   function setBalance(v) { try { localStorage.setItem(BAL_KEY, String(v)); } catch (e) {} }
 
   /** A believable, unrepeatable balance — nobody gets the same one twice. */
-  function randomBalance() {
-    var whole = Math.floor(MIN_BALANCE + Math.random() * (MAX_TYPED - MIN_BALANCE));
+  function shuffled() {
+    var whole = Math.floor(SHUFFLE_MIN + Math.random() * (SHUFFLE_MAX - SHUFFLE_MIN));
     return Math.round((whole + Math.floor(Math.random() * 100) / 100) * 100) / 100;
   }
 
@@ -79,16 +76,17 @@
    * Suggestions scaled to what they are trading with — $70 and $300 on $1,000.
    * Big enough that the run is worth watching, small enough that it gets there.
    */
-  function suggestedStake(b) { return Math.max(1, Math.round(b * 0.07 * 100) / 100); }
+  function suggestedStake(b) { return Math.max(0.35, Math.round(b * 0.07 * 100) / 100); }
   function suggestedTP(b) { return Math.max(5, Math.round(b * 0.3 * 100) / 100); }
 
   /* ── state ─────────────────────────────────────────────────────────────── */
 
   var S = {
     stage: "gate",
-    amount: String(MIN_BALANCE),
+    // Whatever the last run left behind is what the box opens on.
+    amount: "",
     balance: getBalance(),
-    step: 0,               // 0 stake · 1 take profit · 2 press start · 3 done
+    step: 0,               // 0 stake · 1 take profit · 2 start · 3 done
     stake: "",
     tp: "",
     running: false,
@@ -100,6 +98,11 @@
   };
 
   var bot = null;
+
+  function setText(id, v) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = v;
+  }
 
   /* ── the bot's view of us ──────────────────────────────────────────────── */
 
@@ -136,8 +139,7 @@
     showStatus: function (msg, type) {
       S.lastContract = msg;
       setText("botLastContract", msg);
-      var conn = document.getElementById("botConnection");
-      if (conn) conn.textContent = S.connection;
+      setText("botConnection", S.connection);
       if (type === "success" && /take profit/i.test(msg)) {
         toast("Take profit reached — that is your ending. Stop recording.");
       }
@@ -166,52 +168,56 @@
     updateRunningTime: function (t) { setText("runningTimeValue", t); }
   };
 
-  function setText(id, v) {
-    var el = document.getElementById(id);
-    if (el) el.textContent = v;
-  }
-
-  /* ── the balance gate ──────────────────────────────────────────────────── */
+  /* ── the way in ────────────────────────────────────────────────────────── */
 
   function viewGate() {
-    var carry = S.balance >= 1;
+    var returning = S.balance > 0;
 
-    return '<div class="bot-panel-content">' +
-      '<div class="bot-config">' +
-        "<h4>Step 1 of 3 · Screen recording</h4>" +
-        '<p style="margin:0;font-size:13.5px;line-height:1.65;color:var(--muted)">' +
-          "You are about to open <b style=\"color:var(--text)\">Smart Recovery Differ</b> — the same bot from the " +
-          "trading dashboard, the same engine, on practice money. Set a balance, let it trade, and record your screen " +
-          "while it does. That recording is your video." +
-        "</p>" +
-        '<p style="margin:0;font-size:13px;line-height:1.6;color:#fcd34d">' +
-          "<b>Nothing here is real money.</b> It is a practice account, so your first video does not have you fumbling " +
-          "through a platform you have never opened." +
-        "</p>" +
+    return '<div class="gate">' +
+      '<section class="gate-bot">' +
+        '<div class="bot-badges-row">' +
+          '<span class="bot-chip">Smart Recovery</span>' +
+          '<span class="gate-badge">Practice money</span>' +
+        "</div>" +
+        "<h2>Smart Recovery Differ</h2>" +
+        "<p>Starts with digit differ trades on random numbers. On loss, it analyses every volatility market to find " +
+        "the best one for digit over 4 or under 5, and runs recovery trades until it wins.</p>" +
+        '<ul class="bot-meta">' +
+          "<li>Rating 5.0/5</li><li>Smart Recovery · Market Analysis</li><li>Volatility indices</li>" +
+        "</ul>" +
+      "</section>" +
 
+      '<section class="gate-form">' +
         '<div class="input-group">' +
-          "<label>Starting balance</label>" +
-          '<div style="display:flex;flex-wrap:wrap;gap:10px">' +
+          '<label for="balInput">Practice balance</label>' +
+          '<div class="bal-row">' +
             '<div class="bal-input"><span class="bal-cur">USD</span>' +
-              '<input id="balInput" type="text" inputmode="decimal" value="' + esc(S.amount) + '" aria-label="Starting balance" /></div>' +
-            '<button class="secondary-btn" type="button" data-act="shuffle">Shuffle</button>' +
+              '<input id="balInput" type="text" inputmode="decimal" value="' + esc(S.amount) +
+              '" placeholder="0.00" aria-label="Practice balance" /></div>' +
+            '<button class="secondary-btn" type="button" data-act="shuffle" title="A believable figure between $' +
+              money(SHUFFLE_MIN) + " and $" + money(SHUFFLE_MAX) + '">' +
+              icon('<path d="m18 14 4 4-4 4"/><path d="M2 18h1.97a4 4 0 0 0 3.3-1.7l5.46-8.6A4 4 0 0 1 16.03 6H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.97a4 4 0 0 1 3.6 2.2"/><path d="M22 18h-6.04a4 4 0 0 1-3.3-1.8l-.36-.45"/>', 15) +
+              " Shuffle</button>" +
           "</div>" +
-          "<small style=\"display:block\">Anything from $" + money(MIN_BALANCE) + " to $" + money(MAX_TYPED) +
-          ". A round number looks staged on camera — Shuffle gives you one that does not.</small>" +
+          "<small>Type any amount you like. " +
+          (returning
+            ? "This is what your last run finished on."
+            : "Shuffle gives you a figure between $" + money(SHUFFLE_MIN) + " and $" + money(SHUFFLE_MAX) +
+              " that does not look staged on camera.") +
+          "</small>" +
         "</div>" +
 
-        (carry
-          ? '<div class="carry"><span>Your last run finished on <b style="color:var(--text)">$' + money(S.balance) + "</b>.</span>" +
-            '<button class="secondary-btn" type="button" data-act="carry" style="padding:7px 13px;font-size:12.5px">Carry on from that</button></div>'
-          : "") +
-
-        '<div class="config-actions">' +
-          '<button class="primary-btn btn-liquid-glow" type="button" data-act="open">Open Smart Recovery Differ</button>' +
+        '<div class="gate-next">' +
+          icon('<path d="M15 10 20 5"/><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m22 8-6 4 6 4V8Z"/>', 15) +
+          "<span>Next: set a stake, set a target, press start — and record your screen while it trades. " +
+          "<b>None of this is real money.</b></span>" +
         "</div>" +
-      "</div>" +
 
-      steps() +
-    "</div>";
+        '<button class="primary-btn btn-liquid-glow gate-go" type="button" data-act="open">' +
+          (returning ? "Continue" : "Open the bot") +
+        "</button>" +
+      "</section>" +
+    "</div>" + window.MBLSteps.html();
   }
 
   /* ── the bot, in the dashboard's own clothes ───────────────────────────── */
@@ -224,7 +230,7 @@
       '<div class="bot-panel-header">' +
         "<div>" +
           '<div style="font-size:16px;font-weight:700;">Smart Recovery Differ</div>' +
-          '<div style="font-size:13px;color:var(--muted);">Practice money · the same bot from the trading dashboard</div>' +
+          '<div style="font-size:13px;color:var(--muted);">Runs smart recovery digit differ. Starts with DIGITDIFF, then uses DIGITOVER/DIGITUNDER recovery with martingale.</div>' +
         "</div>" +
       "</div>" +
 
@@ -236,44 +242,51 @@
             '<div class="config-grid">' +
               '<div class="input-group' + (S.step === 0 ? " glow" : "") + '">' +
                 '<label for="stakeInput">Initial Stake (USD)</label>' +
-                '<input type="number" id="stakeInput" min="0.35" step="0.01" value="' + esc(S.stake) + '"' + (S.running ? " disabled" : "") + " />" +
+                '<input type="number" id="stakeInput" min="0.35" step="0.01" value="' + esc(S.stake) +
+                  '" placeholder="' + money(DEFAULTS.initialStake) + '"' + (S.running ? " disabled" : "") + " />" +
                 (S.step === 0
-                  ? '<div class="cfg-hint">Step 1 of 2 — what each trade risks. We suggest <b>' + money(sug) +
-                    ' USD</b>. <button type="button" class="linky" data-act="useStake">Use ' + money(sug) + "</button></div>"
-                  : "") +
+                  ? '<div class="cfg-hint"><b>Step 1 of 3.</b> What each trade risks. We suggest <b>' + money(sug) +
+                    ' USD</b> for this balance. <button type="button" class="linky" data-act="useStake">Use ' + money(sug) + "</button></div>"
+                  : '<small>Minimum stake is enforced by Deriv for each contract.</small>') +
               "</div>" +
 
               '<div class="input-group' + (S.step === 1 ? " glow" : "") + '">' +
                 '<label for="takeProfitInput">Take Profit (USD)</label>' +
-                '<input type="number" id="takeProfitInput" min="5" step="1" value="' + esc(S.tp) + '"' + (S.running ? " disabled" : "") + " />" +
+                '<input type="number" id="takeProfitInput" min="5" step="1" value="' + esc(S.tp) +
+                  '" placeholder="' + money(DEFAULTS.takeProfit) + '"' + (S.running ? " disabled" : "") + " />" +
                 (S.step === 1
-                  ? '<div class="cfg-hint">Step 2 of 2 — the bot stops itself the moment it reaches this. We suggest <b>' +
+                  ? '<div class="cfg-hint"><b>Step 2 of 3.</b> The bot stops itself the moment it reaches this. We suggest <b>' +
                     money(sugTP) + ' USD</b>. <button type="button" class="linky" data-act="useTP">Use ' + money(sugTP) + "</button></div>"
                   : "") +
               "</div>" +
 
               '<div class="input-group">' +
-                "<label>Stop Loss (USD)</label>" +
-                '<input type="number" value="0" disabled />' +
+                '<label for="stopLossInput">Stop Loss (USD)</label>' +
+                '<input type="number" id="stopLossInput" value="' + DEFAULTS.stopLoss + '" disabled />' +
               "</div>" +
 
               '<div class="input-group">' +
-                "<label>Martingale Multiplier</label>" +
-                '<input type="number" value="3.1" disabled />' +
+                '<label for="martingaleInput">Martingale Multiplier</label>' +
+                '<input type="number" id="martingaleInput" value="' + DEFAULTS.martingaleMultiplier + '" disabled />' +
               "</div>" +
             "</div>" +
 
             '<div class="locked-note">' + icon('<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>', 13) +
-              "<span><b style=\"color:var(--text)\">Stop loss is switched off</b> and martingale is already set. Leave them — " +
-              "this way the run ends on your take profit, which is the ending you want on camera.</span></div>" +
+              '<span>Stop loss and martingale are the bot\'s own defaults and are left alone here. ' +
+              '<b style="color:var(--text)">On practice the stop loss will not fire</b>, so a run always ends on your ' +
+              "take profit — which is the ending you want on camera.</span></div>" +
 
             (S.guideMsg ? '<div class="guide-msg">' + icon('<path d="M20 6 9 17l-5-5"/>', 13) + "<span>" + esc(S.guideMsg) + "</span></div>" : "") +
 
             '<div class="config-actions">' +
-              '<button class="primary-btn' + (S.step === 2 ? " glow btn-liquid-glow" : "") + '" type="button" data-act="start"' + (S.running ? " disabled" : "") + ">Start Bot</button>" +
-              '<button class="secondary-btn' + (S.running ? " btn-liquid-glow" : "") + '" type="button" data-act="stop"' + (S.running ? "" : " disabled") + ">Stop Bot</button>" +
+              '<button class="primary-btn' + (S.step === 2 ? " glow btn-liquid-glow" : "") + '" type="button" data-act="start"' +
+                (S.running ? " disabled" : "") + ">Start Bot</button>" +
+              '<button class="secondary-btn' + (S.running ? " btn-liquid-glow" : "") + '" type="button" data-act="stop"' +
+                (S.running ? "" : " disabled") + ">Stop Bot</button>" +
               '<div class="bot-stat">Connection: <strong id="botConnection">' + esc(S.connection) + "</strong></div>" +
             "</div>" +
+
+            (S.step === 2 ? '<div class="cfg-hint"><b>Step 3 of 3.</b> Start recording your screen, then press Start Bot.</div>' : "") +
 
             '<div class="bot-stat">Target: <strong id="botTarget">' + esc(S.target) + "</strong></div>" +
             '<div class="bot-stat">Last contract: <strong id="botLastContract">' + esc(S.lastContract) + "</strong></div>" +
@@ -304,65 +317,13 @@
         "</div>" +
       "</div>" +
 
-      steps() +
+      window.MBLSteps.html() +
     "</div>";
   }
 
   function statRow(label, id, value) {
     return '<div class="stat-card"><span class="stat-label">' + label +
       '</span><span class="stat-value" id="' + id + '">' + value + "</span></div>";
-  }
-
-  /* ── the three steps ───────────────────────────────────────────────────── */
-
-  function steps() {
-    return '<div class="steps">' +
-      '<div class="bot-config">' +
-        '<div class="step-n">1</div>' +
-        "<h4>Record your screen</h4>" +
-        '<p style="margin:0;font-size:13px;line-height:1.6;color:var(--muted)">Start the bot above and record it ' +
-        'trading. <b style="color:var(--text)">20 to 40 seconds is plenty</b> — enough to see a few trades land and ' +
-        "the bot stop itself at the target.</p>" +
-        '<ul class="tips">' +
-          "<li><b>On a phone:</b> swipe down for the control centre and tap Screen Record. On iPhone, add it in Settings → Control Centre first.</li>" +
-          "<li><b>On a computer:</b> Windows — press <b>Win + Alt + R</b>. Mac — press <b>Shift + Cmd + 5</b>.</li>" +
-          "<li>Record in <b>portrait</b> if you can. Sideways video gets less reach on every platform.</li>" +
-        "</ul>" +
-      "</div>" +
-
-      '<div class="bot-config">' +
-        '<div class="step-n">2</div>' +
-        "<h4>Talk over it</h4>" +
-        '<p style="margin:0;font-size:13px;line-height:1.6;color:var(--muted)">A silent screen recording is not a ' +
-        'video. Say what people are looking at and say the name. <b style="color:var(--text)">Your own voice or a ' +
-        "realistic AI voice — both are fine.</b></p>" +
-        '<div class="voice-box">' +
-          '<div class="voice-head">' +
-            icon('<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/>', 16) +
-            "<span>Hear an AI voice-over</span>" +
-            '<button class="secondary-btn" type="button" data-act="voice" style="padding:7px 13px;font-size:12.5px">Download</button>' +
-          "</div>" +
-          '<audio controls preload="none" src="' + VOICE_SRC + '"></audio>' +
-          '<p style="margin:8px 0 0;font-size:11.5px;color:rgba(152,162,189,0.75)">This one was made with a free AI voice tool. Using one is allowed.</p>' +
-        "</div>" +
-        '<p style="margin:12px 0 0;font-size:13px;color:var(--text)"><b>Openers that work:</b></p>' +
-        '<ul class="tips">' + STARTERS.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>" +
-      "</div>" +
-
-      '<div class="bot-config">' +
-        '<div class="step-n">3</div>' +
-        "<h4>Edit it</h4>" +
-        '<p style="margin:0;font-size:13px;line-height:1.6;color:var(--muted)">Put the recording and the voice ' +
-        'together in whatever you already use — <b style="color:var(--text)">CapCut</b> is free and does all of this ' +
-        "on a phone. VN and InShot work too.</p>" +
-        '<ul class="tips">' +
-          "<li>Add <b>captions</b>. Most people watch with the sound off, and CapCut writes them for you.</li>" +
-          "<li>Cut the first second. Start on the trade, not on you lining up the shot.</li>" +
-          "<li>Say <b>Magic Bots Lab</b> out loud, and say the bots are <b>100% free</b>. That is a rule, not a tip.</li>" +
-          "<li>Export at 1080p and post the same video to all three of your accounts.</li>" +
-        "</ul>" +
-      "</div>" +
-    "</div>";
   }
 
   /* ── the record prompt ─────────────────────────────────────────────────── */
@@ -382,8 +343,8 @@
     el.innerHTML =
       '<div class="rec-panel">' +
         "<h3>Start recording first</h3>" +
-        "<p>The bot is about to start trading. Begin your screen recording <b>now</b>, so you catch it from the first " +
-        "trade rather than joining halfway through.</p>" +
+        "<p>The bot is about to open. Begin your screen recording <b>now</b>, so you catch it from the first trade " +
+        "rather than joining halfway through.</p>" +
         '<label class="rec-check"><input type="checkbox" id="dontAsk" /><span>Do not show this again</span></label>' +
         '<button class="primary-btn" type="button" id="recGo" style="width:100%">I am recording — open the bot</button>' +
         '<button class="secondary-btn" type="button" id="recSkip" style="width:100%;margin-top:8px">Open it without recording</button>' +
@@ -416,7 +377,7 @@
       S.tp = value;
       if (isFinite(n) && n > 0 && S.step === 1) {
         S.step = 2;
-        S.guideMsg = "Take profit set to " + money(n) + " USD. Stop loss and martingale are handled — press Start Bot.";
+        S.guideMsg = "Take profit set to " + money(n) + " USD. Everything else is handled — press Start Bot.";
         render();
       }
     }
@@ -434,11 +395,13 @@
 
     bot.start({
       initialStake: stake,
-      minStake: 0.35,
+      minStake: DEFAULTS.minStake,
       takeProfit: tp,
-      // Zero switches the stop loss off in the engine — it only checks when > 0.
+      // The field above shows the real default so the panel matches the
+      // dashboard. Zero is what reaches the engine, and the engine only checks
+      // a stop loss when it is above zero — so on practice it cannot fire.
       stopLoss: 0,
-      martingaleMultiplier: 3.1
+      martingaleMultiplier: DEFAULTS.martingaleMultiplier
     });
 
     // On a phone the trades are far below the fold, so go to them.
@@ -457,7 +420,7 @@
     document.getElementById("topTitle").textContent = S.stage === "bot" ? "Smart Recovery Differ" : "Create a post";
     document.getElementById("topSub").textContent = S.stage === "bot"
       ? "Set it up, record it — steps 2 and 3 are below"
-      : "Three steps: record, talk over it, edit";
+      : "Practise on the real bot, then record, talk over it and edit";
     if (S.stats) botUI.updateStats(S.stats);
   }
 
@@ -469,49 +432,50 @@
     var act = el.dataset.act;
 
     if (act === "shuffle") {
-      S.amount = String(randomBalance());
+      S.amount = String(shuffled());
       render();
       toast("Balance shuffled — that one will not look staged.");
       return;
     }
 
-    if (act === "carry") { S.amount = String(S.balance); render(); return; }
-
     if (act === "open") {
       var n = parseFloat(String(S.amount).replace(/,/g, ""));
-      if (!isFinite(n) || n < MIN_BALANCE) { toast("Start with at least $" + money(MIN_BALANCE) + ".", true); return; }
-      if (n > MAX_TYPED) { toast("The most you can type in is $" + money(MAX_TYPED) + ".", true); return; }
+      if (!isFinite(n) || n <= 0) { toast("Type a balance to practise with.", true); return; }
 
       askToRecord(function () {
         setBalance(n);
         S.balance = n;
         S.stage = "bot";
-        S.stake = String(suggestedStake(n));
+        // Nothing is filled in. The guide starts at step one, where it should.
+        S.step = 0;
+        S.stake = "";
         S.tp = "";
-        // The suggestion is already in the box, so the guide is on take profit.
-        S.step = 1;
-        S.guideMsg = "Stake set to " + money(suggestedStake(n)) + " USD. Now set your take profit.";
+        S.guideMsg = null;
+        S.stats = null;
         render();
       });
       return;
     }
 
-    if (act === "useStake") { onType("stake", String(suggestedStake(S.balance))); return; }
-    if (act === "useTP") { onType("tp", String(suggestedTP(S.balance))); return; }
+    if (act === "useStake") {
+      var v = String(suggestedStake(S.balance));
+      var si = document.getElementById("stakeInput");
+      if (si) si.value = v;
+      onType("stake", v);
+      return;
+    }
+
+    if (act === "useTP") {
+      var t = String(suggestedTP(S.balance));
+      var ti = document.getElementById("takeProfitInput");
+      if (ti) ti.value = t;
+      onType("tp", t);
+      return;
+    }
+
     if (act === "start") { start(); return; }
     if (act === "stop") { if (bot) bot.stop("Stopped by you.", "warning"); return; }
-
-    if (act === "voice") {
-      // A unique name per download, so a creator can tell one file from another.
-      var code = Math.random().toString(36).slice(2, 7).toUpperCase();
-      var a = document.createElement("a");
-      a.href = VOICE_SRC;
-      a.download = "blake-magicbotslab-" + code + ".mp3";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      toast("Downloading blake-magicbotslab-" + code + ".mp3");
-    }
+    if (act === "voice") { toast("Downloading " + window.MBLSteps.downloadVoice()); }
   });
 
   document.addEventListener("input", function (e) {
@@ -525,11 +489,12 @@
 
   if (window.SimSmartRecoveryDifferBot) {
     bot = new window.SimSmartRecoveryDifferBot(botUI, {
-      defaults: { initialStake: 1, minStake: 0.35, takeProfit: 100, stopLoss: 0, martingaleMultiplier: 3.1 },
+      defaults: DEFAULTS,
       markets: ["R_10", "R_25", "R_50", "R_75", "R_100"]
     });
   }
 
-  if (S.balance >= MIN_BALANCE) S.amount = String(S.balance);
+  // The box opens on whatever the last run left behind.
+  if (S.balance > 0) S.amount = String(S.balance);
   render();
 })();
