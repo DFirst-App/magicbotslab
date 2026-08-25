@@ -226,8 +226,8 @@
           '<p>Post one video a day about our free trading bots on three of your own social accounts. ' +
           'At the end of the month you are paid — <b>views are not required</b>.</p>' +
           '<div class="grid g2" style="margin-top:14px">' +
-            '<div class="stat"><div class="k">Accounts you already have</div><div class="v ok">' + money(M.FIRST_MONTH_EXISTING) + '</div><div class="s">for your first month</div></div>' +
-            '<div class="stat"><div class="k">Brand-new accounts</div><div class="v hi2">' + money(M.FIRST_MONTH_NEW) + '</div><div class="s">first month only, while you build reach</div></div>' +
+            '<div class="stat"><div class="k">Accounts you already have</div><div class="v ok">' + money(M.FIRST_MONTH_EXISTING) + '</div><div class="s">month one — they already have followers, so use these if you can</div></div>' +
+            '<div class="stat"><div class="k">Accounts opened for this</div><div class="v hi2">' + money(M.FIRST_MONTH_NEW) + '</div><div class="s">month one only — nobody follows them yet. Month two onwards is the same for everyone.</div></div>' +
           "</div>" +
           '<p style="margin-top:12px">Every month after that pays <b>' + money(M.STEP) + ' more</b> than the one before, up to ' +
           "<b>" + money(M.CEILING) + '</b> a month. Reach ' + M.VIEWS_TARGET.toLocaleString() + ' views in a month and there is ' +
@@ -285,9 +285,18 @@
         '<div><label class="lbl">How you want to be paid <span style="text-transform:none;letter-spacing:0">— optional, change it any time</span></label>' +
           payoutPicker(f.payout, "f-payout") + "</div>" +
 
+        '<div class="note-box">' +
+          "<b>Use the social accounts you already have.</b> Accounts with followers already on them reach people from " +
+          "your first video, so they pay <b>" + money(M.FIRST_MONTH_EXISTING) + "</b> for month one." +
+          "<br /><br />" +
+          "If you open <b>new TikTok, Instagram or YouTube accounts just for this programme</b>, they start with nobody " +
+          "watching, so month one pays <b>" + money(M.FIRST_MONTH_NEW) + "</b> while you build reach. From month two " +
+          "everyone is paid the same." +
+        "</div>" +
+
         '<label class="check"><input type="checkbox" data-f="newAccounts"' + (f.newAccounts ? " checked" : "") + " />" +
-          "<span>I made these accounts brand new for this. <b>" + money(M.FIRST_MONTH_NEW) + "</b> for the first month instead of <b>" +
-          money(M.FIRST_MONTH_EXISTING) + "</b> — we check every account ourselves before paying, so this is a starting point, not the decision.</span></label>" +
+          "<span>The accounts above are <b>brand new</b> — I opened them for this programme and they have no followers yet. " +
+          "<span style=\"color:var(--faint)\">Leave this unticked if you are using accounts you already had.</span></span></label>" +
 
         '<label class="check"><input type="checkbox" data-f="agreed"' + (f.agreed ? " checked" : "") + " />" +
           "<span>I have read the <b>Rules</b> and I will say in every video that the bots are <b>100% free</b>.</span></label>" +
@@ -353,11 +362,16 @@
 
     var rows = chosen.map(function (k) {
       var p = M.PLATFORMS.filter(function (x) { return x.key === k; })[0] || { key: k, name: k, hint: "@handle" };
-      return '<div class="plat-row">' +
-        (p.logo ? logo(p.logo, p.name, 18) : "") +
-        '<span class="nm">' + esc(p.name) + "</span>" +
-        '<input class="field" data-h="' + esc(p.key) + '" value="' + esc(S.handles[p.key] || "") + '" placeholder="' + esc(p.hint) + '" />' +
-        '<button class="x" data-drop="' + esc(p.key) + '" aria-label="Remove ' + esc(p.name) + '">' + icon(ICONS.x) + "</button>" +
+      var filled = (S.handles[p.key] || "").trim();
+      return '<div class="plat-row' + (filled ? " filled" : "") + '">' +
+        '<div class="plat-head">' +
+          (p.logo ? logo(p.logo, p.name, 18) : "") +
+          '<span class="nm">' + esc(p.name) + "</span>" +
+          (filled ? '<span class="plat-ok" title="Saved">' + icon('<path d="M20 6 9 17l-5-5"/>', 13) + "</span>" : "") +
+          '<button class="x" data-drop="' + esc(p.key) + '" aria-label="Remove ' + esc(p.name) + '">' + icon(ICONS.x, 14) + "</button>" +
+        "</div>" +
+        '<input class="plat-input" data-h="' + esc(p.key) + '" value="' + esc(S.handles[p.key] || "") +
+          '" placeholder="' + esc(p.hint) + '" aria-label="' + esc(p.name) + ' account" spellcheck="false" autocapitalize="none" autocomplete="off" />' +
       "</div>";
     }).join("");
 
@@ -493,25 +507,37 @@
         (rows.length === 0
           ? "<p>Nothing here yet. Your first month appears the moment it is signed off — finish " +
             M.QUALIFYING_DAYS + " posted days and it will be waiting.</p>"
-          : '<div class="tablewrap"><table class="t"><thead><tr><th>Month</th><th>Period</th><th>Base</th><th>Bonus</th><th>Team</th><th>Status</th></tr></thead><tbody>' +
+          : '<div class="tablewrap"><table class="t"><thead><tr><th>Month</th><th>Period</th><th>Base</th><th>Bonus</th><th>Team</th><th>Paid by</th><th>Status</th></tr></thead><tbody>' +
             rows.map(function (e) {
               var cls = e.status === "paid" ? "ok" : e.status === "cancelled" ? "bad-t" : "warnt";
+              // The method a month was actually paid by, or the one they have
+              // chosen for the ones still coming. Seeing it here is the point.
+              var m = e.method || c.payout_method;
+              var mp = m ? M.PAYOUTS.filter(function (x) { return x.key === m; })[0] : null;
               return "<tr><td>" + e.month_number + "</td><td style=\"color:var(--muted)\">" + fmt(e.period_start) + " – " + fmt(e.period_end) +
                 "</td><td>" + money(e.base_usd) + "</td><td>" + money(e.bonus_usd) + "</td><td>" + money(e.team_usd) +
-                '</td><td><span class="' + cls + '">' + esc(e.status) + "</span></td></tr>";
+                '</td><td><span class="method-cell">' +
+                  (mp ? (mp.logo ? logo(mp.logo, mp.label, 15) : "") + esc(mp.label) : '<span style="color:var(--faint)">Not chosen</span>') +
+                "</span></td>" +
+                '<td><span class="' + cls + '">' + esc(e.status) + "</span></td></tr>";
             }).join("") + "</tbody></table></div>") +
       "</section>" +
 
       '<section class="card ' + (c.payout_method ? "good" : "warn") + '">' +
-        "<h3>" + (c.payout_method ? "You will be paid by " + esc(payoutLabel(c.payout_method)) : "No payout method chosen yet") + "</h3>" +
+        '<h3 class="method-cell">' +
+          (c.payout_method
+            ? (payoutLogo(c.payout_method) ? logo(payoutLogo(c.payout_method), "", 18) : "") + "You will be paid by " + esc(payoutLabel(c.payout_method))
+            : "No payout method chosen yet") + "</h3>" +
         "<p>You only fill in the account details when there is money to withdraw — there is nothing to enter until then. " +
         "Change the method any time.</p>" +
         '<button class="btn sm ghost" data-go="me">Change it in My details</button>' +
       "</section>" +
 
       '<section class="card"><div class="eyebrow">' + icon(ICONS.earnings) + " How the amount is decided</div>" +
-        "<p>Month one pays <b>" + money(M.FIRST_MONTH_EXISTING) + "</b> on accounts you already had, or <b>" + money(M.FIRST_MONTH_NEW) +
-        "</b> on brand-new ones, because a new account has no reach yet. From month two everyone is on the same ladder: <b>" +
+        "<p>Month one pays <b>" + money(M.FIRST_MONTH_EXISTING) + "</b> if you post from social accounts you already had, or <b>" +
+        money(M.FIRST_MONTH_NEW) +
+        "</b> if you opened new ones for this programme, because a new account has nobody watching it yet. " +
+        "From month two everyone is on the same ladder: <b>" +
         money(M.STEP) + " more every month</b>, up to <b>" + money(M.CEILING) + "</b>. Reach <b>" + M.VIEWS_TARGET.toLocaleString() +
         " views</b> in a month and <b>" + money(M.VIEWS_BONUS) + "</b> is added on top.</p></section>" +
     "</div>";
@@ -520,6 +546,11 @@
   function payoutLabel(k) {
     var p = M.PAYOUTS.filter(function (x) { return x.key === k; })[0];
     return p ? p.label : k;
+  }
+
+  function payoutLogo(k) {
+    var p = M.PAYOUTS.filter(function (x) { return x.key === k; })[0];
+    return p && p.logo ? p.logo : "";
   }
 
   /* ── team ──────────────────────────────────────────────────────────────── */
@@ -675,12 +706,19 @@
         '<div style="margin-top:10px">' + platformPicker() + "</div>" +
       "</section>" +
 
-      '<section class="card"><h2>Are these accounts brand new?</h2>' +
-        "<p>This only changes your first month: accounts you already had pay <b>" + money(M.FIRST_MONTH_EXISTING) +
-        "</b>, accounts made new for this pay <b>" + money(M.FIRST_MONTH_NEW) + "</b>, because they have no reach yet. " +
-        "From month two everyone is on the same ladder.</p>" +
-        '<label class="check"><input type="checkbox" data-me="newAccounts"' + (c.new_accounts ? " checked" : "") + " />" +
-        "<span>I made these accounts brand new for this.</span></label>" +
+      '<section class="card"><h2>Are your accounts brand new?</h2>' +
+        "<p>This is about <b>the social accounts you post from</b> — your TikTok, Instagram, YouTube and so on. " +
+        "It only changes your first month.</p>" +
+        '<div class="note-box">' +
+          "<b>Accounts you already had</b> — they have followers, so your videos reach people straight away. " +
+          "Month one pays <b>" + money(M.FIRST_MONTH_EXISTING) + "</b>." +
+          "<br /><br />" +
+          "<b>Accounts you opened for this programme</b> — nobody is watching them yet, so month one pays <b>" +
+          money(M.FIRST_MONTH_NEW) + "</b> while you build reach. From month two everyone is paid the same." +
+        "</div>" +
+        '<label class="check" style="margin-top:10px"><input type="checkbox" data-me="newAccounts"' + (c.new_accounts ? " checked" : "") + " />" +
+        "<span>My accounts are brand new — I opened them for this programme. " +
+        "<span style=\"color:var(--faint)\">Untick this if you are using accounts you already had.</span></span></label>" +
         '<p style="margin-top:10px;font-size:11.5px;color:var(--faint)">Ticked this by mistake? It does not matter. ' +
         "<b>We check every account ourselves before we pay you</b>, so what is set here never decides it on its own.</p>" +
       "</section>" +
@@ -859,6 +897,16 @@
       });
     }
   });
+
+  /**
+   * A pasted profile URL is longer than the box, so a single-line input scrolls
+   * to keep the caret in view and the start of it disappears. That is right
+   * while you are typing and wrong the moment you stop — what you want to see
+   * then is which account it is, which lives at the front. So: rewind on blur.
+   */
+  document.addEventListener("blur", function (e) {
+    if (e.target && e.target.classList && e.target.classList.contains("plat-input")) e.target.scrollLeft = 0;
+  }, true);
 
   document.addEventListener("input", function (e) {
     var el = e.target;

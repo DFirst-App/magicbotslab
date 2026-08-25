@@ -81,9 +81,7 @@ window.MBL = (function () {
   var DONT = [
     "Do not re-upload a video you already posted on another day.",
     "Do not re-upload somebody else's footage. Take the idea, rebuild it yourself.",
-    "Do not promise profits, guaranteed returns, or a fixed income.",
-    "Do not say anything about Magic Bots Lab that is not on the list of facts.",
-    "Do not buy views, followers or engagement."
+    "Do not hide or delete your posts before you have been paid. We check that every video is still live."
   ];
 
   var IDEAS = [

@@ -58,11 +58,15 @@
     thread: (function () { try { return JSON.parse(get(THREAD_KEY) || "[]"); } catch (e) { return []; } })()
   };
 
+  var CHAT_ICON = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.9-.9L3 21l1.9-5A8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5z"/></svg>';
+  var CLOSE_ICON = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+
   var btn = document.createElement("button");
   btn.className = "sup-btn";
   btn.type = "button";
   btn.setAttribute("aria-label", "Message support");
-  btn.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.9-.9L3 21l1.9-5A8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5z"/></svg>';
+  btn.setAttribute("aria-expanded", "false");
+  btn.innerHTML = CHAT_ICON;
   document.body.appendChild(btn);
 
   var panel = document.createElement("div");
@@ -87,8 +91,13 @@
         '<span style="width:34px;height:34px;border-radius:999px;display:grid;place-items:center;background:rgba(0,210,255,.18);color:var(--accent);flex:none">' +
           '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.9-.9L3 21l1.9-5A8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5z"/></svg>' +
         "</span>" +
-        '<div style="min-width:0"><div style="font-size:14px;font-weight:700">Talk to us</div>' +
+        '<div style="min-width:0;flex:1"><div style="font-size:14px;font-weight:700">Talk to us</div>' +
         '<div style="font-size:11px;color:var(--muted)"><span style="display:inline-block;width:6px;height:6px;border-radius:999px;background:var(--success);margin-right:5px"></span>Usually answered within a day</div></div>' +
+        // Closing from inside the panel: the bubble behind it is a small target
+        // on a phone, and on a short screen it can be off the bottom entirely.
+        '<button type="button" id="supClose" class="sup-close" aria-label="Close support">' +
+          '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>' +
+        "</button>" +
       "</div>" +
 
       '<div class="sup-body" id="supBody">' +
@@ -122,6 +131,8 @@
 
     var body = panel.querySelector("#supBody");
     body.scrollTop = body.scrollHeight;
+
+    panel.querySelector("#supClose").onclick = function () { toggle(false); };
 
     var change = panel.querySelector("#supChange");
     if (change) change.onclick = function () { state.email = ""; draw(); };
@@ -193,14 +204,18 @@
     });
   }
 
-  btn.onclick = function () {
-    state.open = !state.open;
+  function toggle(open) {
+    state.open = open === undefined ? !state.open : open;
     panel.hidden = !state.open;
     btn.setAttribute("aria-label", state.open ? "Close support" : "Message support");
-    if (state.open) draw();
-  };
+    btn.setAttribute("aria-expanded", state.open ? "true" : "false");
+    btn.innerHTML = state.open ? CLOSE_ICON : CHAT_ICON;
+    if (state.open) draw(); else btn.focus();
+  }
+
+  btn.onclick = function () { toggle(); };
 
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && state.open) btn.onclick();
+    if (e.key === "Escape" && state.open) toggle(false);
   });
 })();

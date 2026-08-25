@@ -293,12 +293,83 @@ label.lbl { display: block; font-size: 10.5px; font-weight: 700; letter-spacing:
 .pill.warn { border-color: rgba(252,211,77,0.4); background: rgba(252,211,77,0.12); color: var(--warning); }
 
 /* platform rows fill the card rather than floating in the middle of it */
-.plat { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
-.plat-row { display: flex; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 12px; background: rgba(0,0,0,0.25); padding: 8px 10px; }
-.plat-row .nm { font-size: 12px; font-weight: 700; min-width: 88px; color: var(--muted); }
-.plat-row .field { border: 0; background: transparent; padding: 4px 0; font-size: 13px; }
-.plat-row .x { border: 0; background: transparent; color: var(--faint); cursor: pointer; padding: 4px; border-radius: 8px; }
-.plat-row .x:hover { background: rgba(255,255,255,0.07); color: var(--danger); }
+/* Two lines, not one. Squeezing a name, an input and a remove button onto a
+   single row left the input narrower than what people type into it, so the
+   start of a pasted link scrolled out of sight the moment it was pasted. Now
+   the platform is on top and the whole width is yours to type on. */
+.plat { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+
+.plat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 10px 11px 11px;
+  transition: border-color .15s, background .15s;
+}
+.plat-row:focus-within { border-color: var(--accent); background: rgba(0, 0, 0, 0.34); }
+.plat-row.filled { border-color: rgba(36, 217, 112, 0.28); }
+
+.plat-head { display: flex; align-items: center; gap: 8px; }
+.plat-head .nm { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 700; color: var(--text); }
+.plat-ok { display: grid; place-items: center; color: var(--success); }
+
+.plat-row .x {
+  flex: none;
+  display: grid; place-items: center;
+  width: 24px; height: 24px;
+  border: 0; border-radius: 7px;
+  background: transparent; color: var(--faint);
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.plat-row .x:hover { background: rgba(255, 95, 109, 0.14); color: var(--danger); }
+
+.plat-input {
+  width: 100%;
+  min-width: 0;
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: rgba(0, 0, 0, 0.4);
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  /* A pasted profile URL is long. Let it scroll inside its own box rather than
+     stretching the card, and keep the caret visible while typing. */
+  text-overflow: ellipsis;
+  transition: border-color .15s;
+}
+.plat-input:focus { border-color: var(--accent); background: rgba(0, 0, 0, 0.5); }
+.plat-input::placeholder { color: var(--faint); }
+
+/* A payment method reads as its badge plus its name, in a table cell too. */
+.method-cell { display: inline-flex; align-items: center; gap: 7px; }
+
+/* The one place a longer explanation earns its keep: the money turns on it. */
+.note-box {
+  border: 1px solid var(--line-accent);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: rgba(0, 210, 255, 0.06);
+  padding: 11px 13px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.sup-close {
+  flex: none;
+  display: grid; place-items: center;
+  width: 30px; height: 30px;
+  border: 0; border-radius: 8px;
+  background: transparent; color: var(--muted);
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.sup-close:hover { background: rgba(255, 255, 255, 0.1); color: var(--text); }
 
 /* ── tables ──────────────────────────────────────────────────────────────── */
 
