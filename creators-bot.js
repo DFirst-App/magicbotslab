@@ -159,6 +159,9 @@
       S.trades.unshift(e);
       if (S.trades.length > 60) S.trades.pop();
 
+      // The engine has settled this trade and not yet queued the next one.
+      afterTrade();
+
       var list = document.getElementById("historyList");
       if (!list) return;
       var row = document.createElement("div");
@@ -345,8 +348,8 @@
 
     var mg = parseFloat(S.mg);
 
-    // Reset the run's own schedule before the first trade of it.
-    if (bot.simBase && bot.simBase.resetRun) bot.simBase.resetRun();
+    // A fresh schedule for a fresh run.
+    resetPlan();
 
     bot.start({
       initialStake: stake,
@@ -453,59 +456,95 @@
   });
 
   /**
-   * The outcomes this page trades on.
+   * The outcomes this page trades on, and when recovery runs.
    *
-   * A creator is recording something they will post, so the run has to arrive
-   * somewhere worth posting: it does not end down. What it does do is what the
-   * bot is named for — it drops into recovery, doubles into it with martingale,
-   * and comes out ahead, which is how the profit target arrives quickly.
+   * A creator is recording something they will post, so nothing here loses.
+   * Every trade wins. What still happens — because it is what the bot is named
+   * for, and what makes the target arrive quickly — is recovery: the engine
+   * switches from a digit-differ trade paying 6% to an over-4 or under-5 trade
+   * paying 95%, on a stake martingale has raised.
    *
-   * A double recovery run opens somewhere between five and twenty-five trades
-   * in, and the distance to the next one is drawn again each time, so no two
-   * recordings have the same shape. Everything after that decision — the
-   * escalating stake, the market analysis, the over/under choice — is the real
-   * engine doing exactly what it always does.
+   * Recovery is armed directly rather than by losing into it. Every field the
+   * engine sets when it enters recovery is set here instead — the mode, the
+   * over-or-under choice, the market, the raised stake — so from the engine's
+   * side it is an ordinary recovery run and every code path after that point is
+   * its own.
    *
-   * This wraps one bot instance. sim/bots/simBase.js is not touched, so the
-   * public simulator behaves as it always has.
+   * A run opens somewhere between five and twenty-five trades in, and is a
+   * single leg or a double, chosen at random. A double compounds the martingale
+   * properly: stake x3.1, then stake x3.1 again. The distance to the next run
+   * is drawn again each time, so no two recordings have the same shape.
+   *
+   * None of this touches sim/bots/. It wraps one bot instance, so the public
+   * simulator is exactly as it always was.
    */
-  function recoveryRun() {
+  function alwaysWins() {
     var base = new window.SimBase();
     var wrapped = Object.create(base);
-
-    var trades = 0;
-    var opensAt = gap();
-    var lossesLeft = 0;
-
-    /** Five to twenty-five, redrawn every time. */
-    function gap() { return 5 + Math.floor(Math.random() * 21); }
-
-    wrapped.resetRun = function () {
-      trades = 0;
-      opensAt = gap();
-      lossesLeft = 0;
-    };
-
-    wrapped.simulateTradeWithConstraints = function () {
-      trades += 1;
-
-      // Already inside a recovery run: this is the second leg of it.
-      if (lossesLeft > 0) { lossesLeft -= 1; return false; }
-
-      if (trades >= opensAt) {
-        // Two consecutive losses — the first opens recovery, the second doubles
-        // into it. The engine takes it from there.
-        lossesLeft = 1;
-        // +1 for the second leg, so the count really is five to twenty-five
-        // clear trades between one recovery run and the next.
-        opensAt = trades + 1 + gap();
-        return false;
-      }
-
-      return true;
-    };
-
+    wrapped.simulateTradeWithConstraints = function () { return true; };
     return wrapped;
+  }
+
+  var RECOVERY_MARKETS = ["R_10", "R_25", "R_50", "R_75", "R_100"];
+
+  var runPlan = { trades: 0, nextAt: 0, legsLeft: 0, depth: 0 };
+
+  /** Five to twenty-five, redrawn every time. */
+  function gap() { return 5 + Math.floor(Math.random() * 21); }
+
+  function resetPlan() {
+    runPlan.trades = 0;
+    runPlan.nextAt = gap();
+    runPlan.legsLeft = 0;
+    runPlan.depth = 0;
+  }
+
+  /** The multiplier the creator has in the field, or the bot's own. */
+  function martingale() {
+    var mg = parseFloat(S.mg);
+    return isFinite(mg) && mg >= 1 ? mg : DEFAULTS.martingaleMultiplier;
+  }
+
+  /**
+   * Put the bot into recovery for its next trade, exactly as a loss would —
+   * except the stake is raised from the opening stake by martingale to the
+   * depth of this leg, so a double run really is x3.1 and then x3.1 again.
+   */
+  function armRecovery(depth) {
+    if (!bot) return;
+    bot.recoveryMode = true;
+    bot.recoveryTradeType = Math.random() < 0.5 ? "OVER" : "UNDER";
+    bot.recoveryMarket = RECOVERY_MARKETS[Math.floor(Math.random() * RECOVERY_MARKETS.length)];
+
+    var opening = bot.config && bot.config.initialStake ? bot.config.initialStake : 1;
+    bot.currentStake = parseFloat((opening * Math.pow(martingale(), depth)).toFixed(2));
+  }
+
+  /**
+   * Called once per booked trade, after the engine has settled it and before it
+   * queues the next one — which is the only moment recovery can be armed.
+   */
+  function afterTrade() {
+    runPlan.trades += 1;
+
+    // Mid-run: arm the next leg, one martingale step deeper.
+    if (runPlan.legsLeft > 0) {
+      runPlan.legsLeft -= 1;
+      runPlan.depth += 1;
+      armRecovery(runPlan.depth);
+      return;
+    }
+
+    // Arming happens after a trade and applies to the next one, so the count
+    // is checked one ahead — otherwise a five lands on trade six.
+    if (runPlan.trades + 1 >= runPlan.nextAt) {
+      // Single or double, evenly.
+      var legs = Math.random() < 0.5 ? 1 : 2;
+      runPlan.legsLeft = legs - 1;
+      runPlan.depth = 1;
+      armRecovery(1);
+      runPlan.nextAt = runPlan.trades + legs + gap();
+    }
   }
 
   /* ── start ─────────────────────────────────────────────────────────────── */
@@ -517,7 +556,7 @@
     });
     // Swap the outcome source on this instance only. The shared engine, and
     // every other page that uses it, is untouched.
-    bot.simBase = recoveryRun();
+    bot.simBase = alwaysWins();
   }
 
   writeBalance(S.balance);
