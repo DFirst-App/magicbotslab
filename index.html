@@ -476,6 +476,28 @@
       .landing-badge__text { font-size: 11px; }
       .landing-social-icon img { width: 26px; height: 26px; }
     }
+    /* The way in to the Creator Program, for readers who came to earn rather
+       than to trade. Wraps instead of overflowing on a narrow phone. */
+    .creators-badge {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px 8px;
+      max-width: 100%;
+      margin-bottom: 14px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 154, 60, 0.45);
+      background: rgba(255, 122, 24, 0.12);
+      color: #ff9a3c;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      transition: background .15s;
+    }
+    .creators-badge:hover { background: rgba(255, 122, 24, 0.2); }
+    .creators-badge__amt { color: #24d970; white-space: nowrap; }
   </style>
   <link rel="stylesheet" href="guide.css" />
 </head>
@@ -504,6 +526,12 @@
     </ol>
 
     <section class="hero-copy">
+      <!-- Plenty of people arrive here to earn rather than to trade, and nothing
+           on this page told them they could. -->
+      <a class="creators-badge" href="creators.html">
+        <span>Get paid to post about Magic Bots Lab</span>
+        <span class="creators-badge__amt">$100 a month</span>
+      </a>
       <h1>Automated Trading Bots</h1>
       <p>Connect your Deriv account to run Magic Bots Lab automations, access MT5 bot downloads, and manage fully automated trading systems from one control dashboard.</p>
       <div class="status" id="statusText"></div>

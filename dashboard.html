@@ -258,6 +258,23 @@
       box-shadow: 0 8px 20px rgba(27, 55, 97, 0.35);
     }
     .start-trading-btn .badges { display: inline-flex; gap: 5px; }
+
+    /* Earning by posting is a different kind of thing from trading, so it gets
+       its own colour rather than a second blue button nobody reads. */
+    .creators-btn {
+      flex: 1 1 auto;
+      justify-content: center;
+      min-height: 42px;
+      padding: 10px 16px;
+      font-size: 12px;
+      letter-spacing: 0.03em;
+      color: #1b0f04;
+      background: linear-gradient(135deg, #ff9a3c, #ff7a18);
+      border-color: rgba(255, 154, 60, 0.5);
+      box-shadow: 0 8px 20px rgba(120, 55, 10, 0.35);
+      text-decoration: none;
+    }
+    .creators-btn .chip { background: rgba(0, 0, 0, 0.18); color: #1b0f04; }
     .chip {
       font-size: 10px;
       font-weight: 800;
@@ -480,7 +497,7 @@
 
     @media (max-width: 380px) {
       .details-grid { grid-template-columns: 1fr 1fr; }
-      .fund-actions, .start-trading-btn { width: 100%; }
+      .fund-actions, .start-trading-btn, .creators-btn { width: 100%; }
       .balance-actions { flex-direction: column; align-items: stretch; }
     }
   </style>
@@ -521,6 +538,10 @@
               <span class="chip">MT5</span>
             </span>
           </button>
+          <a class="btn creators-btn" href="creators.html">
+            <span>Get paid to post</span>
+            <span class="badges"><span class="chip">$100/mo</span></span>
+          </a>
         </div>
         <div class="balance-hint">If your full balance is not visible, transfer funds to your Deriv options account.</div>
       </div>
@@ -580,6 +601,7 @@
     <div class="status" id="statusText"></div>
 
     <footer class="dash-footer">
+      <a class="btn social-btn" href="creators.html" style="background:rgba(255,122,24,0.14);border-color:rgba(255,154,60,0.45);color:#ff9a3c">Creator Program</a>
       <a class="btn social-btn social-btn--whatsapp" href="https://whatsapp.com/channel/0029Vb6sxFG9xVJWbyIwL110" target="_blank" rel="noopener noreferrer">Join WhatsApp</a>
       <a class="btn social-btn social-btn--telegram" href="https://t.me/magicabofficialchannel" target="_blank" rel="noopener noreferrer">Join Telegram</a>
     </footer>
