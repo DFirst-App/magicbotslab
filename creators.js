@@ -574,9 +574,9 @@
         "From month two everyone is on the same ladder: <b>" +
         money(M.STEP) + " more every month</b>, up to <b>" + money(M.CEILING) + "</b>.</p>" +
         '<div class="note-box">' +
-          "<b>The " + money(M.VIEWS_BONUS) + " bonus:</b> if <b>half the videos you posted that month</b> reach <b>" +
-          M.VIEWS_TARGET.toLocaleString() + " views each</b>, we add <b>" + money(M.VIEWS_BONUS) +
-          "</b> on top. It is half of your posts getting there, not one of them going viral." +
+          '<b class="ok">The ' + money(M.VIEWS_BONUS) + ' bonus:</b> if <b class="hi">half the videos you posted that month</b> reach <b class="hi2">' +
+          M.VIEWS_TARGET.toLocaleString() + ' views each</b>, we add <b class="ok">' + money(M.VIEWS_BONUS) +
+          "</b> on top." +
         "</div></section>" +
     "</div>";
   }
