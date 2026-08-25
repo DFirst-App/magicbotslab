@@ -1,4 +1,4 @@
-const { select, update, trim, readBody, json, guard, findCreator } = require("../_lib/db");
+const { select, update, trim, readBody, json, guard, findCreator, dbFailed } = require("../_lib/db");
 
 /**
  * TEAM — connecting two creators who missed the link.
@@ -16,7 +16,9 @@ module.exports = async (req, res) => {
   if (!guard(req, res)) return;
 
   const body = await readBody(req);
-  const me = await findCreator(body.token);
+  let me;
+  try { me = await findCreator(body.token); }
+  catch (e) { return dbFailed(res, e); }
   if (!me) return json(res, 404, { error: "No creator found." });
 
   const code = trim(body.code).toUpperCase();

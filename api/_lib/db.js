@@ -138,15 +138,43 @@ function guard(req, res, methods = ["POST"]) {
 const CREATOR_FIELDS =
   "id,name,email,country,new_accounts,status,payout_method,started_at,first_post_at,referral_code,referred_by,created_at";
 
-/** Find the creator behind a token. Null when the token means nothing. */
+/**
+ * Find the creator behind a token.
+ *
+ * Returns the row, or null when the token means nothing — but THROWS when the
+ * database itself is unreachable or the schema is missing. Those are not the
+ * same thing, and quietly returning null for both is how "the migration was
+ * never run" ends up looking like "your token expired" for a week.
+ */
 async function findCreator(token) {
   if (!isToken(token)) return null;
+
   const r = await select("mbl_creators", `select=${CREATOR_FIELDS}&access_token=eq.${encodeURIComponent(token)}&limit=1`);
-  return r.ok && Array.isArray(r.data) && r.data[0] ? r.data[0] : null;
+
+  if (!r.ok) {
+    const err = new Error((r.error && r.error.message) || "database unavailable");
+    err.dbCode = r.error && r.error.code;
+    throw err;
+  }
+
+  return Array.isArray(r.data) && r.data[0] ? r.data[0] : null;
+}
+
+/**
+ * Turn a thrown database error into an honest response. PGRST205 means the
+ * table is not there, which is a deployment problem and not the caller's
+ * fault, so it says so rather than blaming their token.
+ */
+function dbFailed(res, e) {
+  console.error("[mbl] database error:", e && e.dbCode, e && e.message);
+  if (e && e.dbCode === "PGRST205") {
+    return json(res, 503, { error: "The Creator Program is not finished being set up. Please try again shortly." });
+  }
+  return json(res, 503, { error: "Not available right now. Please try again in a minute." });
 }
 
 module.exports = {
   rest, select, insert, update, upsert, remove,
   trim, isEmail, isToken, normaliseHandle, newToken,
-  readBody, json, guard, findCreator, CREATOR_FIELDS, configured,
+  readBody, json, guard, findCreator, dbFailed, CREATOR_FIELDS, configured,
 };

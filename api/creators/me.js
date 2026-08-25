@@ -1,4 +1,4 @@
-const { select, readBody, json, guard, findCreator } = require("../_lib/db");
+const { select, readBody, json, guard, findCreator, dbFailed } = require("../_lib/db");
 
 /**
  * ME — everything the dashboard draws, in one call.
@@ -16,7 +16,9 @@ module.exports = async (req, res) => {
   if (!guard(req, res)) return;
 
   const { token } = await readBody(req);
-  const creator = await findCreator(token);
+  let creator;
+  try { creator = await findCreator(token); }
+  catch (e) { return dbFailed(res, e); }
   if (!creator) return json(res, 404, { error: "No creator found." });
 
   const id = creator.id;

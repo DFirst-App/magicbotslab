@@ -1,6 +1,6 @@
 const {
   select, update, upsert, remove, trim, normaliseHandle,
-  readBody, json, guard, findCreator,
+  readBody, json, guard, findCreator, dbFailed,
 } = require("../_lib/db");
 
 /**
@@ -22,7 +22,9 @@ module.exports = async (req, res) => {
   if (!guard(req, res)) return;
 
   const body = await readBody(req);
-  const creator = await findCreator(body.token);
+  let creator;
+  try { creator = await findCreator(body.token); }
+  catch (e) { return dbFailed(res, e); }
   if (!creator) return json(res, 404, { error: "No creator found." });
 
   const id = creator.id;

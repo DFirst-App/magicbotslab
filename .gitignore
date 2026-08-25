@@ -1,0 +1,10 @@
+# Secrets. This file exists mainly so .env can never be committed: this repo is
+# public-facing and a service key in its history is a key you have to rotate.
+.env
+.env.*
+!.env.example
+
+# Local
+node_modules/
+.DS_Store
+nohup.out

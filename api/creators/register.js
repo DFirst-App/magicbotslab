@@ -1,6 +1,6 @@
 const {
   select, insert, upsert, trim, isEmail, normaliseHandle, newToken,
-  readBody, json, guard, CREATOR_FIELDS,
+  readBody, json, guard, dbFailed, CREATOR_FIELDS,
 } = require("../_lib/db");
 
 /**
@@ -50,7 +50,12 @@ module.exports = async (req, res) => {
 
   // Already registered? Say so plainly rather than creating a second seat.
   const existing = await select("mbl_creators", `select=id&email=eq.${encodeURIComponent(email)}&limit=1`);
-  if (existing.ok && existing.data && existing.data.length) {
+
+  // A failed lookup is not "no match" — if the schema is missing, say so here
+  // rather than letting the insert fail with something nobody can read.
+  if (!existing.ok) return dbFailed(res, Object.assign(new Error("lookup failed"), { dbCode: existing.error && existing.error.code }));
+
+  if (existing.data && existing.data.length) {
     return json(res, 409, { error: "You are already registered with that email. Open your dashboard on the device you signed up on." });
   }
 
