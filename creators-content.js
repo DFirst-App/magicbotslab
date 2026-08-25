@@ -69,7 +69,9 @@ window.MBL = (function () {
 
   var DO = [
     "Post every day. Views are not required for you to be paid.",
-    "Want the $500 bonus? Half the videos you post in a month need 10,000 views each.",
+    "Add music if you like, but turn it down until your voice is clearly heard over it.",
+    "Use other footage in your edit too — b-roll, stock clips, anything that makes it watchable.",
+    "Want the $500 bonus? Half the videos you post in a month need 10,000 views each. Good edits are how you get there.",
     "Tell viewers about Magic Bots Lab in every video — say the name out loud.",
     "Say the bots are 100% FREE. Every video, no exceptions.",
     "Post the same video to all three of your accounts — that counts as one day.",
@@ -81,7 +83,7 @@ window.MBL = (function () {
 
   var DONT = [
     "Do not re-upload a video you already posted on another day.",
-    "Do not re-upload somebody else's footage. Take the idea, rebuild it yourself.",
+    "Do not re-upload somebody else's video as it is. Using their clips inside your own edit is fine — posting their video as yours is not.",
     "Do not hide or delete your posts before you have been paid. We check that every video is still live."
   ];
 

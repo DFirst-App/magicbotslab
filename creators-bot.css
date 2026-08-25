@@ -941,3 +941,16 @@ body {
   margin-top: auto;
   text-decoration: none;
 }
+
+/* The bonus, said where the effort that earns it is being described. */
+.make-bonus {
+  margin-top: auto;
+  padding: 12px 13px;
+  border: 1px solid rgba(36, 217, 112, 0.35);
+  border-radius: 12px;
+  background: rgba(36, 217, 112, 0.07);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.make-bonus b { color: #24d970; }
