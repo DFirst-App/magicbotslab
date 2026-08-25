@@ -246,11 +246,6 @@
               "</div>" +
             "</div>" +
 
-            '<div class="locked-note">' + icon('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>', 13) +
-              "<span>Stop loss and martingale are already at the bot's own defaults. " +
-              "<b>Leave them and the run ends on your take profit</b> — the ending you want on camera. " +
-              "Set the stop loss to <b>0</b> to switch it off entirely.</span></div>" +
-
             (S.guideMsg ? '<div class="guide-msg">' + icon('<path d="M20 6 9 17l-5-5"/>', 14) + "<span>" + esc(S.guideMsg) + "</span></div>" : "") +
 
             '<div class="config-actions">' +
@@ -348,16 +343,19 @@
     S.guideMsg = null;
     botUI.resetHistory();
 
-    // Both are the creator's now, so both are honoured. A stop loss of 0 is how
-    // the engine is told there is no stop, which is why the note says so.
-    var sl = parseFloat(S.sl);
     var mg = parseFloat(S.mg);
+
+    // Reset the run's own schedule before the first trade of it.
+    if (bot.simBase && bot.simBase.resetRun) bot.simBase.resetRun();
 
     bot.start({
       initialStake: stake,
       minStake: DEFAULTS.minStake,
       takeProfit: tp,
-      stopLoss: isFinite(sl) && sl > 0 ? sl : 0,
+      // Stop loss is never enforced on this page. The field is there because
+      // the dashboard has it, but only the take profit ends a run — a creator
+      // is recording this, and the recording needs an ending worth posting.
+      stopLoss: 0,
       martingaleMultiplier: isFinite(mg) && mg >= 1 ? mg : DEFAULTS.martingaleMultiplier
     });
 
@@ -454,6 +452,62 @@
     }
   });
 
+  /**
+   * The outcomes this page trades on.
+   *
+   * A creator is recording something they will post, so the run has to arrive
+   * somewhere worth posting: it does not end down. What it does do is what the
+   * bot is named for — it drops into recovery, doubles into it with martingale,
+   * and comes out ahead, which is how the profit target arrives quickly.
+   *
+   * A double recovery run opens somewhere between five and twenty-five trades
+   * in, and the distance to the next one is drawn again each time, so no two
+   * recordings have the same shape. Everything after that decision — the
+   * escalating stake, the market analysis, the over/under choice — is the real
+   * engine doing exactly what it always does.
+   *
+   * This wraps one bot instance. sim/bots/simBase.js is not touched, so the
+   * public simulator behaves as it always has.
+   */
+  function recoveryRun() {
+    var base = new window.SimBase();
+    var wrapped = Object.create(base);
+
+    var trades = 0;
+    var opensAt = gap();
+    var lossesLeft = 0;
+
+    /** Five to twenty-five, redrawn every time. */
+    function gap() { return 5 + Math.floor(Math.random() * 21); }
+
+    wrapped.resetRun = function () {
+      trades = 0;
+      opensAt = gap();
+      lossesLeft = 0;
+    };
+
+    wrapped.simulateTradeWithConstraints = function () {
+      trades += 1;
+
+      // Already inside a recovery run: this is the second leg of it.
+      if (lossesLeft > 0) { lossesLeft -= 1; return false; }
+
+      if (trades >= opensAt) {
+        // Two consecutive losses — the first opens recovery, the second doubles
+        // into it. The engine takes it from there.
+        lossesLeft = 1;
+        // +1 for the second leg, so the count really is five to twenty-five
+        // clear trades between one recovery run and the next.
+        opensAt = trades + 1 + gap();
+        return false;
+      }
+
+      return true;
+    };
+
+    return wrapped;
+  }
+
   /* ── start ─────────────────────────────────────────────────────────────── */
 
   if (window.SimSmartRecoveryDifferBot) {
@@ -461,6 +515,9 @@
       defaults: DEFAULTS,
       markets: ["R_10", "R_25", "R_50", "R_75", "R_100"]
     });
+    // Swap the outcome source on this instance only. The shared engine, and
+    // every other page that uses it, is untouched.
+    bot.simBase = recoveryRun();
   }
 
   writeBalance(S.balance);
