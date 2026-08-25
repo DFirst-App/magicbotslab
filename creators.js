@@ -277,9 +277,8 @@
         '<div><label class="lbl" for="f-email">Email</label>' +
           '<input class="field" id="f-email" data-f="email" type="email" value="' + esc(f.email) + '" placeholder="you@email.com" autocomplete="email" /></div>' +
 
-        '<div><label class="lbl" for="f-country">Country</label>' +
-          '<input class="field" id="f-country" data-f="country" value="' + esc(f.country) + '" list="countries" placeholder="Start typing…" autocomplete="country-name" />' +
-          '<datalist id="countries">' + (window.MBL_COUNTRIES || []).map(function (c) { return "<option>" + esc(c) + "</option>"; }).join("") + "</datalist></div>" +
+        '<div><label class="lbl">Country</label>' +
+          pickerButton('data-pick-country="1"', f.country, "Choose your country") + "</div>" +
 
         "<div>" + platformPicker() + "</div>" +
 
@@ -365,10 +364,9 @@
     return '<label class="lbl">Where you post — pick ' + M.PLATFORMS_REQUIRED + "</label>" +
       '<div class="plat">' + rows + "</div>" +
       '<div class="row" style="margin-top:8px">' +
-        '<select class="field" style="max-width:260px" data-add="1">' +
-          '<option value="">Add another platform…</option>' +
-          rest.map(function (p) { return '<option value="' + esc(p.key) + '">' + esc(p.name) + "</option>"; }).join("") +
-        "</select>" +
+        (rest.length
+          ? pickerButton('data-pick-platform="1" style="max-width:260px"', "", "Add another platform…")
+          : "") +
         '<span style="font-size:11.5px;color:var(--faint)">' +
           (chosen.length === M.PLATFORMS_REQUIRED
             ? "Three chosen. Post on more if you want to — three is the minimum, not a limit."
@@ -771,10 +769,29 @@
   /* ── events, delegated from the root ───────────────────────────────────── */
 
   document.addEventListener("click", function (e) {
-    var el = e.target.closest("[data-go],[data-act],[data-drop],[data-pay],[data-lp],[data-undo],[data-day],[data-dir]");
+    var el = e.target.closest("[data-go],[data-act],[data-drop],[data-pay],[data-lp],[data-undo],[data-day],[data-dir],[data-pick-country],[data-pick-platform]");
     if (!el) return;
 
     if (el.dataset.go) { S.view = el.dataset.go; render(); document.getElementById("view").focus(); return; }
+
+    if (el.dataset.pickCountry) {
+      Picker.open(el, (window.MBL_COUNTRIES || []).map(function (c) { return { value: c, label: c }; }),
+        function (v) { S.form.country = v; render(); }, "Type three letters…");
+      return;
+    }
+
+    if (el.dataset.pickPlatform) {
+      var taken = S.platforms;
+      var free = M.PLATFORMS.filter(function (p) { return taken.indexOf(p.key) < 0; })
+        .map(function (p) { return { value: p.key, label: p.name, logo: p.logo }; });
+      Picker.open(el, free, function (v) {
+        if (S.platforms.length >= M.PLATFORMS_REQUIRED) { toast("Remove one first — " + M.PLATFORMS_REQUIRED + " at a time.", true); return; }
+        S.platforms.push(v);
+        if (S.me && S.platforms.length === M.PLATFORMS_REQUIRED) saveProfile({ platforms: S.platforms }, true);
+        render();
+      }, "Search platforms…");
+      return;
+    }
 
     if (el.dataset.drop) {
       S.platforms = S.platforms.filter(function (k) { return k !== el.dataset.drop; });
@@ -868,18 +885,6 @@
   document.addEventListener("change", function (e) {
     var el = e.target;
 
-    if (el.dataset.add && el.value) {
-      if (S.platforms.length >= M.PLATFORMS_REQUIRED) {
-        toast("Remove one first — " + M.PLATFORMS_REQUIRED + " at a time.", true);
-        el.value = "";
-        return;
-      }
-      S.platforms.push(el.value);
-      if (S.me && S.platforms.length === M.PLATFORMS_REQUIRED) saveProfile({ platforms: S.platforms }, true);
-      render();
-      return;
-    }
-
     if (el.dataset.me === "newAccounts") {
       saveProfile({ newAccounts: el.checked });
       return;
@@ -889,6 +894,139 @@
       S.form[el.dataset.f] = el.checked;
     }
   });
+
+/* ── the picker ───────────────────────────────────────────────────────────────
+ *
+ * A native <select> of 199 countries is a wall of text you scroll, and a
+ * <datalist> looks like a different operating system on every browser. Neither
+ * belongs on a page people judge us by.
+ *
+ * So: one floating panel, opened under whatever button asked for it, with a
+ * search box that filters as you type and a list you can walk with the arrow
+ * keys. It lives outside the view's markup and manages its own DOM, which is
+ * what lets it survive without a re-render stealing focus mid-keystroke.
+ */
+var Picker = (function () {
+  var el = null, opts = [], onPick = null, anchor = null, active = 0;
+
+  function close() {
+    if (!el) return;
+    el.remove();
+    el = null; opts = []; onPick = null; anchor = null;
+    document.removeEventListener("mousedown", outside, true);
+    window.removeEventListener("resize", close);
+    window.removeEventListener("scroll", close, true);
+  }
+
+  function outside(e) { if (el && !el.contains(e.target) && e.target !== anchor && !anchor.contains(e.target)) close(); }
+
+  function place() {
+    if (!el || !anchor) return;
+    var r = anchor.getBoundingClientRect();
+    var w = Math.max(r.width, 240);
+    var left = Math.min(r.left, window.innerWidth - w - 12);
+    var below = window.innerHeight - r.bottom;
+    var height = Math.min(320, Math.max(180, below - 16));
+
+    el.style.width = w + "px";
+    el.style.left = Math.max(12, left) + "px";
+
+    // Flip above when there is more room up there — a list that opens off the
+    // bottom of a phone is a list nobody can use.
+    if (below < 220 && r.top > below) {
+      el.style.top = "auto";
+      el.style.bottom = (window.innerHeight - r.top + 6) + "px";
+      el.style.maxHeight = Math.min(320, r.top - 16) + "px";
+    } else {
+      el.style.bottom = "auto";
+      el.style.top = (r.bottom + 6) + "px";
+      el.style.maxHeight = height + "px";
+    }
+  }
+
+  function draw(filter) {
+    var list = el.querySelector(".picker-list");
+    var q = (filter || "").trim().toLowerCase();
+
+    // Starts-with before contains: typing "ken" should put Kenya first, not
+    // whatever alphabetically-earlier country happens to contain those letters.
+    var hits = opts.filter(function (o) { return !q || o.label.toLowerCase().indexOf(q) >= 0; });
+    hits.sort(function (a, b) {
+      if (!q) return 0;
+      var sa = a.label.toLowerCase().indexOf(q) === 0 ? 0 : 1;
+      var sb = b.label.toLowerCase().indexOf(q) === 0 ? 0 : 1;
+      return sa - sb;
+    });
+
+    active = 0;
+    list.innerHTML = hits.length
+      ? hits.map(function (o, i) {
+          return '<button type="button" class="picker-opt' + (i === 0 ? " on" : "") + '" data-v="' + esc(o.value) + '">' +
+            (o.logo ? logo(o.logo, "", 18) : "") +
+            "<span>" + esc(o.label) + "</span></button>";
+        }).join("")
+      : '<div class="picker-empty">Nothing matches that.</div>';
+  }
+
+  function move(step) {
+    var items = el.querySelectorAll(".picker-opt");
+    if (!items.length) return;
+    items[active] && items[active].classList.remove("on");
+    active = (active + step + items.length) % items.length;
+    items[active].classList.add("on");
+    items[active].scrollIntoView({ block: "nearest" });
+  }
+
+  function open(button, options, pick, placeholder) {
+    close();
+    anchor = button; opts = options; onPick = pick;
+
+    el = document.createElement("div");
+    el.className = "picker-panel";
+    el.innerHTML =
+      '<div class="picker-search"><input type="text" placeholder="' + esc(placeholder || "Search…") + '" aria-label="Search" /></div>' +
+      '<div class="picker-list"></div>';
+    document.body.appendChild(el);
+
+    draw("");
+    place();
+
+    var input = el.querySelector("input");
+    input.addEventListener("input", function () { draw(input.value); });
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowDown") { e.preventDefault(); move(1); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); move(-1); }
+      else if (e.key === "Enter") {
+        e.preventDefault();
+        var on = el.querySelector(".picker-opt.on");
+        if (on) { var v = on.dataset.v; var cb = onPick; close(); cb(v); }
+      } else if (e.key === "Escape") { e.preventDefault(); close(); button.focus(); }
+    });
+
+    el.addEventListener("click", function (e) {
+      var b = e.target.closest(".picker-opt");
+      if (!b) return;
+      var v = b.dataset.v; var cb = onPick;
+      close(); cb(v);
+    });
+
+    setTimeout(function () { input.focus(); }, 30);
+    document.addEventListener("mousedown", outside, true);
+    window.addEventListener("resize", close);
+    window.addEventListener("scroll", close, true);
+  }
+
+  return { open: open, close: close };
+})();
+
+/** The button half of a picker — what you see when it is shut. */
+function pickerButton(attr, value, placeholder, logoSrc) {
+  return '<button type="button" class="picker-btn" ' + attr + '>' +
+    (logoSrc ? logo(logoSrc, "", 18) : "") +
+    '<span class="picker-val' + (value ? "" : " empty") + '">' + esc(value || placeholder) + "</span>" +
+    icon('<path d="m6 9 6 6 6-6"/>', 15) +
+    "</button>";
+}
 
   /* ── start ─────────────────────────────────────────────────────────────── */
 

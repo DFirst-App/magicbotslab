@@ -409,3 +409,74 @@ table.t td { padding: 9px 0; font-size: 13px; border-top: 1px solid rgba(255,255
   .card { padding: 15px; }
   .stat .v { font-size: 21px; }
 }
+
+/* ── the picker ──────────────────────────────────────────────────────────────
+   A native <select> of two hundred countries is a wall you scroll, and a
+   <datalist> renders like a different operating system on every browser.
+   This is one control that looks the same everywhere and can be searched. */
+
+.picker-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text);
+  font-size: 13.5px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.picker-btn:hover { border-color: var(--line-accent); }
+.picker-btn:focus-visible { outline: none; border-color: var(--accent); }
+.picker-btn .picker-val { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.picker-btn .picker-val.empty { color: var(--faint); }
+.picker-btn svg.ico { color: var(--faint); }
+
+.picker-panel {
+  position: fixed;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--line-accent);
+  border-radius: 12px;
+  /* Opaque. A translucent popover over a dotted background is unreadable. */
+  background: var(--panel-2);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+}
+
+.picker-search { padding: 8px; border-bottom: 1px solid var(--border); }
+.picker-search input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+}
+.picker-search input:focus { border-color: var(--accent); }
+
+.picker-list { overflow-y: auto; padding: 5px; }
+
+.picker-opt {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.picker-opt:hover, .picker-opt.on { background: rgba(0, 210, 255, 0.12); color: var(--text); }
+.picker-empty { padding: 14px 12px; font-size: 12.5px; color: var(--faint); text-align: center; }

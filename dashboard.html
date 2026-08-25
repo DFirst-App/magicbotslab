@@ -260,21 +260,53 @@
     .start-trading-btn .badges { display: inline-flex; gap: 5px; }
 
     /* Earning by posting is a different kind of thing from trading, so it gets
-       its own colour rather than a second blue button nobody reads. */
+       its own colour rather than a second blue button nobody reads.
+
+       Two lines: what it is, and what it pays. The amount is the reason anyone
+       clicks, so it is the part that never wraps or shrinks away. */
     .creators-btn {
       flex: 1 1 auto;
-      justify-content: center;
-      min-height: 42px;
-      padding: 10px 16px;
-      font-size: 12px;
-      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 46px;
+      padding: 8px 14px;
+      border-radius: 12px;
       color: #1b0f04;
-      background: linear-gradient(135deg, #ff9a3c, #ff7a18);
-      border-color: rgba(255, 154, 60, 0.5);
-      box-shadow: 0 8px 20px rgba(120, 55, 10, 0.35);
+      background: linear-gradient(135deg, #ffb15c, #ff7a18);
+      border: 1px solid rgba(255, 154, 60, 0.55);
+      box-shadow: 0 8px 20px rgba(120, 55, 10, 0.3);
       text-decoration: none;
+      transition: transform .12s ease, box-shadow .12s ease;
     }
-    .creators-btn .chip { background: rgba(0, 0, 0, 0.18); color: #1b0f04; }
+    .creators-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 26px rgba(120, 55, 10, 0.4); }
+    .creators-btn__icon {
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 30px; height: 30px;
+      border-radius: 9px;
+      background: rgba(0, 0, 0, 0.16);
+    }
+    .creators-btn__text { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+    .creators-btn__title {
+      font-size: 13px; font-weight: 800; letter-spacing: 0.01em;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .creators-btn__sub { font-size: 10.5px; font-weight: 600; opacity: 0.72; }
+    .creators-btn__amt {
+      flex: none;
+      margin-left: auto;
+      padding: 4px 9px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.18);
+      font-size: 11.5px; font-weight: 800;
+      white-space: nowrap;
+    }
+    @media (max-width: 420px) {
+      /* On the narrowest phones the subtitle is the first thing to go. */
+      .creators-btn__sub { display: none; }
+    }
     .chip {
       font-size: 10px;
       font-weight: 800;
@@ -538,9 +570,15 @@
               <span class="chip">MT5</span>
             </span>
           </button>
-          <a class="btn creators-btn" href="creators.html">
-            <span>Get paid to post</span>
-            <span class="badges"><span class="chip">$100/mo</span></span>
+          <a class="creators-btn" href="creators.html">
+            <span class="creators-btn__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+            </span>
+            <span class="creators-btn__text">
+              <span class="creators-btn__title">Get paid to post</span>
+              <span class="creators-btn__sub">Short videos about Magic Bots Lab</span>
+            </span>
+            <span class="creators-btn__amt">$100/mo</span>
           </a>
         </div>
         <div class="balance-hint">If your full balance is not visible, transfer funds to your Deriv options account.</div>
