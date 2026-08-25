@@ -253,12 +253,12 @@
           " grace days, counted the honest way. Miss one and the finish moves out a day. You do not lose the month.</p>" +
         "</section>" +
 
-        '<a class="make-post" href="creators-practice.html">' +
+        '<a class="make-post" href="creators-bot.html">' +
           '<span class="make-post__icon">' +
             icon('<path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/>', 19) +
           "</span>" +
           "<span><span class=\"make-post__t\">See how a post is made</span>" +
-          '<span class="make-post__s">Practise on a real bot — record, talk over it, edit</span></span>' +
+          '<span class="make-post__s">try a real bot, screen record, add creative voice over and edit</span></span>' +
           '<span class="make-post__go">Show me' + icon('<path d="m9 18 6-6-6-6"/>', 14) + "</span>" +
         "</a>" +
 
@@ -350,12 +350,12 @@
 
       // The one thing that turns a dashboard into a day's work: making the
       // video. It goes above the numbers, because the numbers follow from it.
-      '<a class="make-post" href="creators-practice.html">' +
+      '<a class="make-post" href="creators-bot.html">' +
         '<span class="make-post__icon">' +
           icon('<path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/>', 19) +
         "</span>" +
         "<span><span class=\"make-post__t\">Create a post</span>" +
-        '<span class="make-post__s">Practise on a real bot, then record, talk over it and edit</span></span>' +
+        '<span class="make-post__s">try a real bot, screen record, add creative voice over and edit</span></span>' +
         '<span class="make-post__go">Create post' + icon('<path d="m9 18 6-6-6-6"/>', 14) + "</span>" +
       "</a>" +
 
