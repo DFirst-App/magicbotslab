@@ -1,6 +1,6 @@
 const {
   select, insert, upsert, trim, isEmail, normaliseHandle, newToken,
-  readBody, json, guard, dbFailed, CREATOR_FIELDS,
+  readBody, json, guard, dbFailed, findCreator, rememberDerivAccount, tokenFor, CREATOR_FIELDS,
 } = require("../_lib/db");
 
 /**
@@ -59,7 +59,26 @@ module.exports = async (req, res) => {
   if (!existing.ok) return dbFailed(res, Object.assign(new Error("lookup failed"), { dbCode: existing.error && existing.error.code }));
 
   if (existing.data && existing.data.length) {
-    return json(res, 409, { error: "You are already registered with that email. Open your dashboard on the device you signed up on." });
+    // Almost always this is the same person on a different device, not somebody
+    // taking a name. If they can prove the Deriv account, let them straight in
+    // rather than stranding them on an error they cannot act on.
+    const mine = await findCreator(null, body.derivAccess);
+    if (mine && String(mine.email).toLowerCase() === email) {
+      const own = await tokenFor(mine.id);
+      if (own) {
+        const full = await select("mbl_creators", `select=${CREATOR_FIELDS}&id=eq.${mine.id}&limit=1`);
+        return json(res, 200, {
+          ok: true,
+          token: own,
+          recovered: true,
+          creator: full.ok && full.data ? full.data[0] : null,
+        });
+      }
+    }
+
+    return json(res, 409, {
+      error: "You are already registered with that email. Open your dashboard on the device you signed up on — or connect the same Deriv account here and we will recognise you.",
+    });
   }
 
   // Whoever brought them, if they arrived on somebody's link.
@@ -103,6 +122,9 @@ module.exports = async (req, res) => {
     console.error("[mbl] handles failed:", saved.error);
     return json(res, 500, { error: "Could not save your accounts. Please try again." });
   }
+
+  // So their next device recognises them without any of this.
+  await rememberDerivAccount(creator, body.derivAccess);
 
   const full = await select("mbl_creators", `select=${CREATOR_FIELDS}&id=eq.${creator.id}&limit=1`);
 

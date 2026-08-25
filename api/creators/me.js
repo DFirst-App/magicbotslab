@@ -1,4 +1,4 @@
-const { select, readBody, json, guard, findCreator, dbFailed } = require("../_lib/db");
+const { select, readBody, json, guard, findCreator, rememberDerivAccount, tokenFor, dbFailed } = require("../_lib/db");
 
 /**
  * ME — everything the dashboard draws, in one call.
@@ -15,11 +15,23 @@ const TEAM_PER_PERSON_USD = 20;
 module.exports = async (req, res) => {
   if (!guard(req, res)) return;
 
-  const { token } = await readBody(req);
+  const { token, derivAccess } = await readBody(req);
   let creator;
-  try { creator = await findCreator(token); }
+  try { creator = await findCreator(token, derivAccess); }
   catch (e) { return dbFailed(res, e); }
   if (!creator) return json(res, 404, { error: "No creator found." });
+
+  // First time they open this with Deriv connected, record the account so the
+  // next device recognises them.
+  await rememberDerivAccount(creator, derivAccess);
+
+  // Found by their Deriv account rather than their own token? Hand the token
+  // over so this device stops needing to ask.
+  let recoveredToken = null;
+  if (!token || token !== undefined) {
+    const own = await tokenFor(creator.id);
+    if (own && own !== token) recoveredToken = own;
+  }
 
   const id = creator.id;
 
@@ -81,5 +93,6 @@ module.exports = async (req, res) => {
       pendingUsd: (members.length - earning) * TEAM_PER_PERSON_USD,
     },
     serverTime: new Date().toISOString(),
+    recoveredToken: recoveredToken,
   });
 };

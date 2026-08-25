@@ -716,6 +716,20 @@ body {
       }
 }
 
+/* ── the live-performance colours, from trading-dashboard.html ──────────
+   Keyed by id there, so a class-based extraction missed every one of them
+   and the figures came out plain. They are the whole point of the card. */
+
+#balanceValue { color: #00d2ff; }
+#totalProfitValue.positive { color: #24d970; }
+#totalProfitValue.negative { color: #ff5f6d; }
+#totalTradesValue { color: #ff7a18; }
+#winRateValue { color: #a855f7; }
+#currentStakeValue { color: #00d2ff; }
+#consecutiveLossesValue { color: #ff5f6d; }
+#targetValue { color: #fcd34d; }
+#runningTimeValue { color: #00d2ff; }
+
 /* ═══ added for creators — and nothing else is ═════════════════════════════ */
 
 .page {

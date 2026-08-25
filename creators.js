@@ -117,13 +117,29 @@
 
   /* ── loading ───────────────────────────────────────────────────────────── */
 
+  /** Whatever Deriv token this browser holds — the key to being recognised. */
+  function derivAccess() {
+    try { return localStorage.getItem("deriv_access_token") || ""; } catch (e) { return ""; }
+  }
+
   function load() {
     S.token = localStorage.getItem(TOKEN_KEY) || "";
-    if (!S.token) { S.me = false; render(); return Promise.resolve(); }
+    var deriv = derivAccess();
 
-    return post("me", { token: S.token }).then(function (r) {
+    // With neither a token of our own nor a Deriv account to be recognised by,
+    // there is nothing to look up.
+    if (!S.token && !deriv) { S.me = false; render(); return Promise.resolve(); }
+
+    return post("me", { token: S.token, derivAccess: deriv }).then(function (r) {
       if (r.ok && r.data && r.data.creator) {
         S.me = r.data;
+
+        // Recognised by the Deriv account rather than by a token this device
+        // had. Keep the key so it never has to ask again.
+        if (r.data.recoveredToken) {
+          S.token = r.data.recoveredToken;
+          try { localStorage.setItem(TOKEN_KEY, S.token); } catch (e) {}
+        }
         S.platforms = (r.data.handles || []).map(function (h) { return h.platform; });
         S.handles = (r.data.handles || []).reduce(function (a, h) { a[h.platform] = h.handle || ""; return a; }, {});
         if (!S.platforms.length) S.platforms = ["tiktok", "instagram", "youtube"];
@@ -815,13 +831,16 @@
     post("register", {
       name: f.name, email: f.email, country: f.country,
       newAccounts: f.newAccounts, payoutMethod: f.payout,
-      platforms: S.platforms, handles: S.handles, refCode: ref
+      platforms: S.platforms, handles: S.handles, refCode: ref,
+      derivAccess: derivAccess()
     }).then(function (r) {
       S.busy = false;
       if (!r.ok) { render(); return toast((r.data && r.data.error) || "Could not register you.", true); }
       localStorage.setItem(TOKEN_KEY, r.data.token);
       S.token = r.data.token;
-      toast("You are in. Post your first video and your month starts.");
+      toast(r.data.recovered
+        ? "Welcome back — this is the same account, with all your progress."
+        : "You are in. Post your first video and your month starts.");
       S.view = "home";
       return load();
     }).catch(function () { S.busy = false; render(); toast("Could not reach us just now.", true); });

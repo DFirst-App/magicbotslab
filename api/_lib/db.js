@@ -136,7 +136,7 @@ function guard(req, res, methods = ["POST"]) {
 
 /** The columns a creator is ever shown about themselves. */
 const CREATOR_FIELDS =
-  "id,name,email,country,new_accounts,status,payout_method,started_at,first_post_at,referral_code,referred_by,created_at";
+  "id,name,email,country,new_accounts,status,payout_method,started_at,first_post_at,referral_code,referred_by,deriv_loginid,created_at";
 
 /**
  * Find the creator behind a token.
@@ -146,18 +146,56 @@ const CREATOR_FIELDS =
  * same thing, and quietly returning null for both is how "the migration was
  * never run" ends up looking like "your token expired" for a week.
  */
-async function findCreator(token) {
-  if (!isToken(token)) return null;
+async function findCreator(token, derivAccess) {
+  if (isToken(token)) {
+    const r = await select("mbl_creators", `select=${CREATOR_FIELDS}&access_token=eq.${encodeURIComponent(token)}&limit=1`);
 
-  const r = await select("mbl_creators", `select=${CREATOR_FIELDS}&access_token=eq.${encodeURIComponent(token)}&limit=1`);
-
-  if (!r.ok) {
-    const err = new Error((r.error && r.error.message) || "database unavailable");
-    err.dbCode = r.error && r.error.code;
-    throw err;
+    if (!r.ok) {
+      const err = new Error((r.error && r.error.message) || "database unavailable");
+      err.dbCode = r.error && r.error.code;
+      throw err;
+    }
+    if (Array.isArray(r.data) && r.data[0]) return r.data[0];
   }
 
-  return Array.isArray(r.data) && r.data[0] ? r.data[0] : null;
+  // No token, or one this browser has never had — the second-device case. Ask
+  // Deriv which accounts the caller's own access token reaches, then look for a
+  // creator recorded against one of them. Possession of a working token is the
+  // proof; an account id on its own would not be.
+  if (typeof derivAccess === "string" && derivAccess.trim().length > 20) {
+    const { derivAccountIds } = require("./deriv");
+    const ids = await derivAccountIds(derivAccess);
+    if (ids.length) {
+      const list = ids.map((x) => `"${x}"`).join(",");
+      const r2 = await select("mbl_creators", `select=${CREATOR_FIELDS}&deriv_loginid=in.(${list})&limit=1`);
+      if (r2.ok && Array.isArray(r2.data) && r2.data[0]) return r2.data[0];
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Remember which Deriv account this is, so the same person is recognised on
+ * their next device. Verified against Deriv rather than taken from the body,
+ * and only ever written once — a creator cannot move their claim to another
+ * account later.
+ */
+async function rememberDerivAccount(creator, derivAccess) {
+  if (!creator || creator.deriv_loginid) return;
+  if (typeof derivAccess !== "string" || derivAccess.trim().length <= 20) return;
+
+  const { primaryDerivId } = require("./deriv");
+  const id = await primaryDerivId(derivAccess);
+  if (!id) return;
+
+  await update("mbl_creators", `id=eq.${creator.id}&deriv_loginid=is.null`, { deriv_loginid: id });
+}
+
+/** The creator's own key, handed back when they were found some other way. */
+async function tokenFor(creatorId) {
+  const r = await select("mbl_creators", `select=access_token&id=eq.${creatorId}&limit=1`);
+  return r.ok && Array.isArray(r.data) && r.data[0] ? r.data[0].access_token : null;
 }
 
 /**
@@ -176,5 +214,5 @@ function dbFailed(res, e) {
 module.exports = {
   rest, select, insert, update, upsert, remove,
   trim, isEmail, isToken, normaliseHandle, newToken,
-  readBody, json, guard, findCreator, dbFailed, CREATOR_FIELDS, configured,
+  readBody, json, guard, findCreator, rememberDerivAccount, tokenFor, dbFailed, CREATOR_FIELDS, configured,
 };

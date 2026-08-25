@@ -35,6 +35,20 @@
   var SHUFFLE_MIN = 1000;
   var SHUFFLE_MAX = 100000;
 
+  /**
+   * A balance that has run away stops being useful.
+   *
+   * The stake and take-profit suggestions are percentages of the balance, so a
+   * few good sessions compound into figures nobody would film — and a creator
+   * who has set their own number should not have it taken away mid-run either.
+   * So the check happens on arrival, before anything is running: above the
+   * ceiling, it is quietly brought back to somewhere sensible. They can type
+   * whatever they like afterwards, including a bigger number, and it stands
+   * for as long as they are on the page.
+   */
+  var BALANCE_CEILING = 156436;
+  var BALANCE_RESET_MAX = 64675.32;
+
   /** Smart Recovery Differ's own defaults, from trading-dashboard.html. */
   var DEFAULTS = { initialStake: 1, minStake: 0.35, takeProfit: 100, stopLoss: 1000, martingaleMultiplier: 3.1 };
 
@@ -87,9 +101,12 @@
   var S = {
     balance: readBalance(),
     pending: "",           // what is typed in the balance box before Apply
-    step: 0,               // 0 stake · 1 take profit · 2 start · 3 running or done
-    stake: "",
-    tp: "",
+    // Both fields open on the bot's own defaults, so a creator who wants
+    // nothing explained can press Start and film it. The guiding is still
+    // there for anyone who changes one — clearing a field walks it back.
+    step: 2,               // 0 stake · 1 take profit · 2 start · 3 running or done
+    stake: String(DEFAULTS.initialStake),
+    tp: String(DEFAULTS.takeProfit),
     // The bot's own defaults, and the creator's to change — the dashboard lets
     // them, so this does too.
     sl: String(DEFAULTS.stopLoss),
@@ -118,24 +135,34 @@
     updateBalance: function (balance) {
       S.balance = balance;
       writeBalance(Math.round(balance * 100) / 100);
-      setText("balanceValue", "$" + money(balance));
+      // "1,234.56 USD" — the dashboard's own shape, not "$1,234.56".
+      setText("balanceValue", Number(balance).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " USD");
       var input = document.getElementById("derivBalanceInput");
       // Do not fight somebody who is mid-edit.
       if (input && document.activeElement !== input) input.value = (Math.round(balance * 100) / 100).toFixed(2);
     },
     updateStats: function (snap) {
       S.stats = snap;
-      var pl = Number(snap.totalProfit);
+
+      // Every line below mirrors updateBotStats() in trading-dashboard.html —
+      // the same strings, and the same rule about when profit turns green or
+      // red, so the card reads identically to the one creators will use.
+      var pl = Number(snap.totalProfit || 0);
       var el = document.getElementById("totalProfitValue");
       if (el) {
-        el.textContent = (pl >= 0 ? "+$" : "-$") + money(Math.abs(pl));
-        el.className = "stat-value " + (pl >= 0 ? "positive" : "negative");
+        el.textContent = (pl >= 0 ? "+" : "") + "$" + pl.toFixed(2);
+        el.classList.toggle("positive", pl > 0);
+        el.classList.toggle("negative", pl < 0);
       }
-      setText("totalTradesValue", snap.totalTrades);
-      setText("winRateValue", snap.winRate + "%");
-      setText("currentStakeValue", "$" + money(snap.currentStake));
-      setText("consecutiveLossesValue", snap.consecutiveLosses);
-      setText("targetValue", snap.market + " / " + snap.digit);
+
+      setText("totalTradesValue", String(snap.totalTrades == null ? 0 : snap.totalTrades));
+      setText("winRateValue", (snap.winRate == null ? 0 : snap.winRate) + "%");
+      setText("currentStakeValue", "$" + Number(snap.currentStake || 0).toFixed(2));
+      setText("consecutiveLossesValue", String(snap.consecutiveLosses == null ? 0 : snap.consecutiveLosses));
+      setText("targetValue",
+        snap.market !== undefined && snap.digit !== undefined
+          ? snap.market + " / " + snap.digit
+          : (snap.market !== undefined ? String(snap.market) : "-"));
     },
     updateTargets: function (market, digit) {
       S.target = market + " · digit " + digit;
@@ -223,7 +250,8 @@
                 (S.step === 0
                   ? '<div class="cfg-hint"><b>Step 1 of 3.</b> What each trade risks. On a balance of $' + money(S.balance) +
                     " we suggest <b>" + money(sug) + ' USD</b>. <button type="button" class="linky" data-act="useStake">Use ' + money(sug) + "</button></div>"
-                  : '<small>Minimum stake is enforced by Deriv for each contract.</small>') +
+                  : '<small>Ready to go. For a bigger run on this balance, ' +
+                    '<button type="button" class="linky" data-act="useStake">use ' + money(sug) + "</button>.</small>") +
               "</div>" +
 
               '<div class="input-group' + (S.step === 1 ? " glow" : S.step > 1 ? " done" : "") + '">' +
@@ -233,7 +261,8 @@
                 (S.step === 1
                   ? '<div class="cfg-hint"><b>Step 2 of 3.</b> The bot stops itself the moment it reaches this. We suggest <b>' +
                     money(sugTP) + ' USD</b>. <button type="button" class="linky" data-act="useTP">Use ' + money(sugTP) + "</button></div>"
-                  : "") +
+                  : '<small>The bot stops itself here. For this balance, ' +
+                    '<button type="button" class="linky" data-act="useTP">use ' + money(sugTP) + "</button>.</small>") +
               "</div>" +
 
               '<div class="input-group">' +
@@ -260,7 +289,7 @@
             "</div>" +
 
             (S.step === 2
-              ? '<div class="cfg-hint"><b>Step 3 of 3.</b> Start your screen recording, then press Start Bot.</div>'
+              ? '<div class="cfg-hint">Everything is set. Start your screen recording, then press Start Bot.</div>'
               : "") +
 
             '<div class="bot-stat">Target: <strong id="botTarget">' + esc(S.target) + "</strong></div>" +
@@ -272,7 +301,8 @@
           '<div class="bot-stats">' +
             "<h4>Live Performance</h4>" +
             '<div class="stats-grid">' +
-              statRow("Account Balance", "balanceValue", "$" + money(S.balance)) +
+              statRow("Account Balance", "balanceValue",
+                Number(S.balance).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " USD") +
               statRow("Total Profit", "totalProfitValue", "$0.00") +
               statRow("Total Trades", "totalTradesValue", "0") +
               statRow("Win Rate", "winRateValue", "0%") +
@@ -319,20 +349,25 @@
 
   function onType(which, value) {
     var n = parseFloat(value);
+    var ok = isFinite(n) && n > 0;
+
     if (which === "stake") {
       S.stake = value;
-      if (isFinite(n) && n > 0 && S.step === 0) {
-        S.step = 1;
-        S.guideMsg = "Stake set to " + money(n) + " USD. Now set your take profit.";
+      if (!ok) { if (S.step !== 0) { S.step = 0; S.guideMsg = null; render(); } return; }
+      if (S.step === 0) {
+        S.step = parseFloat(S.tp) > 0 ? 2 : 1;
+        S.guideMsg = "Stake set to " + money(n) + " USD." + (S.step === 1 ? " Now set your take profit." : " Press Start Bot.");
         render();
       }
-    } else {
-      S.tp = value;
-      if (isFinite(n) && n > 0 && S.step === 1) {
-        S.step = 2;
-        S.guideMsg = "Take profit set to " + money(n) + " USD. Everything else is handled — press Start Bot.";
-        render();
-      }
+      return;
+    }
+
+    S.tp = value;
+    if (!ok) { if (S.step !== 1) { S.step = 1; S.guideMsg = null; render(); } return; }
+    if (S.step === 1) {
+      S.step = 2;
+      S.guideMsg = "Take profit set to " + money(n) + " USD. Everything else is handled — press Start Bot.";
+      render();
     }
   }
 
@@ -377,10 +412,11 @@
     S.balance = Math.round(n * 100) / 100;
     S.pending = "";
     writeBalance(S.balance);
-    // A new balance means new suggestions, so start the walk again.
-    S.step = 0;
-    S.stake = "";
-    S.tp = "";
+    // A new balance means new suggestions, but the defaults still work — so
+    // Start stays one click away and the hints simply update.
+    S.step = 2;
+    S.stake = String(DEFAULTS.initialStake);
+    S.tp = String(DEFAULTS.takeProfit);
     S.guideMsg = null;
     S.stats = null;
     botUI.resetHistory();
@@ -557,6 +593,12 @@
     // Swap the outcome source on this instance only. The shared engine, and
     // every other page that uses it, is untouched.
     bot.simBase = alwaysWins();
+  }
+
+  // Bring a runaway balance back before the page draws, so the suggestions are
+  // scaled to something a creator would actually put on camera.
+  if (S.balance > BALANCE_CEILING) {
+    S.balance = Math.round((1000 + Math.random() * (BALANCE_RESET_MAX - 1000)) * 100) / 100;
   }
 
   writeBalance(S.balance);
