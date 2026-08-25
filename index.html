@@ -522,20 +522,6 @@
         font-size: 11.5px;
       }
     }
-
-    /* Quiet links out to the pages written for search. Deliberately understated:
-       the Connect button is still the thing to press. */
-    .seo-links {
-      display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
-      margin: 22px auto 0; max-width: 760px;
-    }
-    .seo-links a {
-      font-size: 13px; color: #9aa8bd; text-decoration: none;
-      padding: 8px 14px; border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.09);
-      transition: color .15s ease, background .15s ease;
-    }
-    .seo-links a:hover { color: #eef2f8; background: rgba(255,255,255,0.05); }
   </style>
   <link rel="stylesheet" href="guide.css" />
 </head>
@@ -617,14 +603,6 @@
           <p>Deriv offers complex derivatives, such as options and contracts for difference ("CFDs"). These products may not be suitable for all clients, and trading them puts you at risk. Please make sure that you understand the following risks before trading Deriv products: a) you may lose some or all of the money you invest in the trade, b) if your trade involves currency conversion, exchange rates will affect your profit and loss. You should never trade with borrowed money or with money that you cannot afford to lose.</p>
         </div>
       </div>
-
-      <!-- The pages people arrive on from a search. Linked from here so a
-           crawler can reach them, and so a visitor who is still deciding has
-           somewhere to read rather than a Connect button and nothing else. -->
-      <nav class="seo-links" aria-label="More about Magic Bots Lab">
-        <a href="creator-program.html">Get paid to post &mdash; Creator Program</a>
-        <a href="is-magic-bots-lab-legit.html">Is Magic Bots Lab legit?</a>
-      </nav>
     </section>
 
     <div class="wave"></div>
