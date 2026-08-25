@@ -172,6 +172,12 @@
     html += "</div>";
 
     document.getElementById("rail").innerHTML = html;
+
+    // Read the connected trading balance once, not on every re-render.
+    if (!drawRail.balanceMounted && window.MBL_BALANCE_MOUNT) {
+      drawRail.balanceMounted = true;
+      window.MBL_BALANCE_MOUNT(document.getElementById("railBalance"));
+    }
     document.getElementById("railFoot").innerHTML = joined
       ? "Post every day. Views are not required to be paid."
       : "Join on the Home tab. You start the same day — there is nothing to wait for.";
