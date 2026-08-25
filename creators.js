@@ -233,8 +233,12 @@
             '<div class="stat"><div class="k">Accounts opened for this</div><div class="v hi2">' + money(M.FIRST_MONTH_NEW) + '</div><div class="s">month one only — nobody follows them yet. Month two onwards is the same for everyone.</div></div>' +
           "</div>" +
           '<p style="margin-top:12px">Every month after that pays <b>' + money(M.STEP) + ' more</b> than the one before, up to ' +
-          "<b>" + money(M.CEILING) + '</b> a month. Reach ' + M.VIEWS_TARGET.toLocaleString() + ' views in a month and there is ' +
-          "<b>" + money(M.VIEWS_BONUS) + "</b> on top.</p>" +
+          "<b>" + money(M.CEILING) + "</b> a month.</p>" +
+          '<div class="note-box" style="margin-top:10px">' +
+            "<b>The " + money(M.VIEWS_BONUS) + " bonus, exactly:</b> if <b>half the videos you post in a month</b> reach " +
+            "<b>" + M.VIEWS_TARGET.toLocaleString() + " views each</b>, we add <b>" + money(M.VIEWS_BONUS) + "</b> on top of that month's pay. " +
+            "Not one video going big — half of them getting there." +
+          "</div>" +
         "</section>" +
 
         '<section class="card">' +
@@ -255,7 +259,7 @@
           "</span>" +
           "<span><span class=\"make-post__t\">See how a post is made</span>" +
           '<span class="make-post__s">Practise on a real bot — record, talk over it, edit</span></span>' +
-          '<span class="make-post__go">' + icon('<path d="m9 18 6-6-6-6"/>', 18) + "</span>" +
+          '<span class="make-post__go">Show me' + icon('<path d="m9 18 6-6-6-6"/>', 14) + "</span>" +
         "</a>" +
 
         '<section class="card">' +
@@ -352,7 +356,7 @@
         "</span>" +
         "<span><span class=\"make-post__t\">Create a post</span>" +
         '<span class="make-post__s">Practise on a real bot, then record, talk over it and edit</span></span>' +
-        '<span class="make-post__go">' + icon('<path d="m9 18 6-6-6-6"/>', 18) + "</span>" +
+        '<span class="make-post__go">Create post' + icon('<path d="m9 18 6-6-6-6"/>', 14) + "</span>" +
       "</a>" +
 
       '<div class="grid g4">' +
@@ -361,6 +365,13 @@
         '<div class="stat"><div class="k">This month pays</div><div class="v hi">' + money(first) + '</div><div class="s">' + (c.new_accounts ? "brand-new accounts" : "accounts you already had") + "</div></div>" +
         '<div class="stat"><div class="k">Your team</div><div class="v hi2">' + (S.me.teamTotals ? S.me.teamTotals.members : 0) + '</div><div class="s">' + money(M.TEAM_PER_PERSON) + " each once they are paid</div></div>" +
       "</div>" +
+
+      // The bonus, where a working creator will actually see it.
+      '<section class="card"><div class="eyebrow">' + icon(ICONS.earnings) + " The " + money(M.VIEWS_BONUS) + " bonus</div>" +
+        "<p>On top of your monthly pay: if <b>half the videos you post in a month</b> reach <b>" +
+        M.VIEWS_TARGET.toLocaleString() + " views each</b>, we add <b>" + money(M.VIEWS_BONUS) + "</b>. " +
+        "Half of your posts getting there — not one of them going viral. " +
+        "<b>You are paid either way</b>; views only decide the bonus.</p></section>" +
 
       '<section class="card">' +
         '<div class="eyebrow">' + icon(ICONS.rules) + " What to say about Magic Bots Lab</div>" +
@@ -561,8 +572,12 @@
         money(M.FIRST_MONTH_NEW) +
         "</b> if you opened new ones for this programme, because a new account has nobody watching it yet. " +
         "From month two everyone is on the same ladder: <b>" +
-        money(M.STEP) + " more every month</b>, up to <b>" + money(M.CEILING) + "</b>. Reach <b>" + M.VIEWS_TARGET.toLocaleString() +
-        " views</b> in a month and <b>" + money(M.VIEWS_BONUS) + "</b> is added on top.</p></section>" +
+        money(M.STEP) + " more every month</b>, up to <b>" + money(M.CEILING) + "</b>.</p>" +
+        '<div class="note-box">' +
+          "<b>The " + money(M.VIEWS_BONUS) + " bonus:</b> if <b>half the videos you posted that month</b> reach <b>" +
+          M.VIEWS_TARGET.toLocaleString() + " views each</b>, we add <b>" + money(M.VIEWS_BONUS) +
+          "</b> on top. It is half of your posts getting there, not one of them going viral." +
+        "</div></section>" +
     "</div>";
   }
 

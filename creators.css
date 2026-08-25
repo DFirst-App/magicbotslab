@@ -426,6 +426,11 @@ table.t td { padding: 9px 0; font-size: 13px; border-top: 1px solid rgba(255,255
 }
 .sup-btn:hover { transform: scale(1.05); }
 
+/* The author rule below sets display:flex, which beats the browser's own
+   [hidden] { display: none }. Without this line the panel never actually
+   hides — setting .hidden looks like it worked and nothing moves on screen. */
+.sup[hidden] { display: none; }
+
 .sup {
   position: fixed; right: 18px; bottom: 86px; z-index: 79;
   width: min(380px, calc(100vw - 24px));
@@ -702,33 +707,50 @@ table.t td { padding: 9px 0; font-size: 13px; border-top: 1px solid rgba(255,255
 
 /* ── create a post, on Home ──────────────────────────────────────────────── */
 
+/* The one thing that turns a dashboard into a day's work. It carries the
+   product's own cyan rather than the orange used for money, and it ends in
+   something that plainly looks pressable — an arrow alone reads as decoration. */
 .make-post {
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
   padding: 13px 14px;
-  border: 1px solid rgba(255, 154, 60, 0.45);
+  border: 1px solid rgba(0, 210, 255, 0.4);
   border-radius: 13px;
-  background: linear-gradient(135deg, rgba(255, 177, 92, 0.16), rgba(255, 122, 24, 0.1));
+  background: linear-gradient(135deg, rgba(0, 210, 255, 0.14), rgba(0, 210, 255, 0.05));
   color: var(--text);
   text-align: left;
   text-decoration: none;
   cursor: pointer;
-  transition: transform .12s, border-color .15s;
+  transition: transform .12s, border-color .15s, background .15s;
 }
-.make-post:hover { transform: translateY(-1px); border-color: var(--accent-2); }
+.make-post:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent);
+  background: linear-gradient(135deg, rgba(0, 210, 255, 0.2), rgba(0, 210, 255, 0.08));
+}
 .make-post__icon {
   flex: none;
   display: grid; place-items: center;
   width: 38px; height: 38px;
   border-radius: 11px;
-  background: rgba(255, 122, 24, 0.2);
-  color: var(--accent-2);
+  background: rgba(0, 210, 255, 0.2);
+  color: var(--accent);
 }
 .make-post__t { display: block; font-size: 14px; font-weight: 800; }
 .make-post__s { display: block; margin-top: 2px; font-size: 11.5px; color: var(--muted); }
-.make-post__go { flex: none; margin-left: auto; color: var(--accent-2); }
+.make-post__go {
+  flex: none;
+  margin-left: auto;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #04121f;
+  font-size: 12.5px; font-weight: 800;
+  white-space: nowrap;
+}
 
 @media (max-width: 420px) {
   .make-post__s { display: none; }

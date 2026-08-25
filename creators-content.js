@@ -69,6 +69,7 @@ window.MBL = (function () {
 
   var DO = [
     "Post every day. Views are not required for you to be paid.",
+    "Want the $500 bonus? Half the videos you post in a month need 10,000 views each.",
     "Tell viewers about Magic Bots Lab in every video — say the name out loud.",
     "Say the bots are 100% FREE. Every video, no exceptions.",
     "Post the same video to all three of your accounts — that counts as one day.",

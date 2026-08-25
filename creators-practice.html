@@ -9,24 +9,21 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="creators.css" />
   <link rel="stylesheet" href="creators-practice.css" />
 </head>
 <body>
-  <div class="main" style="min-height:100dvh">
-    <header class="topbar">
-      <a class="btn ghost sm" href="creators.html" id="backBtn">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7M19 12H5"/></svg>
-        Back
-      </a>
-      <div>
-        <h1 id="topTitle">Create a post</h1>
-        <div class="sub" id="topSub">Three steps: record, talk over it, edit</div>
-      </div>
-    </header>
+  <header class="pbar">
+    <a class="back-btn" href="creators.html" aria-label="Back to the Creator Program">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7M19 12H5"/></svg>
+      <span>Back</span>
+    </a>
+    <div>
+      <h1 id="topTitle">Create a post</h1>
+      <div class="sub" id="topSub">Three steps: record, talk over it, edit</div>
+    </div>
+  </header>
 
-    <main class="content" id="view"></main>
-  </div>
+  <main class="page" id="view"></main>
 
   <div class="toasts" id="toasts" aria-live="polite"></div>
 
