@@ -137,24 +137,25 @@ window.MBL = (function () {
     }
   ];
 
+  /* Five platforms, each with its own mark. Nothing here is listed unless we
+     have the real logo for it — a made-up glyph next to a real one looks like
+     a fake, and this is the screen people decide to trust us on. */
   var PLATFORMS = [
-    { key: "tiktok", name: "TikTok", hint: "@handle or paste your link" },
-    { key: "instagram", name: "Instagram Reels", hint: "@handle or paste your link" },
-    { key: "youtube", name: "YouTube Shorts", hint: "@channel or paste your link" },
-    { key: "facebook", name: "Facebook Reels", hint: "Page name or paste your link" },
-    { key: "snapchat", name: "Snapchat Spotlight", hint: "@username or paste your link" },
-    { key: "pinterest", name: "Pinterest", hint: "@username or paste your link" },
-    { key: "x", name: "X", hint: "@handle or paste your link" }
+    { key: "tiktok", name: "TikTok", logo: "logos/tiktok.svg", hint: "@handle or paste your link" },
+    { key: "instagram", name: "Instagram Reels", logo: "logos/instagram.svg", hint: "@handle or paste your link" },
+    { key: "youtube", name: "YouTube Shorts", logo: "logos/youtube.svg", hint: "@channel or paste your link" },
+    { key: "facebook", name: "Facebook Reels", logo: "logos/facebook.svg", hint: "Page name or paste your link" },
+    { key: "snapchat", name: "Snapchat Spotlight", logo: "logos/snapchat.svg", hint: "@username or paste your link" }
   ];
 
   var PAYOUTS = [
-    { key: "mpesa", label: "M-Pesa", group: "Mobile money" },
-    { key: "paypal", label: "PayPal", group: "Online" },
-    { key: "wise", label: "Wise", group: "Online" },
-    { key: "payoneer", label: "Payoneer", group: "Online" },
-    { key: "venmo", label: "Venmo", group: "Online" },
-    { key: "cashapp", label: "Cash App", group: "Online" },
-    { key: "usdt", label: "USDT (Tether)", group: "Crypto" }
+    { key: "mpesa", label: "M-Pesa", group: "Mobile money", logo: "logos/mpesa.svg" },
+    { key: "paypal", label: "PayPal", group: "Online", logo: "logos/paypal.svg" },
+    { key: "wise", label: "Wise", group: "Online", logo: "logos/wise.svg" },
+    { key: "payoneer", label: "Payoneer", group: "Online", logo: "logos/payoneer.svg" },
+    { key: "venmo", label: "Venmo", group: "Online", logo: "logos/venmo.svg" },
+    { key: "cashapp", label: "Cash App", group: "Online", logo: "logos/cashapp.svg" },
+    { key: "usdt", label: "USDT (Tether)", group: "Crypto", logo: "logos/tether.svg" }
   ];
 
   /* ── progress ──────────────────────────────────────────────────────────── */

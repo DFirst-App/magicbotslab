@@ -55,8 +55,26 @@
     return x.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
   }
 
-  function icon(path) {
-    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + "</svg>";
+  /**
+   * An inline icon, always with an explicit size.
+   *
+   * An <svg> carrying only a viewBox has no intrinsic size and stretches to
+   * fill its container — which is exactly what went wrong here the first time:
+   * every eyebrow icon rendered around 350px square and pushed the cards to
+   * three times the height they should have been. The width and height
+   * attributes are the fix, and the CSS repeats it as a belt.
+   */
+  function icon(path, size) {
+    var n = size || 14;
+    return '<svg class="ico" viewBox="0 0 24 24" width="' + n + '" height="' + n +
+      '" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      path + "</svg>";
+  }
+
+  /** A real brand mark, never a drawn approximation. */
+  function logo(src, alt, size) {
+    var n = size || 18;
+    return '<img class="logo" src="' + esc(src) + '" alt="' + esc(alt || "") + '" width="' + n + '" height="' + n + '" />';
   }
 
   var ICONS = {
@@ -337,6 +355,7 @@
     var rows = chosen.map(function (k) {
       var p = M.PLATFORMS.filter(function (x) { return x.key === k; })[0] || { key: k, name: k, hint: "@handle" };
       return '<div class="plat-row">' +
+        (p.logo ? logo(p.logo, p.name, 18) : "") +
         '<span class="nm">' + esc(p.name) + "</span>" +
         '<input class="field" data-h="' + esc(p.key) + '" value="' + esc(S.handles[p.key] || "") + '" placeholder="' + esc(p.hint) + '" />' +
         '<button class="x" data-drop="' + esc(p.key) + '" aria-label="Remove ' + esc(p.name) + '">' + icon(ICONS.x) + "</button>" +
@@ -365,7 +384,8 @@
     return '<div class="stack" id="' + id + '">' + Object.keys(groups).map(function (g) {
       return '<div><div style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:6px">' + esc(g) + "</div>" +
         '<div class="row">' + groups[g].map(function (p) {
-          return '<button type="button" class="pill' + (value === p.key ? " on" : "") + '" data-pay="' + esc(p.key) + '">' + esc(p.label) + "</button>";
+          return '<button type="button" class="pill pill-logo' + (value === p.key ? " on" : "") + '" data-pay="' + esc(p.key) + '">' +
+            (p.logo ? logo(p.logo, p.label, 16) : "") + esc(p.label) + "</button>";
         }).join("") + "</div></div>";
     }).join("") + "</div>";
   }
@@ -426,9 +446,10 @@
         '<div class="eyebrow">' + icon(ICONS.log) + " Log a video</div>" +
         '<p>Tick the accounts it went live on. The same video on all three is <b>one day</b>, not three.</p>' +
         '<div class="row" style="margin:10px 0">' + mine.map(function (k) {
-          var p = M.PLATFORMS.filter(function (x) { return x.key === k; })[0] || { key: k, name: k };
+          var p = M.PLATFORMS.filter(function (x) { return x.key === k; })[0] || { key: k, name: k, logo: "" };
           var on = S.log.platforms.indexOf(k) >= 0;
-          return '<button type="button" class="pill' + (on ? " good" : "") + '" data-lp="' + esc(k) + '">' + (on ? "✓ " : "") + esc(p.name) + "</button>";
+          return '<button type="button" class="pill pill-logo' + (on ? " good" : "") + '" data-lp="' + esc(k) + '">' +
+            (p.logo ? logo(p.logo, p.name, 15) : "") + (on ? "✓ " : "") + esc(p.name) + "</button>";
         }).join("") + "</div>" +
         '<div class="row">' +
           '<input class="field" style="flex:1;min-width:220px" data-l="link" value="' + esc(S.log.link) + '" placeholder="Link to the video (optional)" />' +

@@ -138,6 +138,12 @@ button { font: inherit; color: inherit; }
 .rail-item[aria-current="true"]::before { height: 20px; }
 .rail-item svg { flex: none; width: 16px; height: 16px; }
 
+/* An <svg> with only a viewBox has no intrinsic size and will happily grow to
+   fill its parent. Every inline icon here is sized in the markup as well; this
+   is the guarantee that a missed one can never blow a card open again. */
+svg.ico { flex: none; width: 14px; height: 14px; }
+img.logo { flex: none; width: 18px; height: 18px; object-fit: contain; border-radius: 4px; }
+
 .rail-item .tag {
   margin-left: auto;
   font-size: 10px;
@@ -181,18 +187,18 @@ button { font: inherit; color: inherit; }
 .topbar .sub { font-size: 11.5px; color: var(--faint); }
 .topbar .spacer { margin-left: auto; }
 
-.content { padding: 20px 22px 96px; width: 100%; }
+.content { padding: 16px 20px 96px; width: 100%; }
 
-.grid { display: grid; gap: 14px; }
-.g2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-.g3 { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
-.g4 { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.grid { display: grid; gap: 11px; }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.g4 { grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); }
 
 .card {
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 14px;
   background: var(--panel);
-  padding: 18px;
+  padding: 14px 15px;
 }
 
 .card.accent {
@@ -204,21 +210,21 @@ button { font: inherit; color: inherit; }
 .card.warn { border-color: rgba(252, 211, 77, 0.35); background: rgba(252, 211, 77, 0.06); }
 .card.bad  { border-color: rgba(255, 95, 109, 0.35); background: rgba(255, 95, 109, 0.06); }
 
-.card h2 { margin: 0 0 8px; font-size: 16px; font-weight: 700; }
-.card h3 { margin: 0 0 6px; font-size: 13.5px; font-weight: 700; }
-.card p  { margin: 0 0 10px; font-size: 13px; line-height: 1.65; color: var(--muted); }
+.card h2 { margin: 0 0 6px; font-size: 14.5px; font-weight: 700; letter-spacing: -0.01em; }
+.card h3 { margin: 0 0 5px; font-size: 13px; font-weight: 700; }
+.card p  { margin: 0 0 8px; font-size: 12.5px; line-height: 1.6; color: var(--muted); }
 .card p:last-child { margin-bottom: 0; }
 
 .eyebrow {
-  display: flex; align-items: center; gap: 7px;
-  font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
-  color: var(--faint); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--faint); margin-bottom: 8px;
 }
 
-.stat { border: 1px solid var(--border); border-radius: 14px; background: rgba(0,0,0,0.22); padding: 14px; }
+.stat { border: 1px solid var(--border); border-radius: 12px; background: rgba(0,0,0,0.22); padding: 11px 12px; }
 .stat .k { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint); }
-.stat .v { font-size: 24px; font-weight: 700; margin-top: 6px; line-height: 1; font-variant-numeric: tabular-nums; }
-.stat .s { font-size: 11.5px; color: var(--faint); margin-top: 6px; }
+.stat .v { font-size: 19px; font-weight: 700; margin-top: 5px; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.stat .s { font-size: 11px; color: var(--faint); margin-top: 5px; line-height: 1.45; }
 
 b, strong { color: var(--text); font-weight: 600; }
 .hi { color: var(--accent); }
@@ -266,7 +272,7 @@ b, strong { color: var(--text); font-weight: 600; }
 label.lbl { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
 
 .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.stack { display: grid; gap: 12px; }
+.stack { display: grid; gap: 11px; }
 
 .check { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; line-height: 1.6; color: var(--muted); cursor: pointer; }
 .check input { width: 16px; height: 16px; margin-top: 2px; flex: none; accent-color: var(--accent); }
@@ -276,7 +282,12 @@ label.lbl { display: block; font-size: 10.5px; font-weight: 700; letter-spacing:
   border: 1px solid var(--border); border-radius: 999px;
   padding: 4px 10px; font-size: 11.5px; font-weight: 600; color: var(--muted);
   background: rgba(0,0,0,0.25);
+  cursor: pointer;
 }
+/* A mark plus a word reads faster than either alone, and it is how people
+   recognise a payment method — by the badge, not by the spelling. */
+.pill-logo { padding: 5px 12px 5px 6px; font-size: 12px; }
+.pill-logo img.logo { width: 16px; height: 16px; }
 .pill.on { border-color: var(--line-accent); background: rgba(0,210,255,0.12); color: var(--accent); }
 .pill.good { border-color: rgba(36,217,112,0.4); background: rgba(36,217,112,0.12); color: var(--success); }
 .pill.warn { border-color: rgba(252,211,77,0.4); background: rgba(252,211,77,0.12); color: var(--warning); }
@@ -298,7 +309,7 @@ table.t td { padding: 9px 0; font-size: 13px; border-top: 1px solid rgba(255,255
 
 /* ── the 30-day calendar ─────────────────────────────────────────────────── */
 
-.cal { display: grid; grid-template-columns: repeat(auto-fit, minmax(44px, 1fr)); gap: 6px; }
+.cal { display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 5px; }
 .cal button {
   aspect-ratio: 1;
   border: 1px solid var(--border);
