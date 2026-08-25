@@ -94,6 +94,9 @@
     running: false,
     stats: null,
     guideMsg: null,
+    // The trades live here, not only in the DOM: a re-render used to wipe the
+    // list at exactly the moment the run ended, which is the moment it matters.
+    trades: [],
     connection: "Idle",
     target: "--",
     lastContract: "--",
@@ -153,23 +156,19 @@
       }
     },
     addHistoryEntry: function (e) {
+      S.trades.unshift(e);
+      if (S.trades.length > 60) S.trades.pop();
+
       var list = document.getElementById("historyList");
       if (!list) return;
       var row = document.createElement("div");
       row.className = "history-item history-item--enter " + (e.win ? "win" : "loss");
-      row.innerHTML =
-        '<div class="history-meta">' +
-          "<span><strong>" + esc(e.market) + "</strong> · digit " + esc(String(e.digit)) + "</span>" +
-          "<span>Stake $" + money(e.stake) + " · " +
-            new Date(e.timestamp).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", second: "2-digit" }) +
-          "</span>" +
-        "</div>" +
-        '<span class="history-profit ' + (e.win ? "win" : "loss") + '">' +
-          (e.profit >= 0 ? "+" : "-") + "$" + money(Math.abs(e.profit)) + "</span>";
+      row.innerHTML = tradeRow(e);
       list.insertBefore(row, list.firstChild);
       while (list.children.length > 60) list.removeChild(list.lastChild);
     },
     resetHistory: function () {
+      S.trades = [];
       var list = document.getElementById("historyList");
       if (list) list.innerHTML = "";
     },
@@ -189,8 +188,6 @@
       '<div class="section-heading">' +
         '<div class="section-heading-text">' +
           "<h2>Smart Recovery Differ</h2>" +
-          "<p>Starts with digit differ trades on random numbers. On loss, it analyses every volatility market to " +
-          "find the best one for digit over 4 or under 5, and runs recovery trades until it wins.</p>" +
         "</div>" +
         '<div class="deriv-balance-wrap">' +
           '<div class="deriv-balance-display">' +
@@ -212,13 +209,6 @@
         '<button type="button" data-act="tipdone" aria-label="Dismiss">Got it</button></div>') +
 
       /* The bot panel, exactly as the dashboard draws it. */
-      '<div class="bot-panel-header">' +
-        "<div>" +
-          '<div style="font-size:16px;font-weight:700;">Configuration and live performance</div>' +
-          '<div style="font-size:13px;color:var(--muted);">Runs smart recovery digit differ. Starts with DIGITDIFF, then uses DIGITOVER/DIGITUNDER recovery with martingale.</div>' +
-        "</div>" +
-      "</div>" +
-
       '<div class="bot-panel-grid">' +
         '<div class="bot-column">' +
           '<div class="bot-config">' +
@@ -299,11 +289,27 @@
         '<div class="bot-column bot-history-column">' +
           '<div class="history-card">' +
             '<h4 id="recentTrades">Recent Trades</h4>' +
-            '<div class="history-list" id="historyList"></div>' +
+            '<div class="history-list" id="historyList">' +
+              S.trades.map(function (e) {
+                return '<div class="history-item ' + (e.win ? "win" : "loss") + '">' + tradeRow(e) + "</div>";
+              }).join("") +
+            "</div>" +
           "</div>" +
         "</div>" +
       "</div>" +
     "</div>";
+  }
+
+  /** One trade, in the dashboard's own history-item shape. */
+  function tradeRow(e) {
+    return '<div class="history-meta">' +
+        "<span><strong>" + esc(e.market) + "</strong> · digit " + esc(String(e.digit)) + "</span>" +
+        "<span>Stake $" + money(e.stake) + " · " +
+          new Date(e.timestamp).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", second: "2-digit" }) +
+        "</span>" +
+      "</div>" +
+      '<span class="history-profit ' + (e.win ? "win" : "loss") + '">' +
+        (e.profit >= 0 ? "+" : "-") + "$" + money(Math.abs(e.profit)) + "</span>";
   }
 
   function statRow(label, id, value) {

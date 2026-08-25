@@ -253,7 +253,7 @@
           " grace days, counted the honest way. Miss one and the finish moves out a day. You do not lose the month.</p>" +
         "</section>" +
 
-        '<a class="make-post" href="creators-bot.html">' +
+        '<a class="make-post" href="creators-make.html">' +
           '<span class="make-post__icon">' +
             icon('<path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/>', 19) +
           "</span>" +
@@ -350,7 +350,7 @@
 
       // The one thing that turns a dashboard into a day's work: making the
       // video. It goes above the numbers, because the numbers follow from it.
-      '<a class="make-post" href="creators-bot.html">' +
+      '<a class="make-post" href="creators-make.html">' +
         '<span class="make-post__icon">' +
           icon('<path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/>', 19) +
         "</span>" +

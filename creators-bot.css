@@ -873,3 +873,71 @@ body {
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
 }
 .toast.bad { border-color: rgba(255, 95, 109, 0.5); background: #2a1720; }
+
+/* ── create a post: the three steps that lead into the bot ───────────────── */
+
+.make-intro { margin-bottom: 18px; }
+.make-intro h2 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.015em; }
+.make-intro p { margin: 7px 0 0; max-width: 62ch; font-size: 14px; line-height: 1.65; color: var(--muted); }
+
+.make-steps {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  width: 100%;
+}
+
+.make-step {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  background: rgba(15, 17, 23, 0.6);
+}
+
+/* Step one is where the work starts, so it is the one that looks live. */
+.make-step.is-first {
+  border-color: rgba(0, 210, 255, 0.28);
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgba(0, 210, 255, 0.09), transparent 60%),
+    rgba(15, 17, 23, 0.6);
+}
+
+.make-step-head { display: flex; align-items: center; gap: 11px; }
+.make-step-head h3 { margin: 0; font-size: 18px; font-weight: 700; }
+.make-step-n {
+  flex: none;
+  display: grid; place-items: center;
+  width: 30px; height: 30px;
+  border-radius: 10px;
+  background: rgba(0, 210, 255, 0.16);
+  color: var(--accent);
+  font-size: 15px; font-weight: 800;
+}
+
+.make-step p { margin: 0; font-size: 13.5px; line-height: 1.7; color: var(--muted); }
+.make-step p b { color: var(--text); }
+.make-sub { font-weight: 700; color: var(--text) !important; }
+
+.make-tips { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.75; color: var(--muted); }
+.make-tips li { margin-bottom: 6px; }
+.make-tips li:last-child { margin-bottom: 0; }
+.make-tips b { color: var(--text); }
+
+.make-tips.quotes { list-style: none; padding-left: 0; }
+.make-tips.quotes li {
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border-left: 2px solid rgba(0, 210, 255, 0.35);
+  border-radius: 0 9px 9px 0;
+  background: rgba(255, 255, 255, 0.03);
+  font-style: italic;
+}
+
+.make-go {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  margin-top: auto;
+  text-decoration: none;
+}
