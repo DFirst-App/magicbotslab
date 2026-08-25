@@ -368,10 +368,10 @@
 
       // The bonus, where a working creator will actually see it.
       '<section class="card"><div class="eyebrow">' + icon(ICONS.earnings) + " The " + money(M.VIEWS_BONUS) + " bonus</div>" +
-        "<p>On top of your monthly pay: if <b>half the videos you post in a month</b> reach <b>" +
-        M.VIEWS_TARGET.toLocaleString() + " views each</b>, we add <b>" + money(M.VIEWS_BONUS) + "</b>. " +
-        "Half of your posts getting there — not one of them going viral. " +
-        "<b>You are paid either way</b>; views only decide the bonus.</p></section>" +
+        '<p>On top of your monthly pay: if <b class="hi">half the videos you post in a month</b> reach ' +
+        '<b class="hi2">' + M.VIEWS_TARGET.toLocaleString() + ' views each</b>, we add <b class="ok">' +
+        money(M.VIEWS_BONUS) + "</b>. " +
+        '<b class="ok">You are paid either way</b>; views only decide the bonus.</p></section>' +
 
       '<section class="card">' +
         '<div class="eyebrow">' + icon(ICONS.rules) + " What to say about Magic Bots Lab</div>" +

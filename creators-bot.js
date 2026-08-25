@@ -30,7 +30,6 @@
 
   /** The same key the simulator writes, so a balance carries across both. */
   var BAL_KEY = "simBalance";
-  var TIP_KEY = "mbl_bal_tip_seen";
 
   /** Shuffle picks inside this range. Typing is not limited by it. */
   var SHUFFLE_MIN = 1000;
@@ -91,6 +90,10 @@
     step: 0,               // 0 stake · 1 take profit · 2 start · 3 running or done
     stake: "",
     tp: "",
+    // The bot's own defaults, and the creator's to change — the dashboard lets
+    // them, so this does too.
+    sl: String(DEFAULTS.stopLoss),
+    mg: String(DEFAULTS.martingaleMultiplier),
     running: false,
     stats: null,
     guideMsg: null,
@@ -99,11 +102,8 @@
     trades: [],
     connection: "Idle",
     target: "--",
-    lastContract: "--",
-    tipSeen: false
+    lastContract: "--"
   };
-
-  try { S.tipSeen = localStorage.getItem(TIP_KEY) === "1"; } catch (e) {}
 
   var bot = null;
 
@@ -199,14 +199,12 @@
             '<button type="button" class="deriv-balance-apply' + (edited ? "" : " is-hidden") + '" data-act="apply"' +
               (edited ? "" : " hidden") + ">Apply</button>" +
           "</div>" +
+          '<button type="button" class="bal-shuffle" data-act="shuffle" aria-label="Shuffle the balance" ' +
+            'title="A figure that does not look staged on camera"' + (S.running ? " disabled" : "") + ">" +
+            icon('<path d="m18 14 4 4-4 4"/><path d="M2 18h1.97a4 4 0 0 0 3.3-1.7l5.46-8.6A4 4 0 0 1 16.03 6H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.97a4 4 0 0 1 3.6 2.2"/><path d="M22 18h-6.04a4 4 0 0 1-3.3-1.8l-.36-.45"/>', 15) +
+          "</button>" +
         "</div>" +
       "</div>" +
-
-      (S.tipSeen ? "" :
-        '<div class="bal-tip">' + icon('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>', 15) +
-        "<span>Type any balance you like and tap <b>Apply</b> — or " +
-        '<button type="button" data-act="shuffle">shuffle one</button> that does not look staged on camera.</span>' +
-        '<button type="button" data-act="tipdone" aria-label="Dismiss">Got it</button></div>') +
 
       /* The bot panel, exactly as the dashboard draws it. */
       '<div class="bot-panel-grid">' +
@@ -237,19 +235,21 @@
 
               '<div class="input-group">' +
                 '<label for="stopLossInput">Stop Loss (USD)</label>' +
-                '<input type="number" id="stopLossInput" value="' + DEFAULTS.stopLoss + '" disabled />' +
+                '<input type="number" id="stopLossInput" min="0" step="1" value="' + esc(S.sl) + '"' +
+                  (S.running ? " disabled" : "") + " />" +
               "</div>" +
 
               '<div class="input-group">' +
                 '<label for="martingaleInput">Martingale Multiplier</label>' +
-                '<input type="number" id="martingaleInput" value="' + DEFAULTS.martingaleMultiplier + '" disabled />' +
+                '<input type="number" id="martingaleInput" min="1" step="0.1" value="' + esc(S.mg) + '"' +
+                  (S.running ? " disabled" : "") + " />" +
               "</div>" +
             "</div>" +
 
-            '<div class="locked-note">' + icon('<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>', 13) +
-              "<span>Stop loss and martingale are the bot's own defaults and are left alone here. " +
-              "<b>On simulation the stop loss will not fire</b>, so a run ends on your take profit — the ending you " +
-              "want on camera.</span></div>" +
+            '<div class="locked-note">' + icon('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>', 13) +
+              "<span>Stop loss and martingale are already at the bot's own defaults. " +
+              "<b>Leave them and the run ends on your take profit</b> — the ending you want on camera. " +
+              "Set the stop loss to <b>0</b> to switch it off entirely.</span></div>" +
 
             (S.guideMsg ? '<div class="guide-msg">' + icon('<path d="M20 6 9 17l-5-5"/>', 14) + "<span>" + esc(S.guideMsg) + "</span></div>" : "") +
 
@@ -348,15 +348,17 @@
     S.guideMsg = null;
     botUI.resetHistory();
 
+    // Both are the creator's now, so both are honoured. A stop loss of 0 is how
+    // the engine is told there is no stop, which is why the note says so.
+    var sl = parseFloat(S.sl);
+    var mg = parseFloat(S.mg);
+
     bot.start({
       initialStake: stake,
       minStake: DEFAULTS.minStake,
       takeProfit: tp,
-      // The field shows the real default so the panel matches the dashboard.
-      // Zero is what reaches the engine, and the engine only checks a stop loss
-      // when it is above zero — so on simulation it cannot fire.
-      stopLoss: 0,
-      martingaleMultiplier: DEFAULTS.martingaleMultiplier
+      stopLoss: isFinite(sl) && sl > 0 ? sl : 0,
+      martingaleMultiplier: isFinite(mg) && mg >= 1 ? mg : DEFAULTS.martingaleMultiplier
     });
 
     // On a phone the trades are far below the fold, so go to them.
@@ -403,13 +405,6 @@
 
     if (act === "shuffle") { applyBalance(shuffled()); return; }
 
-    if (act === "tipdone") {
-      S.tipSeen = true;
-      try { localStorage.setItem(TIP_KEY, "1"); } catch (err) {}
-      render();
-      return;
-    }
-
     if (act === "useStake") {
       var v = String(suggestedStake(S.balance));
       var si = document.getElementById("stakeInput");
@@ -446,7 +441,10 @@
     }
 
     if (el.id === "stakeInput") { onType("stake", el.value); return; }
-    if (el.id === "takeProfitInput") { onType("tp", el.value); }
+    if (el.id === "takeProfitInput") { onType("tp", el.value); return; }
+    // These two carry no guiding — they already hold the right answer.
+    if (el.id === "stopLossInput") { S.sl = el.value; return; }
+    if (el.id === "martingaleInput") { S.mg = el.value; }
   });
 
   document.addEventListener("keydown", function (e) {

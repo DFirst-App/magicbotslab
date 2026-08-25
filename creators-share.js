@@ -47,12 +47,20 @@ window.MBLShare = (function () {
   var shuffle = (window.MBL_INVITES || []).map(function (v) { return v.key; })
     .sort(function () { return Math.random() - 0.5; });
 
-  /** Starred first, in the order they were starred; then this visit's order. */
+  /**
+   * Starred first, in the order they were starred. With nothing starred the
+   * default one leads — it is the one people actually send — and the rest
+   * follow in this visit's order, so a group chat never fills up with the
+   * identical paragraph.
+   */
   function ordered() {
     var faves = readFaves();
+    var def = window.MBL_INVITE_DEFAULT;
     var rank = function (k) {
       var i = faves.indexOf(k);
-      return i >= 0 ? -1000 + i : shuffle.indexOf(k);
+      if (i >= 0) return -1000 + i;
+      if (!faves.length && k === def) return -500;
+      return shuffle.indexOf(k);
     };
     return (window.MBL_INVITES || []).slice().sort(function (a, b) { return rank(a.key) - rank(b.key); });
   }

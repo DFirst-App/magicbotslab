@@ -841,23 +841,26 @@ body {
 .section-heading-text h2 { margin: 0; }
 .section-heading-text p { margin: 4px 0 0; }
 
-/* The tip that points at the balance, until it has been read once. */
-.bal-tip {
-  display: flex; align-items: center; gap: 8px;
-  margin: 10px 0 0;
-  padding: 9px 12px;
-  border: 1px solid rgba(0, 210, 255, 0.28);
-  border-radius: 11px;
-  background: rgba(0, 210, 255, 0.06);
-  font-size: 12px; line-height: 1.5; color: var(--muted);
+/* Shuffle sits beside the field it acts on rather than in a banner. */
+.deriv-balance-wrap { display: inline-flex; align-items: center; gap: 8px; }
+
+.bal-shuffle {
+  flex: none;
+  display: grid; place-items: center;
+  width: 34px; height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
 }
-.bal-tip b { color: var(--text); }
-.bal-tip button {
-  margin-left: auto;
-  border: 0; background: transparent;
-  color: var(--accent); font-weight: 700; font-size: 12px;
-  cursor: pointer; font-family: inherit;
-}
+.bal-shuffle:hover { background: rgba(0, 210, 255, 0.1); border-color: rgba(0, 210, 255, 0.4); color: var(--accent); }
+.bal-shuffle:disabled { opacity: .45; cursor: not-allowed; }
+
+/* Only the back arrow is left in the header, so it needs no room for words. */
+.back-btn.icon-only { width: 38px; padding: 0; justify-content: center; }
+.back-btn.icon-only span { display: none; }
 
 /* ── toasts ──────────────────────────────────────────────────────────────── */
 
