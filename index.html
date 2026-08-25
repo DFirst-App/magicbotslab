@@ -478,26 +478,50 @@
     }
     /* The way in to the Creator Program, for readers who came to earn rather
        than to trade. Wraps instead of overflowing on a narrow phone. */
+    /* A fact about this place, sitting above the headline — not a control.
+       It was a link, which made it look like the way in when the way in is the
+       Connect button below it. The figure is the half that carries it, so it
+       keeps its own line rather than being truncated on a narrow phone. */
     .creators-badge {
       display: inline-flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 4px 8px;
+      gap: 6px 10px;
       max-width: 100%;
-      margin-bottom: 14px;
-      padding: 6px 14px;
+      margin-bottom: 16px;
+      padding: 7px 14px;
       border-radius: 999px;
-      border: 1px solid rgba(255, 154, 60, 0.45);
-      background: rgba(255, 122, 24, 0.12);
-      color: #ff9a3c;
+      border: 1px solid rgba(255, 154, 60, 0.4);
+      background:
+        radial-gradient(120% 160% at 0% 50%, rgba(255, 154, 60, 0.18), transparent 65%),
+        rgba(255, 122, 24, 0.08);
       font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-decoration: none;
-      transition: background .15s;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      line-height: 1.35;
+      color: #ffd9b8;
     }
-    .creators-badge:hover { background: rgba(255, 122, 24, 0.2); }
-    .creators-badge__amt { color: #24d970; white-space: nowrap; }
+    .creators-badge__dot {
+      flex: none;
+      width: 7px; height: 7px;
+      border-radius: 999px;
+      background: #24d970;
+      box-shadow: 0 0 0 3px rgba(36, 217, 112, 0.18);
+    }
+    .creators-badge__t { min-width: 0; }
+    .creators-badge__amt {
+      color: #24d970;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 480px) {
+      .creators-badge {
+        border-radius: 14px;
+        padding: 9px 13px;
+        font-size: 11.5px;
+      }
+    }
   </style>
   <link rel="stylesheet" href="guide.css" />
 </head>
@@ -528,10 +552,11 @@
     <section class="hero-copy">
       <!-- Plenty of people arrive here to earn rather than to trade, and nothing
            on this page told them they could. -->
-      <a class="creators-badge" href="creators.html">
-        <span>Get paid to post about Magic Bots Lab</span>
-        <span class="creators-badge__amt">$100 a month</span>
-      </a>
+      <span class="creators-badge">
+        <span class="creators-badge__dot" aria-hidden="true"></span>
+        <span class="creators-badge__t">Get paid to post about Magic Bots Lab</span>
+        <span class="creators-badge__amt">up to $1,250 a month</span>
+      </span>
       <h1>Automated Trading Bots</h1>
       <p>Connect your Deriv account to run Magic Bots Lab automations, access MT5 bot downloads, and manage fully automated trading systems from one control dashboard.</p>
       <div class="status" id="statusText"></div>

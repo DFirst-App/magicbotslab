@@ -259,53 +259,73 @@
     }
     .start-trading-btn .badges { display: inline-flex; gap: 5px; }
 
-    /* Earning by posting is a different kind of thing from trading, so it gets
-       its own colour rather than a second blue button nobody reads.
-
-       Two lines: what it is, and what it pays. The amount is the reason anyone
-       clicks, so it is the part that never wraps or shrinks away. */
+    /* Earning by posting is a different kind of thing from trading, so it keeps
+       its own colour rather than becoming a second blue button nobody reads.
+       Two lines and an arrow: what it is, what it pays, and that it goes
+       somewhere. The figure is the reason anyone clicks, so it never wraps. */
     .creators-btn {
-      flex: 1 1 auto;
+      flex: 0 0 auto;
+      width: 100%;
       display: flex;
       align-items: center;
-      gap: 10px;
-      min-height: 46px;
-      padding: 8px 14px;
-      border-radius: 12px;
-      color: #1b0f04;
-      background: linear-gradient(135deg, #ffb15c, #ff7a18);
-      border: 1px solid rgba(255, 154, 60, 0.55);
-      box-shadow: 0 8px 20px rgba(120, 55, 10, 0.3);
+      gap: 12px;
+      min-height: 54px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      color: #ffd9b8;
+      background:
+        radial-gradient(120% 140% at 0% 0%, rgba(255, 154, 60, 0.22), transparent 60%),
+        rgba(255, 122, 24, 0.09);
+      border: 1px solid rgba(255, 154, 60, 0.38);
       text-decoration: none;
-      transition: transform .12s ease, box-shadow .12s ease;
+      transition: transform .14s ease, border-color .14s ease, background .14s ease;
     }
-    .creators-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 26px rgba(120, 55, 10, 0.4); }
+    .creators-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(255, 154, 60, 0.7);
+      background:
+        radial-gradient(120% 140% at 0% 0%, rgba(255, 154, 60, 0.3), transparent 60%),
+        rgba(255, 122, 24, 0.14);
+    }
     .creators-btn__icon {
       flex: none;
       display: grid;
       place-items: center;
-      width: 30px; height: 30px;
-      border-radius: 9px;
-      background: rgba(0, 0, 0, 0.16);
+      width: 36px; height: 36px;
+      border-radius: 11px;
+      background: rgba(255, 122, 24, 0.2);
+      color: #ff9a3c;
     }
-    .creators-btn__text { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+    .creators-btn__text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
     .creators-btn__title {
-      font-size: 13px; font-weight: 800; letter-spacing: 0.01em;
+      font-size: 14px; font-weight: 800; letter-spacing: -0.01em; color: #fff;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .creators-btn__sub { font-size: 10.5px; font-weight: 600; opacity: 0.72; }
-    .creators-btn__amt {
+    .creators-btn__sub {
+      font-size: 11.5px; font-weight: 500; line-height: 1.45;
+      color: rgba(255, 217, 184, 0.8);
+    }
+    .creators-btn__sub b { color: #24d970; font-weight: 800; white-space: nowrap; }
+    .creators-btn__go {
       flex: none;
       margin-left: auto;
-      padding: 4px 9px;
-      border-radius: 8px;
-      background: rgba(0, 0, 0, 0.18);
-      font-size: 11.5px; font-weight: 800;
-      white-space: nowrap;
+      display: grid; place-items: center;
+      width: 30px; height: 30px;
+      border-radius: 9px;
+      background: rgba(255, 122, 24, 0.16);
+      color: #ff9a3c;
     }
-    @media (max-width: 420px) {
-      /* On the narrowest phones the subtitle is the first thing to go. */
-      .creators-btn__sub { display: none; }
+
+    @media (max-width: 560px) {
+      /* The descriptive half goes first; the figure is the reason to tap. */
+      .creators-btn__long { display: none; }
+      .creators-btn__sub { font-size: 12px; }
+    }
+
+    @media (max-width: 380px) {
+      .creators-btn { gap: 10px; padding: 9px 11px; }
+      .creators-btn__icon { width: 32px; height: 32px; }
+      .creators-btn__go { display: none; }
     }
     .chip {
       font-size: 10px;
@@ -572,13 +592,15 @@
           </button>
           <a class="creators-btn" href="creators.html">
             <span class="creators-btn__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
             </span>
             <span class="creators-btn__text">
               <span class="creators-btn__title">Get paid to post</span>
-              <span class="creators-btn__sub">Short videos about Magic Bots Lab</span>
+              <span class="creators-btn__sub"><span class="creators-btn__long">Short videos about Magic Bots Lab &middot; </span>up to <b>$1,250</b> a month</span>
             </span>
-            <span class="creators-btn__amt">$100/mo</span>
+            <span class="creators-btn__go" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+            </span>
           </a>
         </div>
         <div class="balance-hint">If your full balance is not visible, transfer funds to your Deriv options account.</div>
