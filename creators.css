@@ -187,6 +187,45 @@ img.logo { flex: none; width: 18px; height: 18px; object-fit: contain; border-ra
 .topbar .sub { font-size: 11.5px; color: var(--faint); }
 .topbar .spacer { margin-left: auto; }
 
+/* ── the topbar's way out ──────────────────────────────────────────────────
+   "Back to site" was .btn.ghost: a transparent background, white text and a
+   border at 8% white. On a dark panel that reads as a stray word rather than a
+   control, which is what it was mistaken for.
+
+   And there was no route back to the dashboard at all from here - "Start
+   trading" goes to the bots and "Back to site" to the landing page - so the
+   Creator Program was a place you could enter and not leave. That is the
+   Dashboard link; it stays visible at every width, because a missing way back
+   is not a small-screen problem. */
+.topbar-back {
+  display: inline-flex; align-items: center; gap: 7px; flex: none;
+  padding: 7px 12px;
+  border-radius: 10px;
+  font-size: 12.5px; font-weight: 600;
+  text-decoration: none;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line-accent);
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+.topbar-back:hover { background: rgba(0, 210, 255, 0.13); border-color: rgba(0, 210, 255, 0.45); color: var(--accent); }
+.topbar-back svg { flex: none; color: var(--accent); }
+
+/* The second one is a lesser errand, so it is quieter - but still a control. */
+.topbar-back.is-quiet {
+  color: var(--muted);
+  background: transparent;
+  border-color: var(--border);
+}
+.topbar-back.is-quiet:hover { color: var(--text); background: rgba(255, 255, 255, 0.06); border-color: var(--border-strong, rgba(255,255,255,0.16)); }
+
+/* On a narrow screen the two of them will not both fit beside the title, and
+   getting back to the dashboard is the one that matters. */
+@media (max-width: 560px) {
+  .topbar-back.is-quiet { display: none; }
+  .topbar-back { padding: 7px 10px; }
+}
+
 .content { padding: 16px 20px 96px; width: 100%; }
 
 .grid { display: grid; gap: 11px; }
