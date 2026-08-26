@@ -99,3 +99,96 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 .install-later:hover { background: rgba(255, 255, 255, 0.05); color: var(--text, #eef2f8); }
+
+/* ── the drop-down install card ───────────────────────────────────────────
+ * Pinned to the top of the viewport and centred. It animates transform and
+ * opacity only — the two properties a browser can move without touching
+ * layout, which is what keeps it smooth on a cheap phone — and the motion is
+ * dropped entirely for anybody who has asked their system for reduced motion.
+ */
+
+.install-dock {
+  position: fixed; inset: 0 0 auto 0; z-index: 90;
+  display: flex; justify-content: center;
+  padding: 12px;
+  pointer-events: none;               /* the page underneath stays usable */
+}
+@media (min-width: 640px) { .install-dock { padding: 16px; } }
+
+.install-card2 {
+  pointer-events: auto;
+  width: 100%; max-width: 560px; box-sizing: border-box;
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  color: var(--text, #eef2f8);
+  border: 1px solid rgba(255, 154, 60, 0.28);
+  background:
+    radial-gradient(120% 160% at 0% 0%, rgba(255, 154, 60, 0.18), transparent 62%),
+    rgba(10, 14, 22, 0.94);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+
+  transform: translateY(-130%);
+  opacity: 0;
+  /* A touch of overshoot arriving so it settles rather than stopping dead;
+     a plain ease leaving, because going away should not perform. */
+  transition:
+    transform 460ms cubic-bezier(0.16, 1.02, 0.30, 1.06),
+    opacity 260ms ease;
+  will-change: transform, opacity;
+}
+.install-card2[data-shown="true"] { transform: translateY(0); opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .install-card2 { transition: opacity 160ms linear; transform: none; }
+  .install-card2[data-shown="false"] { opacity: 0; }
+}
+
+.install-card2__icon {
+  flex: none; display: grid; place-items: center;
+  width: 40px; height: 40px; border-radius: 12px;
+  color: var(--accent, #ff9a3c);
+  background: rgba(255, 154, 60, 0.14);
+}
+
+.install-card2__say { flex: 1; min-width: 0; }
+.install-card2__say b {
+  display: block; font-size: 14px; font-weight: 800; line-height: 1.3;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.install-card2__say span {
+  display: block; margin-top: 2px;
+  font-size: 12px; line-height: 1.4;
+  color: var(--muted, #9aa8bd);
+}
+
+.install-card2__go {
+  all: unset; cursor: pointer; flex: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 14px; border-radius: 12px;
+  font-size: 13px; font-weight: 800;
+  color: #1a0d02;
+  background: linear-gradient(135deg, #ff9a3c, #ff7a18);
+  transition: filter .15s ease, transform .06s ease;
+}
+.install-card2__go i { font-style: normal; }
+.install-card2__go:hover { filter: brightness(1.08); }
+.install-card2__go:active { transform: scale(.98); }
+
+.install-card2__x {
+  all: unset; cursor: pointer; flex: none;
+  display: grid; place-items: center;
+  width: 30px; height: 30px; border-radius: 9px;
+  color: var(--faint, #6b7b91);
+}
+.install-card2__x:hover { background: rgba(255, 255, 255, 0.09); color: var(--text, #eef2f8); }
+
+/* Only a genuinely tiny screen loses the word - 375px is an iPhone SE and a
+   good share of Android, and a bare glyph is not a button anybody presses. */
+@media (max-width: 340px) {
+  .install-card2 { gap: 9px; padding: 10px; }
+  .install-card2__go i { display: none; }
+  .install-card2__go { padding: 9px 11px; }
+}

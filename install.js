@@ -53,6 +53,78 @@
   var deferred = null;
   var btn = null;
 
+
+  /* ── the drop-down card ──────────────────────────────────────────────────
+   * The same offer as the button, in the place somebody's eye already is when
+   * a page finishes loading. It arrives a beat late on purpose: sliding in
+   * during the first paint reads as a page glitch rather than an offer, and a
+   * card that lands while somebody is still deciding where to look gets
+   * dismissed reflexively.
+   *
+   * Only on the two pages that are the front doors - the landing page and the
+   * dashboard. Everywhere else the bottom-left button is enough; a banner
+   * dropping over the bot panel somebody is recording would be worse than no
+   * banner at all.
+   */
+
+  var ARRIVE_AFTER_MS = 1400;
+  var card = null;
+
+  function wantsCard() {
+    var path = location.pathname.replace(/\/+$/, "");
+    return path === "" || path === "/index.html" || path === "/dashboard.html";
+  }
+
+  function makeCard() {
+    if (card || !wantsCard()) return;
+
+    var host = document.createElement("div");
+    host.className = "install-dock";
+    host.innerHTML =
+      '<div class="install-card2" role="dialog" aria-label="Install Magic Bots Lab" data-shown="false">' +
+        '<span class="install-card2__icon">' +
+          '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>' +
+        "</span>" +
+        '<div class="install-card2__say">' +
+          "<b>Install Magic Bots Lab</b>" +
+          "<span>" + (isApple()
+            ? "Add it to your home screen &mdash; two taps, nothing to download."
+            : "Full screen, one tap from your home screen. Free, no download.") + "</span>" +
+        "</div>" +
+        '<button type="button" class="install-card2__go">' +
+          '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>' +
+          "<i>Install</i></button>" +
+        '<button type="button" class="install-card2__x" aria-label="Not now">' +
+          '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>' +
+      "</div>";
+
+    document.body.appendChild(host);
+    card = host;
+
+    var inner = host.querySelector(".install-card2");
+    inner.querySelector(".install-card2__go").onclick = function () {
+      if (isApple()) { howTo(); return; }
+      onClick();
+      hideCard();
+    };
+    inner.querySelector(".install-card2__x").onclick = function () { snooze(); hideCard(); remove(); };
+
+    // It sits in the DOM off-screen for the delay, so the browser has long
+    // since painted that position by the time the class flips - which is what
+    // makes it transition instead of jumping. No requestAnimationFrame: that
+    // does not run in a background tab.
+    setTimeout(function () { inner.setAttribute("data-shown", "true"); }, ARRIVE_AFTER_MS);
+  }
+
+  function hideCard() {
+    if (!card) return;
+    var inner = card.querySelector(".install-card2");
+    if (inner) inner.setAttribute("data-shown", "false");
+    var host = card;
+    card = null;
+    setTimeout(function () { if (host.parentNode) host.parentNode.removeChild(host); }, 400);
+  }
+
   function makeButton() {
     if (btn) return;
     btn = document.createElement("button");
@@ -108,14 +180,16 @@
     function close() { if (wrap.parentNode) wrap.parentNode.removeChild(wrap); }
     wrap.onclick = function (e) { if (e.target === wrap) close(); };
     wrap.querySelector(".install-x").onclick = close;
-    wrap.querySelector(".install-later").onclick = function () { snooze(); close(); remove(); };
+    wrap.querySelector(".install-later").onclick = function () { snooze(); close(); remove(); hideCard(); };
     document.body.appendChild(wrap);
   }
 
-  // iOS gets the button straight away - there is no event coming.
+  function offer() { makeButton(); makeCard(); }
+
+  // iOS gets both straight away - there is no event coming.
   if (isApple()) {
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", makeButton);
-    else makeButton();
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", offer);
+    else offer();
     return;
   }
 
@@ -124,8 +198,9 @@
     // choose the moment.
     e.preventDefault();
     deferred = e;
-    makeButton();
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", offer);
+    else offer();
   });
 
-  window.addEventListener("appinstalled", function () { deferred = null; remove(); });
+  window.addEventListener("appinstalled", function () { deferred = null; remove(); hideCard(); });
 })();
