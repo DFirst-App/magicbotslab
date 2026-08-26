@@ -31,10 +31,6 @@
   /** The same key the simulator writes, so a balance carries across both. */
   var BAL_KEY = "simBalance";
 
-  /** Shuffle picks inside this range. Typing is not limited by it. */
-  var SHUFFLE_MIN = 1000;
-  var SHUFFLE_MAX = 100000;
-
   /**
    * A balance that has run away stops being useful.
    *
@@ -82,12 +78,6 @@
     return isFinite(v) && v > 0 ? v : DEFAULTS.takeProfit * 10;   // 1,000 to open on
   }
   function writeBalance(v) { try { localStorage.setItem(BAL_KEY, String(v)); } catch (e) {} }
-
-  /** A believable, unrepeatable figure — nobody films the same balance twice. */
-  function shuffled() {
-    var whole = Math.floor(SHUFFLE_MIN + Math.random() * (SHUFFLE_MAX - SHUFFLE_MIN));
-    return Math.round((whole + Math.floor(Math.random() * 100) / 100) * 100) / 100;
-  }
 
   /**
    * Suggestions scaled to what they are trading with — $70 and $300 on $1,000.
@@ -229,10 +219,6 @@
             '<button type="button" class="deriv-balance-apply' + (edited ? "" : " is-hidden") + '" data-act="apply"' +
               (edited ? "" : " hidden") + ">Apply</button>" +
           "</div>" +
-          '<button type="button" class="bal-shuffle" data-act="shuffle" aria-label="Shuffle the balance" ' +
-            'title="A figure that does not look staged on camera"' + (S.running ? " disabled" : "") + ">" +
-            icon('<path d="m18 14 4 4-4 4"/><path d="M2 18h1.97a4 4 0 0 0 3.3-1.7l5.46-8.6A4 4 0 0 1 16.03 6H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.97a4 4 0 0 1 3.6 2.2"/><path d="M22 18h-6.04a4 4 0 0 1-3.3-1.8l-.36-.45"/>', 15) +
-          "</button>" +
         "</div>" +
       "</div>" +
 
@@ -440,7 +426,6 @@
 
     if (act === "apply") { applyBalance(document.getElementById("derivBalanceInput").value); return; }
 
-    if (act === "shuffle") { applyBalance(shuffled()); return; }
 
     if (act === "useStake") {
       var v = String(suggestedStake(S.balance));

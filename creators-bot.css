@@ -971,3 +971,37 @@ body {
   color: var(--muted);
 }
 .make-bonus b { color: #24d970; }
+
+/* ── the balance, chosen on the steps page before the bot opens ─────────────
+   Lives here rather than beside .bal-shuffle because creators-make.html loads
+   this stylesheet too, and the control it styles now sits in step 1. */
+.make-bal {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.22);
+}
+.make-bal-row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.make-bal-label { font-size: 12px; color: var(--muted); }
+.make-bal-value {
+  margin-left: auto; font-size: 15px; font-weight: 800; color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.make-bal-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.make-bal-btn {
+  display: inline-flex; align-items: center; gap: 7px; flex: none;
+  padding: 7px 12px; border-radius: 9px; cursor: pointer;
+  font-size: 12.5px; font-weight: 700;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  transition: background .15s, border-color .15s, color .15s;
+}
+.make-bal-btn:hover { background: rgba(0, 210, 255, 0.1); border-color: rgba(0, 210, 255, 0.4); color: var(--accent); }
+.make-bal-note { font-size: 11.5px; line-height: 1.5; color: var(--faint, #6b7b91); flex: 1 1 200px; min-width: 0; }
+
+@media (max-width: 480px) {
+  .make-bal-value { margin-left: 0; }
+  .make-bal-btn { width: 100%; justify-content: center; }
+}

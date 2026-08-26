@@ -45,6 +45,23 @@
           <li>Record in <b>portrait</b> for TikTok, Reels and Shorts. Landscape only if you are making a
             <b>long-form video</b> for YouTube.</li>
         </ul>
+        <!-- The balance is chosen HERE now, not inside the bot. Picking it
+             before opening means the creator starts recording a screen that is
+             already right, instead of setting up on camera and re-recording. -->
+        <div class="make-bal">
+          <div class="make-bal-row">
+            <span class="make-bal-label">Balance to trade with</span>
+            <span class="make-bal-value" id="makeBalValue">--</span>
+          </div>
+          <div class="make-bal-actions">
+            <button type="button" class="make-bal-btn" id="makeBalShuffle">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="m18 14 4 4-4 4"/><path d="M2 18h1.97a4 4 0 0 0 3.3-1.7l5.46-8.6A4 4 0 0 1 16.03 6H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.97a4 4 0 0 1 3.6 2.2"/><path d="M22 18h-6.04a4 4 0 0 1-3.3-1.8l-.36-.45"/></svg>
+              Randomise
+            </button>
+            <span class="make-bal-note">Or leave it — the bot opens on whatever you finished with last time.</span>
+          </div>
+        </div>
+
         <a class="primary-btn btn-liquid-glow make-go" href="creators-bot.html">
           Open
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
@@ -92,5 +109,43 @@
 
     </div>
   </main>
+
+  <script>
+    /**
+     * The balance, chosen before the bot is opened.
+     *
+     * Writes the same localStorage key the bot reads (simBalance), so there is
+     * one number and no handover to get wrong. Doing nothing is a valid choice:
+     * the bot opens on whatever the last run finished with.
+     *
+     * The range is deliberately wide and the pence deliberately random - nobody
+     * films the same balance twice, and a round number looks staged on camera.
+     */
+    (function () {
+      var KEY = "simBalance";
+      var MIN = 1000, MAX = 100000;
+
+      function read() {
+        var v = parseFloat(localStorage.getItem(KEY));
+        return isFinite(v) && v > 0 ? v : 1000;
+      }
+      function paint() {
+        var el = document.getElementById("makeBalValue");
+        if (el) el.textContent = read().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " USD";
+      }
+      function shuffled() {
+        var whole = Math.floor(MIN + Math.random() * (MAX - MIN));
+        return Math.round((whole + Math.floor(Math.random() * 100) / 100) * 100) / 100;
+      }
+
+      var btn = document.getElementById("makeBalShuffle");
+      if (btn) btn.addEventListener("click", function () {
+        try { localStorage.setItem(KEY, String(shuffled())); } catch (e) { /* private mode: this visit only */ }
+        paint();
+      });
+
+      paint();
+    })();
+  </script>
 </body>
 </html>
