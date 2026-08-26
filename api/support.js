@@ -13,7 +13,7 @@
  * not a claim to be more than that.
  */
 
-const { readBody, json, recordSupportInbound } = require("./_lib/db");
+const { readBody, json, recordSupportInbound, supportHistory } = require("./_lib/db");
 
 const API = "https://api.telegram.org";
 const COOLDOWN_MS = 20_000;
@@ -41,6 +41,54 @@ const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v || "").trim
 const str = (v, max) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const esc = (v) => v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
+
+/* Telegram's ceiling is 4096; leave room for the header and the new message. */
+const HISTORY_BUDGET = 2200;
+const LINE_CAP = 320;
+
+/** Short and relative - an exact timestamp is noise when triaging. */
+function when(iso) {
+  const then = new Date(iso).getTime();
+  if (!isFinite(then)) return "";
+  const mins = Math.max(0, Math.round((Date.now() - then) / 60000));
+  if (mins < 1) return "just now";
+  if (mins < 60) return mins + "m ago";
+  const hrs = Math.round(mins / 60);
+  if (hrs < 24) return hrs + "h ago";
+  return Math.round(hrs / 24) + "d ago";
+}
+
+/**
+ * The conversation so far, rendered for a phone screen.
+ *
+ * Oldest at the top so it reads downward, each turn labelled, and trimmed from
+ * the OLDEST end when too long - the recent turns are the ones that explain the
+ * message you are about to answer.
+ */
+function renderHistory(history) {
+  if (!history || !history.length) return "";
+  const out = [];
+  let budget = HISTORY_BUDGET;
+
+  for (let i = history.length - 1; i >= 0; i--) {
+    const h = history[i];
+    const who = h.from === "us" ? "↩️ <b>You</b>" : "💬 <b>Them</b>";
+    const body = h.body.length > LINE_CAP ? h.body.slice(0, LINE_CAP) + "…" : h.body;
+    const line = who + " · " + when(h.at) + "\n" + esc(body);
+    if (line.length > budget) { out.unshift("<i>…earlier messages not shown</i>"); break; }
+    budget -= line.length;
+    out.unshift(line);
+  }
+
+  return [
+    "<b>─── Conversation so far (" + history.length + ") ───</b>",
+    "",
+    out.join("\n\n"),
+    "",
+    "<b>─── New message ───</b>",
+  ].join("\n");
+}
+
 module.exports = async (req, res) => {
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return json(res, 405, { error: "Method not allowed." });
@@ -67,24 +115,31 @@ module.exports = async (req, res) => {
   }
 
   // The reply address leads, and is tappable — Telegram linkifies a mailto.
-  const lines = [
+  // What we have already said to this person. Fetched BEFORE the new message is
+  // recorded, so it is the conversation up to now and never includes itself.
+  // A failure here costs context, not delivery - the message still goes.
+  const history = await supportHistory(str(body.visitorId, 16));
+
+  // Three blocks, blank line between each. filter(Boolean) drops the absent
+  // optional fields, which is what it was for - but it was also eating the ""
+  // separators, so the header ran straight into the message.
+  const header = [
     `<b>${esc(str(body.source, 60) || "Magic Bots Lab")}</b>`,
-    "",
     `<b>Reply to:</b> <a href="mailto:${esc(email)}">${esc(email)}</a>`,
     name ? `<b>Name:</b> ${esc(name)}` : "",
     str(body.country, 80) ? `<b>Country:</b> ${esc(str(body.country, 80))}` : "",
     str(body.page, 200) ? `<b>Page:</b> ${esc(str(body.page, 200))}` : "",
     str(body.visitorId, 16) ? `<b>Person:</b> <code>${esc(str(body.visitorId, 16))}</code>` : "",
-    "",
-    esc(message),
-  ].filter(Boolean);
+  ].filter(Boolean).join("\n");
+
+  const lines = [header, renderHistory(history), esc(message)].filter(Boolean);
 
   let messageId = null;
   try {
     const r = await fetch(`${API}/bot${token}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chat, text: lines.join("\n"), parse_mode: "HTML", disable_web_page_preview: true }),
+      body: JSON.stringify({ chat_id: chat, text: lines.join("\n\n"), parse_mode: "HTML", disable_web_page_preview: true }),
     });
     if (!r.ok) {
       console.error("[mbl] telegram refused:", r.status, await r.text().catch(() => ""));

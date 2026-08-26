@@ -283,9 +283,30 @@ async function collectSupportReplies(visitorId) {
   return rows.map((x) => ({ id: x.id, body: x.body, createdAt: x.created_at }));
 }
 
+
+/** What has already been said to this person, oldest first.
+ *
+ *  Attached to their next message so the answer can be written without
+ *  remembering them. With enough people asking at once, the difference between
+ *  "who is this and what did I tell them" and simply reading down the screen is
+ *  the difference between support that works and support that stalls. */
+async function supportHistory(visitorId, limit) {
+  if (!visitorId) return [];
+  const r = await select(
+    SUPPORT,
+    `select=direction,body,created_at&visitor_id=eq.${encodeURIComponent(visitorId)}&order=created_at.desc&limit=${limit || 10}`,
+  );
+  if (!r.ok) { console.error("[mbl] support history failed:", r.error); return []; }
+  // Newest-first so the LIMIT keeps the most recent, then reversed so it reads
+  // like a conversation.
+  return (r.data || []).reverse().map(function (x) {
+    return { from: x.direction === "out" ? "us" : "them", body: x.body, at: x.created_at };
+  });
+}
+
 module.exports = {
   rest, select, insert, update, upsert, remove,
   trim, isEmail, isToken, normaliseHandle, newToken,
   readBody, json, guard, findCreator, rememberDerivAccount, tokenFor, dbFailed, CREATOR_FIELDS, configured,
-  recordSupportInbound, supportVisitorFor, recordSupportReply, collectSupportReplies,
+  recordSupportInbound, supportVisitorFor, recordSupportReply, collectSupportReplies, supportHistory,
 };
