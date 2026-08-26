@@ -1,0 +1,32 @@
+{
+  "id": "/",
+  "name": "Magic Bots Lab — free automated trading bots",
+  "short_name": "Magic Bots Lab",
+  "description": "Free Deriv bots, free MT5 bots and fully automated 24/7 trading. Run them on your own account, or get paid to post about them.",
+
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+
+  "background_color": "#020617",
+  "theme_color": "#020617",
+
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+
+  "shortcuts": [
+    { "name": "Trading bots", "short_name": "Bots", "url": "/trading-dashboard.html" },
+    { "name": "MT5 bots", "short_name": "MT5", "url": "/mt5-dashboard.html" },
+    { "name": "Get paid to post", "short_name": "Creators", "url": "/creators.html" }
+  ],
+
+  "categories": ["finance", "business", "productivity"],
+  "lang": "en",
+  "dir": "ltr",
+
+  "prefer_related_applications": false
+}
