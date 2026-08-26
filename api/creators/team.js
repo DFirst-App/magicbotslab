@@ -17,7 +17,10 @@ module.exports = async (req, res) => {
 
   const body = await readBody(req);
   let me;
-  try { me = await findCreator(body.token); }
+  // Without derivAccess a device that has no valid token of its own can load
+  // the dashboard (me.js accepts it) but every action here would fail with
+  // "no creator found" - exactly the dead end it was added to prevent.
+  try { me = await findCreator(body.token, body.derivAccess); }
   catch (e) { return dbFailed(res, e); }
   if (!me) return json(res, 404, { error: "No creator found." });
 

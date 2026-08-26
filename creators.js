@@ -856,7 +856,7 @@
   }
 
   function saveProfile(patch, quiet) {
-    return post("profile", Object.assign({ token: S.token }, patch)).then(function (r) {
+    return post("profile", Object.assign({ token: S.token, derivAccess: derivAccess() }, patch)).then(function (r) {
       if (!r.ok) { toast((r.data && r.data.error) || "Could not save that.", true); return false; }
       if (!quiet) toast("Saved.");
       return load().then(function () { return true; });
@@ -866,7 +866,7 @@
   function logPost() {
     if (!S.log.platforms.length) return toast("Tick the accounts you posted it on.", true);
     S.busy = true; render();
-    post("posts", { token: S.token, action: "log", day: S.log.day, platforms: S.log.platforms, link: S.log.link })
+    post("posts", { token: S.token, derivAccess: derivAccess(), action: "log", day: S.log.day, platforms: S.log.platforms, link: S.log.link })
       .then(function (r) {
         S.busy = false;
         if (!r.ok) {
@@ -894,11 +894,11 @@
       if (!confirm("Remove everything logged on " + day + "? This cannot be undone.")) return;
       var ids = (S.me.posts || []).filter(function (p) { return p.posted_on === day; }).map(function (p) { return p.id; });
       var chain = Promise.resolve();
-      ids.forEach(function (id) { chain = chain.then(function () { return post("posts", { token: S.token, action: "undo", postId: id }); }); });
+      ids.forEach(function (id) { chain = chain.then(function () { return post("posts", { token: S.token, derivAccess: derivAccess(), action: "undo", postId: id }); }); });
       chain.then(function () { toast("Day removed."); return load(); });
       return;
     }
-    post("posts", { token: S.token, action: "backfill", days: [day] }).then(function (r) {
+    post("posts", { token: S.token, derivAccess: derivAccess(), action: "backfill", days: [day] }).then(function (r) {
       if (!r.ok) return toast((r.data && r.data.error) || "Could not add that day.", true);
       toast("Day added to your calendar.");
       return load();
@@ -966,7 +966,7 @@
 
     if (el.dataset.undo) {
       if (!confirm("Undo this video? It stops counting towards your month, and you cannot get it back.")) return;
-      post("posts", { token: S.token, action: "undo", postId: el.dataset.undo }).then(function (r) {
+      post("posts", { token: S.token, derivAccess: derivAccess(), action: "undo", postId: el.dataset.undo }).then(function (r) {
         if (!r.ok) return toast((r.data && r.data.error) || "Could not undo that.", true);
         toast("Undone.");
         return load();
@@ -1003,7 +1003,7 @@
       var code = (document.getElementById("teamCode").value || "").trim().toUpperCase();
       var dir = document.getElementById("dirA").classList.contains("on") ? "they_referred_me" : "i_referred_them";
       if (code.length < 4) return toast("Type their code first.", true);
-      post("team", { token: S.token, code: code, direction: dir }).then(function (r) {
+      post("team", { token: S.token, derivAccess: derivAccess(), code: code, direction: dir }).then(function (r) {
         if (!r.ok) return toast((r.data && r.data.error) || "Could not connect that.", true);
         toast(dir === "they_referred_me" ? "You are now on " + r.data.name + "'s team" : r.data.name + " is now on your team");
         return load();
