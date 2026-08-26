@@ -21,6 +21,7 @@
   var MAIL_KEY = "mbl_support_email";
   var ID_KEY = "mbl_support_id";
   var THREAD_KEY = "mbl_support_thread";
+  var NUDGED_KEY = "mbl_support_nudged";
 
   var isEmail = function (v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v || "").trim()); };
   var get = function (k) { try { return localStorage.getItem(k) || ""; } catch (e) { return ""; } };
@@ -51,7 +52,7 @@
 
   var state = {
     open: false,
-    nudged: false,
+    nudged: get(NUDGED_KEY) === "1",
     busy: false,
     // An explicit "I am editing" flag. Clearing the email was doing this job,
     // which destroyed the value somebody might not have wanted to lose.
@@ -190,6 +191,7 @@
 
     if (!state.nudged && justAGreeting(message)) {
       state.nudged = true;
+      set(NUDGED_KEY, "1");
       remember({ text: message, from: "them", sent: false });
       remember({
         from: "us",
@@ -223,7 +225,6 @@
       state.busy = false;
       if (!r.ok) { alert(r.d.error || "We could not send that just now."); return; }
       remember({ text: message, from: "them", sent: true });
-      state.nudged = false;
       // Sending is also finishing with the editor — leaving it open afterwards
       // makes it look like something is still required.
       state.editWho = false;

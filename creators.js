@@ -134,6 +134,15 @@
       if (r.ok && r.data && r.data.creator) {
         S.me = r.data;
 
+        // The support bubble should not ask a registered creator who they are —
+        // we already know, and making them retype it is the fastest way to lose
+        // the question they came to ask. Saved to the same keys the bubble reads
+        // everywhere else on the site, so the landing page and the dashboard
+        // know them too.
+        if (window.MBL_SUPPORT_IDENTITY) {
+          window.MBL_SUPPORT_IDENTITY(r.data.creator.name, r.data.creator.email);
+        }
+
         // Recognised by the Deriv account rather than by a token this device
         // had. Keep the key so it never has to ask again.
         if (r.data.recoveredToken) {

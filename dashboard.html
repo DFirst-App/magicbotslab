@@ -23,6 +23,15 @@
       --green: #24d970;
       --orange: #f6ad55;
       --violet: #b794f4;
+
+      /* The support bubble borrows this page's palette rather than arriving in
+         Creator Program cyan. Only tokens this page did not already define. */
+      --accent: #61a5ff;
+      --success: #24d970;
+      --faint: #6b7b91;
+      --panel: #171a21;
+      --panel-2: #1a1e26;
+      --danger: #ff5f6d;
       --red: #ff5f6d;
     }
 
@@ -554,6 +563,7 @@
     }
   </style>
   <link rel="stylesheet" href="guide.css" />
+  <link rel="stylesheet" href="support.css" />
 </head>
 <body>
   <div class="wrap">
@@ -1217,5 +1227,9 @@
       setTimeout(showDashboardGuide, 600);
     }
   </script>
+  <!-- Support, on the dashboard. Somebody whose bot will not start is already
+       here; making them go elsewhere to ask is how the question never gets asked. -->
+  <script>window.MBL_SUPPORT_SOURCE = "Magic Bots Lab · Dashboard";</script>
+  <script src="creators-support.js" defer></script>
 </body>
 </html>
