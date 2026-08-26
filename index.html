@@ -522,8 +522,25 @@
         font-size: 11.5px;
       }
     }
+
+    /* The support bubble ships with its own literal fallbacks so it works on any
+       page. Here it borrows the landing page's palette instead, so it reads as
+       part of this page rather than as a visitor from the Creator Program.
+       Safe to declare: this page uses no CSS variables of its own. */
+    :root {
+      --accent: #ff9a3c;
+      --success: #24d970;
+      --bg: #020617;
+      --text: #eef2f8;
+      --muted: #9aa8bd;
+      --border: rgba(255,255,255,0.09);
+      --panel: #0b1220;
+      --panel-2: #111a2b;
+      --danger: #ff5f6d;
+    }
   </style>
   <link rel="stylesheet" href="guide.css" />
+  <link rel="stylesheet" href="support.css" />
 </head>
 <body>
   <main class="landing">
@@ -859,5 +876,9 @@
       maybeShowConnectHelpAfterReturn();
     }
   </script>
+  <!-- Support, on the front door. This is exactly where somebody who cannot
+       connect gives up, and until now the bubble only existed further in. -->
+  <script>window.MBL_SUPPORT_SOURCE = "Magic Bots Lab · Home";</script>
+  <script src="creators-support.js" defer></script>
 </body>
 </html>

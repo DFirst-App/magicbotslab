@@ -2,8 +2,9 @@
  * MAGIC BOTS LAB — support, from anywhere on the site to a phone.
  *
  * A creator stuck at eleven at night will not compose an email. They will type
- * one line into a box if there is a box. The reply comes back by email; where
- * the message lands on our side is not something they need to think about, and
+ * one line into a box if there is a box. The answer comes back into that same
+ * box — the owner swipe-replies in Telegram and it appears here. Where the
+ * message lands on our side is not something they need to think about, and
  * nothing user-facing names it.
  *
  * This is a public endpoint, so it is a spam target. Two cheap defences: a
@@ -12,7 +13,7 @@
  * not a claim to be more than that.
  */
 
-const { readBody, json } = require("./_lib/db");
+const { readBody, json, recordSupportInbound } = require("./_lib/db");
 
 const API = "https://api.telegram.org";
 const COOLDOWN_MS = 20_000;
@@ -78,6 +79,7 @@ module.exports = async (req, res) => {
     esc(message),
   ].filter(Boolean);
 
+  let messageId = null;
   try {
     const r = await fetch(`${API}/bot${token}/sendMessage`, {
       method: "POST",
@@ -88,10 +90,26 @@ module.exports = async (req, res) => {
       console.error("[mbl] telegram refused:", r.status, await r.text().catch(() => ""));
       return json(res, 502, { error: "We could not send that just now. Please try again in a minute." });
     }
+    const j = await r.json().catch(() => null);
+    messageId = j && j.result && typeof j.result.message_id === "number" ? j.result.message_id : null;
   } catch (e) {
     console.error("[mbl] telegram unreachable:", e);
     return json(res, 502, { error: "We could not send that just now. Please try again in a minute." });
   }
+
+  // Remember which Telegram message this became, so a swipe-reply to it can be
+  // routed back to this person. Awaited but never fatal: the message has
+  // already arrived, and failing now would tell them it had not. The cost of a
+  // failure here is that one answer has to go by email instead.
+  await recordSupportInbound({
+    visitorId: str(body.visitorId, 16),
+    body: message,
+    tgMessageId: messageId,
+    email,
+    name,
+    source: str(body.source, 60),
+    page: str(body.page, 200),
+  });
 
   return json(res, 200, { ok: true, email });
 };

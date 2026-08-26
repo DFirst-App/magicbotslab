@@ -53,6 +53,10 @@
     open: false,
     nudged: false,
     busy: false,
+    // An explicit "I am editing" flag. Clearing the email was doing this job,
+    // which destroyed the value somebody might not have wanted to lose.
+    editWho: false,
+    unread: 0,
     name: get(NAME_KEY),
     email: get(MAIL_KEY),
     thread: (function () { try { return JSON.parse(get(THREAD_KEY) || "[]"); } catch (e) { return []; } })()
@@ -84,7 +88,7 @@
   };
 
   function draw() {
-    var needsWho = !isEmail(state.email) || !state.name.trim();
+    var needsWho = state.editWho || !isEmail(state.email) || !state.name.trim();
 
     panel.innerHTML =
       '<div class="sup-head">' +
@@ -103,18 +107,32 @@
       '<div class="sup-body" id="supBody">' +
         '<div class="sup-msg">Hi' + (state.name ? " " + esc(state.name.split(" ")[0]) : "") +
           " — ask us anything about the Creator Program or the bots. Tell us what happened and what you expected. " +
-          "We reply to your email.</div>" +
+          "The answer comes back here.</div>" +
         state.thread.map(function (l) {
-          return l.from === "us"
-            ? '<div class="sup-msg">' + esc(l.text) + "</div>"
-            : '<div><div class="sup-mine">' + esc(l.text) + "</div>" +
-              (l.sent === false ? "" : '<div class="sup-sent">✓ Sent · we will reply by email</div>') + "</div>";
+          if (l.from === "us") {
+            // system = the widget talking (the nudge). Anything else is an
+            // answer from a person, and it is the reason this window exists.
+            return l.system
+              ? '<div class="sup-msg">' + esc(l.text) + "</div>"
+              : '<div class="sup-reply"><div class="sup-reply-who"><i></i>Magic Bots Lab support</div>' +
+                '<div class="sup-reply-body">' + esc(l.text) + "</div></div>";
+          }
+          return '<div><div class="sup-mine">' + esc(l.text) + "</div>" +
+            (l.sent === false ? "" : '<div class="sup-sent">✓ Sent · check back here or your email</div>') + "</div>";
         }).join("") +
       "</div>" +
 
       '<div class="sup-who">' +
         (needsWho
-          ? '<div style="font-size:11px;color:var(--muted)">Fill these in first so we can reply — then type what you need below.</div>' +
+          ? '<div style="display:flex;align-items:center;gap:8px">' +
+              '<div style="flex:1;min-width:0;font-size:11px;color:var(--muted)">' +
+                (state.editWho ? "Change these, then tap Done." : "Fill these in first so we can reply — then type what you need below.") +
+              "</div>" +
+              // Offered only once both are usable: a Done that saved an
+              // unusable address would lose the reply.
+              (state.editWho && isEmail(state.email) && state.name.trim()
+                ? '<button type="button" id="supDone" class="sup-done">Done</button>' : "") +
+            "</div>" +
             '<input class="field" id="supName" placeholder="Your name" value="' + esc(state.name) + '" />' +
             '<input class="field" id="supMail" type="email" placeholder="Your email for the reply" value="' + esc(state.email) + '" />'
           : '<button type="button" id="supChange" style="all:unset;cursor:pointer;display:flex;gap:6px;width:100%;font-size:11.5px;color:var(--muted)">' +
@@ -135,7 +153,15 @@
     panel.querySelector("#supClose").onclick = function () { toggle(false); };
 
     var change = panel.querySelector("#supChange");
-    if (change) change.onclick = function () { state.email = ""; draw(); };
+    if (change) change.onclick = function () { state.editWho = true; draw(); };
+
+    var done = panel.querySelector("#supDone");
+    if (done) done.onclick = function () {
+      set(NAME_KEY, state.name.trim());
+      set(MAIL_KEY, state.email.trim());
+      state.editWho = false;
+      draw();
+    };
 
     var box = panel.querySelector("#supText");
     box.onkeydown = function (e) {
@@ -167,6 +193,7 @@
       remember({ text: message, from: "them", sent: false });
       remember({
         from: "us",
+        system: true,
         text: "Hello! So we can actually help, tell us what you need in a bit of detail — what you were doing, " +
               "what happened, and what you expected instead. Then send it and we will reply to your email."
       });
@@ -187,7 +214,7 @@
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: state.name, email: state.email, message: message,
-        source: "Magic Bots Lab · Creator Program",
+        source: window.MBL_SUPPORT_SOURCE || "Magic Bots Lab · Creator Program",
         visitorId: id, page: location.pathname
       })
     }).then(function (r) {
@@ -197,11 +224,27 @@
       if (!r.ok) { alert(r.d.error || "We could not send that just now."); return; }
       remember({ text: message, from: "them", sent: true });
       state.nudged = false;
+      // Sending is also finishing with the editor — leaving it open afterwards
+      // makes it look like something is still required.
+      state.editWho = false;
       draw();
+      // There is a conversation now, so start listening for the answer.
+      schedule();
     }).catch(function () {
       state.busy = false;
       alert("We could not reach you just now. Try again in a minute.");
     });
+  }
+
+  function paintBadge() {
+    var old = btn.querySelector(".sup-badge");
+    if (old) old.remove();
+    if (state.open || !state.unread) return;
+    var b = document.createElement("span");
+    b.className = "sup-badge";
+    b.setAttribute("aria-label", state.unread + (state.unread === 1 ? " new reply" : " new replies"));
+    b.textContent = state.unread > 9 ? "9+" : String(state.unread);
+    btn.appendChild(b);
   }
 
   function toggle(open) {
@@ -210,10 +253,52 @@
     btn.setAttribute("aria-label", state.open ? "Close support" : "Message support");
     btn.setAttribute("aria-expanded", state.open ? "true" : "false");
     btn.innerHTML = state.open ? CLOSE_ICON : CHAT_ICON;
+    // Opening it is reading them.
+    if (state.open) state.unread = 0;
+    paintBadge();
     if (state.open) draw(); else btn.focus();
   }
 
-  btn.onclick = function () { toggle(); };
+  /**
+   * Collect anything the owner has replied.
+   *
+   * Polled rather than pushed: a websocket for a bubble that is open for two
+   * minutes at a time is not worth the moving parts. Fast while the panel is
+   * open, slow when it is shut — a closed bubble only needs to know whether to
+   * show a dot.
+   *
+   * Only runs once they have actually asked something. Somebody who never
+   * opened the bubble has nothing waiting, and polling for them would be a
+   * request a minute for no reason.
+   */
+  var polling = null;
+
+  function poll() {
+    if (!state.thread.length) return;
+    fetch("/api/support-replies?visitorId=" + encodeURIComponent(id), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        var fresh = (d && d.replies) || [];
+        if (!fresh.length) return;
+        fresh.forEach(function (rep) {
+          remember({ id: rep.id, text: rep.body, at: rep.createdAt, from: "us" });
+        });
+        if (state.open) draw(); else { state.unread += fresh.length; paintBadge(); }
+      })
+      .catch(function () { /* offline, or the tab is asleep — try again next tick */ });
+  }
+
+  function schedule() {
+    if (polling) clearInterval(polling);
+    polling = setInterval(poll, state.open ? 7000 : 45000);
+  }
+
+  btn.onclick = function () { toggle(); schedule(); poll(); };
+
+  // A reply may have landed while they were away, so look once on arrival and
+  // then keep a slow heartbeat going.
+  if (state.thread.length) { poll(); }
+  schedule();
 
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && state.open) toggle(false);

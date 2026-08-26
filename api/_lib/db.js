@@ -211,8 +211,81 @@ function dbFailed(res, e) {
   return json(res, 503, { error: "Not available right now. Please try again in a minute." });
 }
 
+
+/* ── support threads ──────────────────────────────────────────────────────
+ * The join between a visitor and the Telegram message their question became.
+ * There is no account behind a support conversation: the only thing naming the
+ * person is the random id their own browser minted, and the only thing tying
+ * the owner's answer to them is the id of the message they replied to.
+ *
+ * Every one of these degrades quietly. Support is what people reach for when
+ * something is already broken, so a database that is unreachable must never
+ * turn the support form into a second failure — the message still reaches
+ * Telegram, the reply just cannot be routed back on its own.
+ */
+
+const SUPPORT = "mbl_support_messages";
+
+async function recordSupportInbound(m) {
+  if (!m.visitorId) return;
+  const r = await insert(SUPPORT, {
+    visitor_id: m.visitorId,
+    direction: "in",
+    body: String(m.body || "").slice(0, 4000),
+    tg_message_id: m.tgMessageId || null,
+    email: m.email || null,
+    name: m.name || null,
+    source: m.source || null,
+    page: m.page || null,
+  });
+  if (!r.ok) console.error("[mbl] could not record inbound support:", r.error);
+}
+
+/** Which visitor does this Telegram message belong to? Null when the owner
+ *  replied to something that was never a support message — a normal thing to
+ *  do, not an error. */
+async function supportVisitorFor(tgMessageId) {
+  const r = await select(SUPPORT, `select=visitor_id,email&tg_message_id=eq.${encodeURIComponent(tgMessageId)}&limit=1`);
+  if (!r.ok) { console.error("[mbl] support reply lookup failed:", r.error); return null; }
+  const row = r.data && r.data[0];
+  return row ? { visitorId: row.visitor_id, email: row.email || null } : null;
+}
+
+/** Park the owner's reply for the visitor to collect. */
+async function recordSupportReply(visitorId, body) {
+  const r = await insert(SUPPORT, {
+    visitor_id: visitorId,
+    direction: "out",
+    body: String(body || "").slice(0, 4000),
+  });
+  if (!r.ok) console.error("[mbl] could not record support reply:", r.error);
+  return r.ok;
+}
+
+/** Everything waiting for this visitor, oldest first, marked as collected.
+ *  Marking happens here rather than on a second call because the bubble has
+ *  already drawn them by the time it could confirm, and showing an answer twice
+ *  is worse than an optimistic delivery receipt. */
+async function collectSupportReplies(visitorId) {
+  if (!visitorId) return [];
+  const r = await select(
+    SUPPORT,
+    `select=id,body,created_at&visitor_id=eq.${encodeURIComponent(visitorId)}&direction=eq.out&seen_at=is.null&order=created_at.asc&limit=20`,
+  );
+  if (!r.ok) { console.error("[mbl] collect failed:", r.error); return []; }
+  const rows = r.data || [];
+  if (!rows.length) return [];
+
+  const ids = rows.map((x) => x.id).join(",");
+  const marked = await update(SUPPORT, `id=in.(${ids})`, { seen_at: new Date().toISOString() });
+  if (!marked.ok) console.error("[mbl] could not mark seen:", marked.error);
+
+  return rows.map((x) => ({ id: x.id, body: x.body, createdAt: x.created_at }));
+}
+
 module.exports = {
   rest, select, insert, update, upsert, remove,
   trim, isEmail, isToken, normaliseHandle, newToken,
   readBody, json, guard, findCreator, rememberDerivAccount, tokenFor, dbFailed, CREATOR_FIELDS, configured,
+  recordSupportInbound, supportVisitorFor, recordSupportReply, collectSupportReplies,
 };
