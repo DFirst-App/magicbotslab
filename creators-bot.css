@@ -812,13 +812,66 @@ body {
   font-weight: 800;
 }
 
+/* The live step takes the full width of the grid while it is live, so its hint
+   has somewhere to go. In a 185px column the same sentence wrapped to five
+   lines and cost more height than the field it belonged to. On a phone the grid
+   is one column already, so this changes nothing there. */
+.config-grid .input-group.glow { grid-column: 1 / -1; }
+
+/* ── the step hint ─────────────────────────────────────────────────────────
+   The whole guide, attached to the field it is about. An earlier version put a
+   separate three-step strip above the panel; it said the same thing twice and
+   cost real height on a page somebody is about to film. A numbered chip carries
+   the "one of three" on its own.
+
+   This is a <div>, not the <small> beside it - the dashboard stylesheet hides
+   those below 768px, which is why the suggestion used to vanish on a phone. */
 .cfg-hint {
-  margin-top: 6px;
-  font-size: 12px;
-  line-height: 1.55;
-  color: var(--accent);
+  display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
+  margin-top: 7px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 12px; line-height: 1.5;
+  color: var(--muted);
+  border: 1px solid rgba(0, 210, 255, 0.2);
+  background:
+    radial-gradient(120% 180% at 0% 50%, rgba(0, 210, 255, 0.12), transparent 60%),
+    rgba(255, 255, 255, 0.02);
 }
-.cfg-hint b { color: var(--text); }
+.cfg-hint b { color: var(--text); font-weight: 700; }
+
+/* 1/3 - small, and quietly breathing so the eye lands on the live step */
+.cfg-step {
+  flex: none; display: inline-flex; align-items: baseline; gap: 1px;
+  padding: 3px 8px; border-radius: 999px;
+  font-size: 11px; font-weight: 800; line-height: 1;
+  color: #04121f; background: var(--accent);
+  animation: cfgStepPulse 2.2s ease-in-out infinite;
+}
+.cfg-step i { font-style: normal; font-weight: 700; opacity: .6; font-size: 10px; }
+@keyframes cfgStepPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 210, 255, 0.4); }
+  50%      { box-shadow: 0 0 0 4px rgba(0, 210, 255, 0); }
+}
+
+.cfg-say { flex: 1 1 170px; min-width: 0; }
+
+.cfg-use {
+  flex: none; cursor: pointer;
+  padding: 5px 11px; border-radius: 8px;
+  font-size: 11.5px; font-weight: 700;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(0, 210, 255, 0.35);
+  transition: background .15s ease, color .15s ease, transform .06s ease;
+}
+.cfg-use:hover { background: rgba(0, 210, 255, 0.16); color: var(--accent); }
+.cfg-use:active { transform: scale(.985); }
+
+@media (max-width: 430px) {
+  .cfg-say { flex: 1 1 100%; order: 3; }
+  .cfg-use { margin-left: auto; }
+}
 .linky {
   border: 0; background: transparent; padding: 0;
   color: var(--accent); font-weight: 700; cursor: pointer;
@@ -1004,99 +1057,4 @@ body {
 @media (max-width: 480px) {
   .make-bal-value { margin-left: 0; }
   .make-bal-btn { width: 100%; justify-content: center; }
-}
-
-/* ── the three-step rail ────────────────────────────────────────────────────
-   Its own shape rather than a copy of the Clunoid steps: those are stacked
-   numbered cards down a page, this is one thin horizontal track sitting on top
-   of a bot panel somebody is about to record. It has to earn its space, so it
-   is one row of pills and at most one line of help - about 70px in total.
-
-   The suggested figure lives HERE, not in the .input-group <small>, because the
-   dashboard stylesheet hides that below 768px and a phone was left showing a
-   glowing box with no explanation. */
-.grail {
-  margin-bottom: 14px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(0, 210, 255, 0.16);
-  background:
-    radial-gradient(120% 160% at 0% 0%, rgba(0, 210, 255, 0.10), transparent 62%),
-    rgba(255, 255, 255, 0.025);
-}
-
-.grail-track { display: flex; align-items: center; gap: 8px; }
-
-.grail-step {
-  display: inline-flex; align-items: center; gap: 7px; flex: none;
-  padding: 5px 11px 5px 6px;
-  border-radius: 999px;
-  font-size: 12px; font-weight: 600; letter-spacing: .01em;
-  color: var(--muted);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid transparent;
-  transition: color .25s ease, background .25s ease, border-color .25s ease;
-}
-.grail-n {
-  display: grid; place-items: center; flex: none;
-  width: 19px; height: 19px; border-radius: 999px;
-  font-size: 11px; font-weight: 800; font-style: normal;
-  color: var(--muted);
-  background: rgba(255, 255, 255, 0.07);
-  transition: color .25s ease, background .25s ease, box-shadow .25s ease;
-}
-
-/* where they are now - lit, and breathing so the eye finds it */
-.grail-step.is-now {
-  color: var(--text);
-  background: rgba(0, 210, 255, 0.12);
-  border-color: rgba(0, 210, 255, 0.38);
-}
-.grail-step.is-now .grail-n {
-  color: #04121f;
-  background: var(--accent);
-  animation: grailPulse 2s ease-in-out infinite;
-}
-@keyframes grailPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 210, 255, 0.45); }
-  50%      { box-shadow: 0 0 0 5px rgba(0, 210, 255, 0); }
-}
-
-/* behind them - quietly ticked off */
-.grail-step.is-done { color: var(--muted); background: rgba(36, 217, 112, 0.08); }
-.grail-step.is-done .grail-n { color: #05231a; background: var(--success, #24d970); }
-
-.grail-sep {
-  flex: 1 1 8px; min-width: 8px; height: 1px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.16), rgba(255,255,255,0.06));
-}
-
-.grail-row {
-  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  margin-top: 9px; padding-top: 9px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-.grail-hint { flex: 1 1 220px; min-width: 0; font-size: 12px; line-height: 1.5; color: var(--muted); }
-.grail-hint b { color: var(--text); font-weight: 700; }
-
-.grail-use {
-  flex: none; cursor: pointer;
-  padding: 6px 12px; border-radius: 8px;
-  font-size: 12px; font-weight: 700;
-  color: #04121f; background: var(--accent);
-  border: 0;
-  transition: filter .15s ease, transform .06s ease;
-}
-.grail-use:hover { filter: brightness(1.08); }
-.grail-use:active { transform: scale(.985); }
-
-/* On a narrow phone the labels are what goes, not the steps - three numbered
-   dots still read as "one of three" and keep the row on one line. */
-@media (max-width: 430px) {
-  .grail { padding: 9px 10px; }
-  .grail-step { padding: 5px; gap: 0; font-size: 0; }
-  .grail-step .grail-n { font-size: 11px; }
-  .grail-step.is-now { padding: 5px 11px 5px 6px; gap: 7px; font-size: 12px; }
-  .grail-hint { flex: 1 1 100%; }
-  .grail-use { width: 100%; }
 }

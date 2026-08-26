@@ -57,46 +57,6 @@
     return Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
-  /**
-   * The three steps, as one thin strip.
-   *
-   * The per-field glow alone was not enough: the suggestion sat in a <small>
-   * that the dashboard's own stylesheet hides below 768px, so on a phone a
-   * creator saw a ring around a box and no idea what to put in it. The figure
-   * now lives here, in one place that is visible at every width.
-   *
-   * Deliberately one row and one line - this sits above a bot panel somebody is
-   * about to film, so it earns its space or it does not belong.
-   */
-  function guideRail() {
-    if (S.running || S.step > 2) return "";
-
-    var sug = suggestedStake(S.balance);
-    var sugTP = suggestedTP(S.balance);
-    var steps = ["Stake", "Take profit", "Start"];
-    var pills = steps.map(function (name, i) {
-      var state = S.step === i ? " is-now" : (S.step > i ? " is-done" : "");
-      var mark = S.step > i
-        ? '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'
-        : String(i + 1);
-      return '<span class="grail-step' + state + '"><i class="grail-n">' + mark + "</i>" + esc(name) + "</span>";
-    }).join('<i class="grail-sep" aria-hidden="true"></i>');
-
-    var hint = "";
-    if (S.step === 0) {
-      hint = '<span class="grail-hint">What each trade risks. On ' + money(S.balance) + ' USD we suggest <b>' + money(sug) + ' USD</b>.</span>' +
-             '<button type="button" class="grail-use" data-act="useStake">Use ' + money(sug) + "</button>";
-    } else if (S.step === 1) {
-      hint = '<span class="grail-hint">The bot stops itself the moment it reaches this. We suggest <b>' + money(sugTP) + ' USD</b>.</span>' +
-             '<button type="button" class="grail-use" data-act="useTP">Use ' + money(sugTP) + "</button>";
-    }
-
-    return '<div class="grail" role="group" aria-label="Set the bot up in three steps">' +
-             '<div class="grail-track">' + pills + "</div>" +
-             (hint ? '<div class="grail-row">' + hint + "</div>" : "") +
-           "</div>";
-  }
-
   function icon(path, size) {
     var n = size || 14;
     return '<svg viewBox="0 0 24 24" width="' + n + '" height="' + n +
@@ -268,16 +228,15 @@
           '<div class="bot-config">' +
             "<h4>Configuration</h4>" +
 
-            guideRail() +
-
             '<div class="config-grid">' +
               '<div class="input-group' + (S.step === 0 ? " glow" : S.step > 0 ? " done" : "") + '">' +
                 '<label for="stakeInput">Initial Stake (USD)</label>' +
                 '<input type="number" id="stakeInput" min="' + DEFAULTS.minStake + '" step="0.01" value="' + esc(S.stake) +
                   '" placeholder="' + money(DEFAULTS.initialStake) + '"' + (S.running ? " disabled" : "") + " />" +
                 (S.step === 0
-                  ? '<div class="cfg-hint"><b>Step 1 of 3.</b> What each trade risks. On a balance of $' + money(S.balance) +
-                    " we suggest <b>" + money(sug) + ' USD</b>. <button type="button" class="linky" data-act="useStake">Use ' + money(sug) + "</button></div>"
+                  ? '<div class="cfg-hint"><span class="cfg-step">1<i>/3</i></span>' +
+                    '<span class="cfg-say">What each trade risks. We suggest <b>' + money(sug) + ' USD</b>.</span>' +
+                    '<button type="button" class="cfg-use" data-act="useStake">Use ' + money(sug) + "</button></div>"
                   : '<small>Ready to go. For a bigger run on this balance, ' +
                     '<button type="button" class="linky" data-act="useStake">use ' + money(sug) + "</button>.</small>") +
               "</div>" +
@@ -287,8 +246,9 @@
                 '<input type="number" id="takeProfitInput" min="5" step="1" value="' + esc(S.tp) +
                   '" placeholder="' + money(DEFAULTS.takeProfit) + '"' + (S.running ? " disabled" : "") + " />" +
                 (S.step === 1
-                  ? '<div class="cfg-hint"><b>Step 2 of 3.</b> The bot stops itself the moment it reaches this. We suggest <b>' +
-                    money(sugTP) + ' USD</b>. <button type="button" class="linky" data-act="useTP">Use ' + money(sugTP) + "</button></div>"
+                  ? '<div class="cfg-hint"><span class="cfg-step">2<i>/3</i></span>' +
+                    '<span class="cfg-say">The bot stops itself the moment it reaches this. We suggest <b>' + money(sugTP) + ' USD</b>.</span>' +
+                    '<button type="button" class="cfg-use" data-act="useTP">Use ' + money(sugTP) + "</button></div>"
                   : '<small>The bot stops itself here. For this balance, ' +
                     '<button type="button" class="linky" data-act="useTP">use ' + money(sugTP) + "</button>.</small>") +
               "</div>" +
