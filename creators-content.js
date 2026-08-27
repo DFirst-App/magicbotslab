@@ -152,6 +152,7 @@ window.MBL = (function () {
   var PAYOUTS = [
     { key: "mpesa", label: "M-Pesa", group: "Mobile money", logo: "logos/mpesa.svg" },
     { key: "paypal", label: "PayPal", group: "Online", logo: "logos/paypal.svg" },
+    { key: "skrill", label: "Skrill", group: "Online", logo: "logos/skrill.svg" },
     { key: "wise", label: "Wise", group: "Online", logo: "logos/wise.svg" },
     { key: "payoneer", label: "Payoneer", group: "Online", logo: "logos/payoneer.svg" },
     { key: "venmo", label: "Venmo", group: "Online", logo: "logos/venmo.svg" },

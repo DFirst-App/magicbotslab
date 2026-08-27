@@ -16,7 +16,7 @@ const {
  */
 
 const PLATFORMS_REQUIRED = 3;
-const PAYOUT_METHODS = ["usdt", "paypal", "venmo", "cashapp", "mpesa", "wise", "payoneer"];
+const PAYOUT_METHODS = ["usdt", "paypal", "skrill", "venmo", "cashapp", "mpesa", "wise", "payoneer"];
 
 module.exports = async (req, res) => {
   if (!guard(req, res)) return;
