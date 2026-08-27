@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+
+  "redirects": [
+    { "source": "/creator-program.html", "destination": "/", "permanent": false },
+    { "source": "/creator-program", "destination": "/", "permanent": false },
+    { "source": "/is-magic-bots-lab-legit.html", "destination": "/", "permanent": false },
+    { "source": "/is-magic-bots-lab-legit", "destination": "/", "permanent": false }
+  ]
+}
