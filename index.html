@@ -639,6 +639,24 @@
 
   </main>
 
+  <!-- Asked once, the first time somebody presses Connect. The bots run on a
+       Deriv account the visitor already owns, and a visitor who has not got
+       one used to find that out at Deriv's login screen, which is the wrong
+       place to learn it. Dismissing without answering asks again next time —
+       a question nobody answered has not been answered. -->
+  <div class="guide-overlay" id="connectChoiceOverlay" aria-hidden="true">
+    <div class="guide-modal" role="dialog" aria-labelledby="connectChoiceTitle">
+      <button type="button" class="guide-dismiss" id="connectChoiceDismiss" aria-label="Close">&times;</button>
+      <p class="guide-modal__kicker">Before you connect</p>
+      <h2 id="connectChoiceTitle">Do you have a Deriv account?</h2>
+      <p>Magic Bots Lab runs on <strong>your own</strong> Deriv account. Connect the one you already have &mdash; or open one first, then come back to this page and connect.</p>
+      <div class="guide-modal__actions">
+        <a class="guide-btn guide-btn--primary" id="connectChoiceCreate" href="https://t.deriv.link?t=5HBLVPVNNFJ8" target="_blank" rel="noopener noreferrer sponsored">I&rsquo;m new &mdash; create an account</a>
+        <button type="button" class="guide-btn guide-btn--ghost" id="connectChoiceConnect">I have one &mdash; connect</button>
+      </div>
+    </div>
+  </div>
+
   <div class="guide-overlay" id="connectHelpOverlay" aria-hidden="true">
     <div class="guide-modal" role="dialog" aria-labelledby="connectHelpTitle">
       <button type="button" class="guide-dismiss" id="connectHelpDismiss" aria-label="Close">×</button>
@@ -843,7 +861,10 @@
       setStatus("Authorization successful. Preparing dashboard...", "success");
       try {
         await exchangeCodeForToken(code);
-        if (window.MBLGuide) MBLGuide.mark(MBLGuide.KEYS.indexConnect);
+        if (window.MBLGuide) {
+          MBLGuide.mark(MBLGuide.KEYS.indexConnect);
+          MBLGuide.mark(MBLGuide.KEYS.connectChoice);
+        }
         window.location.href = "dashboard.html?welcome=1";
       } catch (e) {
         setStatus("Connected but token exchange failed. Please try again.", "error");
@@ -876,8 +897,59 @@
       if (e.target === e.currentTarget) hideConnectHelp();
     });
 
+    function connectChoiceAnswered() {
+      if (window.MBLGuide) return MBLGuide.isDone(MBLGuide.KEYS.connectChoice);
+      try {
+        return localStorage.getItem("mbl_guide_connect_choice_v1") === "1";
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function markConnectChoice() {
+      if (window.MBLGuide) MBLGuide.mark(MBLGuide.KEYS.connectChoice);
+    }
+
+    function showConnectChoice() {
+      const overlay = document.getElementById("connectChoiceOverlay");
+      if (!overlay) return false;
+      overlay.classList.add("show");
+      overlay.setAttribute("aria-hidden", "false");
+      return true;
+    }
+
+    function hideConnectChoice() {
+      const overlay = document.getElementById("connectChoiceOverlay");
+      if (!overlay) return;
+      overlay.classList.remove("show");
+      overlay.setAttribute("aria-hidden", "true");
+    }
+
+    /* The first press asks which kind of visitor this is. Every press after it
+       goes straight to Deriv, and so does this one if the card is missing —
+       the connection must never depend on a bit of markup being present. */
+    function onConnectTrigger() {
+      if (connectChoiceAnswered()) return startOAuthLogin();
+      if (!showConnectChoice()) return startOAuthLogin();
+    }
+
+    /* Answered by leaving to sign up: the card stays open behind the new tab,
+       so coming back to finish is one press of the button already on screen. */
+    document.getElementById("connectChoiceCreate")?.addEventListener("click", markConnectChoice);
+
+    document.getElementById("connectChoiceConnect")?.addEventListener("click", () => {
+      markConnectChoice();
+      hideConnectChoice();
+      startOAuthLogin();
+    });
+
+    document.getElementById("connectChoiceDismiss")?.addEventListener("click", hideConnectChoice);
+    document.getElementById("connectChoiceOverlay")?.addEventListener("click", (e) => {
+      if (e.target === e.currentTarget) hideConnectChoice();
+    });
+
     document.querySelectorAll(".connect-trigger").forEach((btn) => {
-      btn.addEventListener("click", startOAuthLogin);
+      btn.addEventListener("click", onConnectTrigger);
     });
     if (!maybeRedirectConnectedUser()) {
       handleOAuthCallback();

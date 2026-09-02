@@ -4,6 +4,7 @@
   const STORAGE_PREFIX = "mbl_guide_";
 
   const KEYS = {
+    connectChoice: "connect_choice_v1",
     indexConnect: "index_connect_v1",
     dashboardBots: "dashboard_bots_v1",
     tradingWelcome: "trading_welcome_v1",
