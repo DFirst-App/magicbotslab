@@ -570,9 +570,6 @@
     }
 
     /* The automation chip explains the switch on hover or keyboard focus. */
-    .automation-switch #automationChip { display: none; }
-    .automation-switch:hover #automationChip,
-    .automation-switch:focus-within #automationChip { display: block; }
 
     .stats-grid {
       display: flex;
@@ -1655,35 +1652,7 @@
           <div class="bot-panel-grid">
             <div class="bot-column">
               <div class="bot-config" id="botConfig">
-                <h4 style="display:flex;align-items:center;gap:8px;">
-                  Configuration
-                  <!-- Automation switch. Only shown for the automated bot, and only
-                       while nothing is running, so it cannot be flipped mid-trade.
-                       Hovering or tabbing to it explains what it does. -->
-                  <span id="automationSwitchWrap" class="automation-switch" hidden
-                        style="position:relative;display:inline-flex;">
-                    <button type="button" id="automationToggle" role="switch" aria-checked="true"
-                            aria-label="Automated trading"
-                            style="display:inline-flex;align-items:center;gap:6px;padding:2px 8px 2px 4px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);background:transparent;cursor:pointer;flex:0 0 auto;transition:background .15s,border-color .15s;">
-                      <span id="automationBox"
-                            style="width:15px;height:15px;border-radius:5px;border:1px solid rgba(255,255,255,0.18);background:transparent;display:grid;place-items:center;transition:background .15s,border-color .15s;">
-                        <svg id="automationTick" width="10" height="10" viewBox="0 0 24 24" fill="none"
-                             stroke="#04121f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" hidden>
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                      </span>
-                      <span id="automationLabel"
-                            style="font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(152,162,189,0.7);">Auto</span>
-                    </button>
-                    <span id="automationChip" role="tooltip"
-                          style="position:absolute;left:0;top:calc(100% + 6px);z-index:30;width:236px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.09);background:#1a1e26;color:var(--muted);font-size:11px;line-height:1.55;font-weight:400;text-transform:none;letter-spacing:normal;box-shadow:0 18px 40px rgba(0,0,0,.5);pointer-events:none;"></span>
-                  </span>
-                </h4>
-                <div id="automationBanner" hidden
-                     style="margin:0 0 12px;padding:10px 12px;border:1px solid rgba(36,217,112,0.35);background:rgba(36,217,112,0.06);border-radius:12px;">
-                  <div id="automationBannerHead" style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#24d970;"></div>
-                  <div id="automationBannerBody" style="margin-top:6px;font-size:11.5px;line-height:1.5;color:var(--muted);"></div>
-                </div>
+                <h4>Configuration</h4>
                 <div class="config-grid">
                   <div class="input-group">
                     <label for="stakeInput">Initial Stake (USD)</label>
@@ -1973,24 +1942,7 @@
     </div>
   </div>
 
-  <!-- Automation consent. The automation is on by default but places nothing
-       until this is answered, so the first run is always the person's choice. -->
-  <div id="automationConsent" role="dialog" aria-labelledby="automationConsentTitle" hidden
-       style="position:fixed;right:16px;bottom:16px;z-index:60;width:min(380px,calc(100vw - 32px));padding:16px;border-radius:16px;border:1px solid rgba(36,217,112,0.45);background:#1a1e26;color:#f3f6fb;box-shadow:0 24px 60px rgba(0,0,0,.55);">
-    <button type="button" id="automationConsentClose" aria-label="Not now"
-            style="position:absolute;right:12px;top:12px;border:0;background:transparent;color:rgba(152,162,189,0.7);font-size:16px;line-height:1;cursor:pointer;">×</button>
-    <h4 id="automationConsentTitle" style="margin:0;font-size:14px;font-weight:700;color:#24d970;">Shall the bot trade this for you?</h4>
-    <p id="automationConsentBody" style="margin:8px 0 0;font-size:12px;line-height:1.6;color:var(--muted);"></p>
-    <p id="automationConsentNote" style="margin:6px 0 0;font-size:11px;line-height:1.6;color:#f6ad55;" hidden></p>
-    <div style="margin-top:12px;display:flex;gap:8px;">
-      <button type="button" id="automationAllow" class="btn"
-              style="background:#24d970;color:#04121f;border-color:#24d970;">Allow</button>
-      <button type="button" id="automationNotNow" class="btn btn--ghost">Not now</button>
-    </div>
-  </div>
-
   <script src="guide.js"></script>
-  <script src="automation.js"></script>
   <script src="popup-notifications.js"></script>
   <script src="bots/smartRecoveryDiffer.js"></script>
   <script src="bots/allMarketsDiffer.js"></script>
@@ -2114,11 +2066,6 @@
         const el = $(id);
         if (el) el.disabled = !!running;
       });
-
-      // Let the automation know a bot started or stopped, so it can tell its own
-      // runs from a hand-driven one and schedule the next one.
-      try { window.MBLAutomation && window.MBLAutomation.notifyRunning(!!running); } catch (_) {}
-      try { renderAutomation(); } catch (_) {}
 
       // Mode toggle is on the Account & Mode card
       const realBtn = $("realModeBtn");
@@ -2563,14 +2510,18 @@
           .then(() => showLowBalanceRecommendPopupIfNeeded(activeBotKey))
           .catch(() => {});
       }
-
-      // The automation switch belongs to this bot, so refresh it on every open.
-      try { renderAutomation(); } catch (_) {}
     }
+
+    /* Set the first time a run is told the balance will not cover the stake,
+       so the popup is shown once and not on every refusal. Cleared when a new
+       run starts. */
+    let insufficientReported = false;
 
     async function startBot() {
       if (botRunning) return;
       if (!activeBotKey) return;
+
+      insufficientReported = false;
 
       const def = BOT_DEFS[activeBotKey];
       if (!def) {
@@ -2632,8 +2583,16 @@
         const ui = {
           showStatus: (text) => {
             setBotConnection(text);
+            /* An account that cannot cover the stake will not start covering
+               it by being retried. The bot used to carry on trying, so this
+               fired again on every refusal and could not be dismissed. Stop
+               the run, and say it once. */
             if (String(text || "").toLowerCase().includes("insufficient")) {
-              showDepositPopup();
+              if (!insufficientReported) {
+                insufficientReported = true;
+                showDepositPopup();
+              }
+              stopBot();
             }
           },
           setRunningState: (running) => {
@@ -2745,7 +2704,10 @@
       } catch (error) {
         stopBot();
         if (String(error?.message || "").toLowerCase().includes("insufficient")) {
-          showDepositPopup();
+          if (!insufficientReported) {
+            insufficientReported = true;
+            showDepositPopup();
+          }
         }
         setNotice(`Failed to start bot: ${error.message}`, true);
       }
@@ -2981,168 +2943,6 @@
     $("tradingWelcomeOverlay")?.addEventListener("click", (e) => {
       if (e.target === $("tradingWelcomeOverlay")) completeTradingWelcome(false);
     });
-
-    // ── Autonomous trading ──────────────────────────────────────────────────
-    // The automation owns no engine of its own: it fills these very inputs and
-    // calls startBot(), so an automated run takes exactly the same path as one
-    // started by hand. Everything it needs from this page is passed in here.
-
-    let automationSnap = null;
-
-    /**
-     * The consent card. Shown once the account is funded and the automation is
-     * ready but not yet allowed. It names the balance it read, the stake and the
-     * target, and says plainly that the bot stops itself at that target.
-     */
-    function renderAutomationConsent(snap) {
-      const card = $("automationConsent");
-      if (!card) return;
-      card.hidden = !snap.needsConsent;
-      if (card.hidden) return;
-
-      const cur = snap.currency || "USD";
-      const pct = Math.round((window.MBLAutomation.PROFIT_TARGET_PCT || 0.1) * 100);
-      $("automationConsentBody").innerHTML =
-        "Your balance is <strong>" + Number(snap.balance || 0).toFixed(2) + " " + cur + "</strong>, so " +
-        "Smart Recovery Differ would stake <strong>" + snap.stake.toFixed(2) + " " + cur + "</strong> a trade " +
-        "and aim for <strong>" + snap.target.toFixed(2) + " " + cur + "</strong> — " + pct + "% of your balance." +
-        "<br><br><strong>It stops on its own the moment that " + snap.target.toFixed(2) + " " + cur + " profit " +
-        "target is reached.</strong> It then rests before sizing the next run from your new balance. These are " +
-        "real trades on your own Deriv account, and you can stop it at any time from this page.";
-
-      // Below the point where the Deriv minimum overrides the safe size, the
-      // recovery ladder no longer fits the balance. Say so before they decide.
-      const note = $("automationConsentNote");
-      const guide = window.MBLGuide;
-      if (note && guide && guide.STAKE_COACH) {
-        const c = guide.STAKE_COACH;
-        const ladder = snap.stake * guide.lossSumMultiplier(c.lossBuffer, c.smartRecoveryMartingale);
-        const fits = ladder <= Number(snap.balance || 0) * c.balanceUtilization + 1e-9;
-        note.hidden = fits;
-        if (!fits) {
-          const floor = Math.ceil((c.minStake * guide.lossSumMultiplier(c.lossBuffer, c.smartRecoveryMartingale)) / c.balanceUtilization);
-          note.textContent = "At this balance the " + c.minStake.toFixed(2) + " " + cur + " minimum stake is larger " +
-            "than the size we would choose, so a long losing streak can use more than your balance. " +
-            "A run is steadier from about " + floor + " " + cur + ".";
-        }
-      }
-    }
-
-    /** Put the bot's own defaults back once an automated run is over. */
-    function automationRestoreDefaults() {
-      const def = BOT_DEFS[RECOMMENDED_BOT_KEY] || {};
-      automationSetInputs({
-        initialStake: BOT_DEFAULTS.initialStake,
-        takeProfit: BOT_DEFAULTS.takeProfit,
-        stopLoss: BOT_DEFAULTS.stopLoss,
-        martingaleMultiplier: def.defaultMartingale || BOT_DEFAULTS.martingaleMultiplier,
-      });
-    }
-
-    function automationSetInputs(cfg) {
-      if ($("stakeInput")) $("stakeInput").value = String(cfg.initialStake);
-      if ($("takeProfitInput")) $("takeProfitInput").value = String(cfg.takeProfit);
-      if ($("stopLossInput")) $("stopLossInput").value = String(cfg.stopLoss);
-      if ($("martingaleInput")) $("martingaleInput").value = String(cfg.martingaleMultiplier);
-      const s = ensureBotState(RECOMMENDED_BOT_KEY);
-      if (s) {
-        s.config.initialStake = cfg.initialStake;
-        s.config.takeProfit = cfg.takeProfit;
-        s.config.stopLoss = cfg.stopLoss;
-        s.config.martingaleMultiplier = cfg.martingaleMultiplier;
-      }
-    }
-
-    function renderAutomation() {
-      const auto = window.MBLAutomation;
-      const wrap = $("automationSwitchWrap");
-      const toggle = $("automationToggle");
-      const tick = $("automationTick");
-      const banner = $("automationBanner");
-      if (!auto || !toggle || !banner || !wrap) return;
-
-      const snap = automationSnap || auto.snapshot();
-      const onThisBot = activeBotKey === auto.BOT_KEY;
-
-      renderAutomationConsent(snap);
-
-      // Switch: only on the automated bot, and only while nothing is running.
-      wrap.hidden = !onThisBot || !!botRunning;
-      toggle.setAttribute("aria-checked", snap.active ? "true" : "false");
-      toggle.style.background = snap.active ? "rgba(36,217,112,0.1)" : "transparent";
-      toggle.style.borderColor = snap.active ? "rgba(36,217,112,0.45)" : "rgba(255,255,255,0.18)";
-      const box = $("automationBox");
-      if (box) {
-        box.style.background = snap.active ? "#24d970" : "transparent";
-        box.style.borderColor = snap.active ? "#24d970" : "rgba(255,255,255,0.18)";
-      }
-      const label = $("automationLabel");
-      if (label) label.style.color = snap.active ? "#24d970" : "rgba(152,162,189,0.7)";
-      if (tick) tick.hidden = !snap.active;
-
-      // Three states, because on-by-default and cleared-to-trade differ.
-      const chip = $("automationChip");
-      if (chip) {
-        chip.textContent = snap.consent === "allowed"
-          ? "Automated trading is on. The bot sizes each run from your balance and stops on its own when the profit target is reached. Switch off to trade by hand — it stays off until you turn it back on."
-          : snap.consent === "unasked"
-            ? "Automated trading is on by default, but it will ask your go-ahead before its first trade. Once you allow it, it sizes each run from your balance and stops on its own when the profit target is reached."
-            : "Automated trading is off, and stays off until you turn it back on. Switch on and the bot sizes a run from your balance and stops when its profit target is reached.";
-      }
-
-      // Switched off, the card carries no trace of the automation at all.
-      const trading = snap.active && onThisBot && snap.phase === "running";
-      const resting = snap.active && onThisBot && snap.phase === "cooldown" && !botRunning;
-      banner.hidden = !(trading || resting);
-      if (banner.hidden) return;
-
-      const cur = snap.currency || "USD";
-      $("automationBannerHead").textContent = trading ? "Trading for you" : "Automated · resting";
-      if (trading) {
-        $("automationBannerBody").innerHTML =
-          "Staking <strong>" + snap.stake.toFixed(2) + " " + cur + "</strong> a trade, aiming for <strong>" +
-          snap.target.toFixed(2) + " " + cur + "</strong> this run.";
-      } else {
-        const left = Math.max(0, (snap.nextRunAt || 0) - Date.now());
-        const mm = String(Math.floor(left / 60000)).padStart(2, "0");
-        const ss = String(Math.floor((left % 60000) / 1000)).padStart(2, "0");
-        $("automationBannerBody").innerHTML =
-          "Next run in <strong>" + mm + ":" + ss + "</strong>, sized from your balance at the time.";
-      }
-      if (!snap.online) {
-        $("automationBannerBody").innerHTML +=
-          '<br><span style="color:#f5c451;">Offline — it resumes on its own when the connection is back.</span>';
-      }
-    }
-
-    $("automationToggle")?.addEventListener("click", () => {
-      const auto = window.MBLAutomation;
-      if (!auto) return;
-      auto.setActive(!auto.snapshot().active);
-    });
-    $("automationAllow")?.addEventListener("click", () => window.MBLAutomation?.allow());
-    $("automationNotNow")?.addEventListener("click", () => window.MBLAutomation?.declineForNow());
-    $("automationConsentClose")?.addEventListener("click", () => window.MBLAutomation?.declineForNow());
-
-    if (window.MBLAutomation) {
-      window.MBLAutomation.subscribe((s) => { automationSnap = s; renderAutomation(); });
-      window.MBLAutomation.init({
-        hasToken: () => !!getToken(),
-        getBalance: () => lastKnownBalance,
-        getCurrency: () => lastKnownCurrency,
-        isRunning: () => botRunning,
-        getActiveBotKey: () => activeBotKey,
-        getDefaults: () => BOT_DEFAULTS,
-        getDefaultMartingale: () => (BOT_DEFS[RECOMMENDED_BOT_KEY] || {}).defaultMartingale || BOT_DEFAULTS.martingaleMultiplier,
-        openBot: (key) => openBot(key),
-        setInputs: automationSetInputs,
-        restoreDefaults: automationRestoreDefaults,
-        start: () => { startBot(); },
-        stop: () => { stopBot(); },
-      });
-      // Keeps the resting countdown moving without touching anything else.
-      setInterval(() => { if (!$("automationBanner")?.hidden) renderAutomation(); }, 1000);
-    }
 
     $("stakeCoachApply")?.addEventListener("click", applySuggestedStakeToConfig);
     $("lowBalanceRecommendApply")?.addEventListener("click", () => {
