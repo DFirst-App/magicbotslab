@@ -800,6 +800,20 @@
         throw new Error("Missing access token");
       }
 
+      /* Somebody who has just connected an account is somebody who means to
+         come back, and this exchange only runs on the way in — so this is the
+         one moment we know it. install.js reads the flag and opens the install
+         offer itself, which is what stops getting the app onto a phone from
+         depending on anybody noticing a button.
+
+         Only when there was no session already: reconnecting after signing out
+         should not turn into being asked again every time. */
+      try {
+        if (!localStorage.getItem(DERIV_OAUTH_SESSION_KEY)) {
+          localStorage.setItem("mbl_install_on_connect", "1");
+        }
+      } catch (_) { /* private mode — the button in the corner still works */ }
+
       localStorage.setItem(DERIV_ACCESS_TOKEN_KEY, tokenData.access_token);
       localStorage.setItem(
         DERIV_OAUTH_SESSION_KEY,

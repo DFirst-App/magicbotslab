@@ -22,12 +22,37 @@
  *
  * Self-mounting and dependency-free, so any page can carry it with one script
  * tag and no markup of its own.
+ *
+ * ── On connecting a Deriv account ────────────────────────────────────────
+ * No browser lets a site install itself. The only install API there is puts up
+ * the browser's OWN dialog, and Chrome will not open even that unless the
+ * person is in the middle of touching the page. So it cannot be silent — what
+ * it can be is unmissable and unprompted: the first time somebody connects
+ * Deriv, the offer opens itself the moment they next touch the screen, instead
+ * of waiting behind a button they were never going to look for.
  */
 (function () {
   "use strict";
 
   var SNOOZE_KEY = "mbl_install_snoozed";
   var SNOOZE_MS = 30 * 86400000;
+
+  /* Set by index.html, where the OAuth exchange lands, the first time a Deriv
+     account is connected. */
+  var ARM_KEY = "mbl_install_on_connect";
+
+  /* Chrome will not fire beforeinstallprompt for a site with no service
+     worker, however complete its manifest is. This one caches nothing; it is
+     registered here rather than on each page because installing is this
+     file's whole job and it already loads everywhere. */
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("/sw.js").catch(function () {
+        /* Private mode and some enterprise policies refuse. Nothing to do:
+           the button below still works wherever the prompt does fire. */
+      });
+    });
+  }
 
   function snoozed() {
     try { return Date.now() < Number(localStorage.getItem(SNOOZE_KEY) || 0); } catch (e) { return false; }
@@ -184,7 +209,60 @@
     document.body.appendChild(wrap);
   }
 
-  function offer() { makeButton(); makeCard(); }
+  /* ── straight after connecting Deriv ─────────────────────────────────────
+   * Connecting an account leaves a flag behind. From there the offer opens on
+   * its own — the person does not have to notice a button, and cannot forget
+   * to press one.
+   *
+   * It waits for a touch, a click or a key because Chrome refuses prompt()
+   * outside a gesture. The gesture is only listened for, never swallowed:
+   * these run in the capture phase and stop nothing, so whatever they were
+   * actually pressing still gets its handler, and prompt() does not block.
+   *
+   * The flag is cleared before the prompt rather than after: if anything about
+   * this goes wrong, it goes wrong once, on the visit it was armed for, rather
+   * than on every visit forever.
+   */
+  function armed() {
+    try { return localStorage.getItem(ARM_KEY) === "1"; } catch (e) { return false; }
+  }
+  function disarm() {
+    try { localStorage.removeItem(ARM_KEY); } catch (e) {}
+  }
+
+  function autoOffer() {
+    if (!armed()) return;
+
+    /* pointerdown is what a tap or a mouse press actually produces, and it is
+       the earliest of them. click and keydown are here as well because a
+       button reached by keyboard or by assistive tech raises those without
+       ever raising pointerdown, and those people should be offered the app
+       too. Whichever arrives first wins; the rest are taken back down. */
+    var EVENTS = ["pointerdown", "touchstart", "click", "keydown"];
+    var fired = false;
+
+    function done() {
+      EVENTS.forEach(function (n) { document.removeEventListener(n, go, true); });
+    }
+    function go() {
+      if (fired) return;
+      fired = true;
+      done();
+      disarm();
+      if (isApple()) {
+        // Only a panel of instructions, with no activation riding on it, so it
+        // can wait for the page's own click to finish first.
+        setTimeout(howTo, 0);
+      } else {
+        // Called straight from the gesture. A timer, even a zero one, is
+        // exactly how a page loses the activation prompt() insists on.
+        onClick();
+      }
+    }
+    EVENTS.forEach(function (n) { document.addEventListener(n, go, true); });
+  }
+
+  function offer() { makeButton(); makeCard(); autoOffer(); }
 
   // iOS gets both straight away - there is no event coming.
   if (isApple()) {
