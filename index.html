@@ -974,6 +974,22 @@
     if (!maybeRedirectConnectedUser()) {
       handleOAuthCallback();
       maybeShowConnectHelpAfterReturn();
+
+      /* Arriving from a Start button on another page (/?start=1).
+         Connecting can only begin here: startOAuthLogin builds its redirect_uri
+         from the CURRENT path, and only this one is registered with Deriv — so a
+         Connect button on any other page has to send people here first and let
+         the real flow run. This reuses that flow rather than copying it.
+
+         The parameter is cleared before the trigger fires, so a refresh does not
+         reopen the dialog. A visitor who is already connected never reaches this
+         line: maybeRedirectConnectedUser has already sent them to the dashboard,
+         which is what "start" means for them. */
+      const q = new URLSearchParams(window.location.search);
+      if (q.get("start") === "1" && !q.get("code") && !q.get("error")) {
+        history.replaceState({}, "", window.location.pathname);
+        onConnectTrigger();
+      }
     }
   </script>
   <!-- Support, on the front door. This is exactly where somebody who cannot
