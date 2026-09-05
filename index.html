@@ -410,6 +410,35 @@
       text-align: center;
     }
 
+    /* The guide links under the feature cards. Pills rather than a list —
+       they sit below a row of cards and a bulleted list would read as an
+       afterthought. Their real job is giving crawlers a path to those pages. */
+    .landing-links {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 26px auto 0;
+      max-width: 900px;
+    }
+
+    .landing-links a {
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      color: #e5e7eb;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(6px);
+      transition: background .15s ease;
+    }
+
+    .landing-links a:hover { background: rgba(255, 255, 255, 0.10); }
+
     .feature-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -627,6 +656,16 @@
           <p>Download MT5 bots and set them up quickly for faster deployment and better workflow.</p>
         </div>
       </div>
+
+      <!-- The guides. They exist mostly for people arriving from a search, but
+           they need a crawlable path in from here or Google never finds them —
+           the legit page sat unlinked for exactly that reason. -->
+      <nav class="landing-links" aria-label="Guides">
+        <a href="/free-deriv-bots.html">Free Deriv bots</a>
+        <a href="/is-magic-bots-lab-legit.html">Is Magic Bots Lab legit?</a>
+        <a href="/no-loss-trading-bot.html">Is there a no-loss bot?</a>
+        <a href="/trading-terms-explained.html">Trading terms explained</a>
+      </nav>
 
       <div class="disclaimer-section" id="disclaimerSection">
         <div class="disclaimer-title">DISCLAIMER</div>

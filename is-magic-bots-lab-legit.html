@@ -121,6 +121,10 @@
 
     /* ── Sections ── */
     .sec { padding-block: clamp(30px, 4.6vw, 56px); border-top: 1px solid var(--border); }
+    .more { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .more a { padding: 9px 16px; font-size: 13px; font-weight: 650; text-decoration: none;
+      color: var(--text); border: 1px solid var(--border); border-radius: 999px; background: var(--panel); }
+    .more a:hover { background: var(--panel-2); }
     .sec-k { margin: 0 0 10px; font-size: 11.5px; font-weight: 800; letter-spacing: 0.16em;
       text-transform: uppercase; color: var(--faint); }
     h2 { margin: 0 0 10px; font-size: clamp(1.35rem, 3vw, 2rem); font-weight: 750; letter-spacing: -0.03em; }
@@ -522,6 +526,16 @@
           <a class="go-btn go-btn--lg" href="/?start=1">Start free</a>
           <a class="line-btn" href="/">Back to Magic Bots Lab</a>
         </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <p class="sec-k">Read next</p>
+      <h2>More, in plain English</h2>
+      <div class="more">
+        <a href="/free-deriv-bots.html">The 11 free Deriv bots</a>
+        <a href="/no-loss-trading-bot.html">Is there a no-loss bot?</a>
+        <a href="/trading-terms-explained.html">Trading terms explained</a>
       </div>
     </section>
 

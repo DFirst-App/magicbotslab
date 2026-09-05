@@ -4,6 +4,9 @@
   "redirects": [
     { "source": "/creator-program.html", "destination": "/", "permanent": false },
     { "source": "/creator-program", "destination": "/", "permanent": false },
-    { "source": "/is-magic-bots-lab-legit", "destination": "/is-magic-bots-lab-legit.html", "permanent": false }
+    { "source": "/is-magic-bots-lab-legit", "destination": "/is-magic-bots-lab-legit.html", "permanent": false },
+    { "source": "/free-deriv-bots", "destination": "/free-deriv-bots.html", "permanent": false },
+    { "source": "/no-loss-trading-bot", "destination": "/no-loss-trading-bot.html", "permanent": false },
+    { "source": "/trading-terms-explained", "destination": "/trading-terms-explained.html", "permanent": false }
   ]
 }
