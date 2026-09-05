@@ -6,8 +6,18 @@
 
   <url>
     <loc>https://magicbotslab.com/</loc>
-    <lastmod>2026-05-23</lastmod>
+    <lastmod>2026-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+
+  <!-- Google already ranks this page and people arrive on it having searched
+       whether we are a scam. It was redirecting to the homepage, which answered
+       nothing; it is a real page again, so it belongs here. -->
+  <url>
+    <loc>https://magicbotslab.com/is-magic-bots-lab-legit.html</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>
