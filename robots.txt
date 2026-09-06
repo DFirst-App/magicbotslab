@@ -5,5 +5,8 @@ Allow: /
 # Simulation page (not for public search)
 Disallow: /simtrading-bots.html
 
+# IndexNow key: cc33fd64e1084a3ca7345e0320e0fd47 — served at
+# /cc33fd64e1084a3ca7345e0320e0fd47.txt for Bing, Yandex and Seznam.
+
 # Sitemap (canonical host)
 Sitemap: https://magicbotslab.com/sitemap.xml
