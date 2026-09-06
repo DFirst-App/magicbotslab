@@ -2,8 +2,12 @@
 User-agent: *
 Allow: /
 
-# Simulation page (not for public search)
-Disallow: /simtrading-bots.html
+# Nothing is disallowed here on purpose. The pages that should stay out of
+# results carry noindex in their own <head>, which is the stronger option: a
+# crawler told not to fetch a page never reads the noindex on it, so a URL
+# somebody links to can still surface. robots.txt is world-readable too, so
+# naming a page you would rather nobody found is an index of what to go and
+# look at. Letting crawlers fetch and read the tag is what actually removes it.
 
 # IndexNow key: cc33fd64e1084a3ca7345e0320e0fd47 — served at
 # /cc33fd64e1084a3ca7345e0320e0fd47.txt for Bing, Yandex and Seznam.
