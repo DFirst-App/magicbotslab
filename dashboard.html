@@ -271,8 +271,18 @@
     /* The real marks instead of the words. The chip keeps its padding and the
        image is held to the height the 10px capitals occupied, so the button
        measures exactly what it did — only what is inside the chips changed. */
-    .start-trading-btn .chip--logo { display: inline-flex; align-items: center; }
-    .start-trading-btn .chip--logo img { height: 12px; width: auto; display: block; }
+    /* Both wordmarks are drawn for dark backgrounds — white and red fills —
+       so the pale wash the text chips used made them vanish into the blue.
+       A dark chip is what they were designed to sit on, and 16px is the
+       smallest the letters in "MetaTrader 5" stay legible at. The button's
+       min-height already covers it, so it is no taller. */
+    .start-trading-btn .chip--logo {
+      display: inline-flex; align-items: center;
+      padding: 3px 9px; border-radius: 8px;
+      background: rgba(4, 18, 40, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    .start-trading-btn .chip--logo img { height: 16px; width: auto; display: block; }
 
     /* Earning by posting is a different kind of thing from trading, so it keeps
        its own colour rather than becoming a second blue button nobody reads.
