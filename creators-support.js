@@ -81,6 +81,34 @@
   panel.hidden = true;
   document.body.appendChild(panel);
 
+  /**
+   * Anything on the page can ask for the bubble, and hand it what was just
+   * sent on the page's behalf.
+   *
+   * The MT5 EA request uses this. It posts the request itself — it has to,
+   * because it also records the row a code is issued against — but the person
+   * then needs to SEE it here, in the thread the answer will arrive in. Without
+   * that they open the bubble onto an empty conversation and cannot tell
+   * whether anything happened. So the name and email it collected fill the
+   * fields, the message it sent is added as sent, and the panel opens.
+   */
+  window.MBL_SUPPORT_ASK = function (d) {
+    d = d || {};
+    if (d.name) { state.name = d.name; set(NAME_KEY, d.name); }
+    if (isEmail(d.email)) { state.email = d.email; set(MAIL_KEY, d.email); }
+    if (d.text) {
+      remember({
+        id: String(Date.now()) + Math.random().toString(16).slice(2),
+        text: d.text, at: new Date().toISOString(), from: "them", sent: true,
+      });
+    }
+    toggle(true);
+    schedule();
+    poll();
+  };
+  /** The browser id this widget answers to — the same one a request is bound to. */
+  window.MBL_SUPPORT_ID = id;
+
   /** A creator's own details beat anything cached here. */
   window.MBL_SUPPORT_IDENTITY = function (name, email) {
     if (name) { state.name = name; set(NAME_KEY, name); }
@@ -107,7 +135,7 @@
 
       '<div class="sup-body" id="supBody">' +
         '<div class="sup-msg">Hi' + (state.name ? " " + esc(state.name.split(" ")[0]) : "") +
-          " — ask us anything about the Creator Program or the bots. Tell us what happened and what you expected. " +
+          " — " + (window.MBL_SUPPORT_GREETING || "ask us anything about the Creator Program or the bots. Tell us what happened and what you expected.") + " " +
           "The answer comes back here.</div>" +
         state.thread.map(function (l) {
           if (l.from === "us") {

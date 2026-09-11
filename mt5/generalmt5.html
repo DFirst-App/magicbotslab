@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Deriv MT5 — full automation · Magic Bots Lab</title>
+  <meta name="description" content="One free Expert Advisor that trades forex and Volatility Indices automatically on your own MetaTrader 5 terminal. Install it once on a single chart and it handles the rest." />
+  <link rel="canonical" href="https://magicbotslab.com/mt5/generalmt5" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://magicbotslab.com/mt5/generalmt5" />
+  <meta property="og:title" content="Deriv MT5 — full automation · Magic Bots Lab" />
+  <meta property="og:description" content="Free MT5 Expert Advisor for forex and Volatility Indices. Download it, set your risk profile and run it on your own terminal." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/mt5/generalmt5.css" />
+  <link rel="stylesheet" href="/support.css" />
+</head>
+<body>
+  <div class="grid-floor" aria-hidden="true"></div>
+
+  <main class="page">
+    <header class="top">
+      <a class="back" href="/trading-dashboard.html">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        Trading dashboard
+      </a>
+      <span class="sep"></span>
+      <span class="brand">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+        MT5 AUTOMATIONS
+      </span>
+      <div class="top-end">
+        <span class="updated" id="updated" hidden></span>
+        <button type="button" class="refresh" id="refresh">
+          <svg id="refreshIcon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+          Refresh
+        </button>
+      </div>
+    </header>
+
+    <h1>Deriv MT5 — full automation</h1>
+    <p class="lede">One Expert Advisor that trades forex and Volatility Indices automatically on your own MetaTrader 5 terminal. Install it once on a single chart and it handles the rest.</p>
+
+    <div class="err" id="pageErr" hidden></div>
+
+    <!-- 1 -->
+    <section class="section">
+      <div class="section-head"><span class="section-n">1</span><h2>Get it running</h2></div>
+      <div class="section-body">
+        <div class="card">
+          <div class="card-row">
+            <button type="button" class="btn-primary" id="openEa">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+              Download Clunoid EA
+            </button>
+            <span class="hint">One EA, one chart — no per-market setup.</span>
+          </div>
+          <ol class="steps">
+            <li><span class="n">1</span><span>Copy the file into MT5’s <code class="cx">MQL5/Experts</code> folder — find it via <code class="cx">File → Open Data Folder</code>.</span></li>
+            <li><span class="n">2</span><span>In MT5 go to <code class="cx">Tools → Options → Expert Advisors</code>, tick <b>Allow WebRequest</b> and add <code class="cx">https://www.clunoid.com</code>.</span></li>
+            <li><span class="n">3</span><span>Restart MT5, or press <b>Compile</b> in MetaEditor. The bot then appears under Expert Advisors.</span></li>
+            <li><span class="n">4</span><span>Drag it onto <b>any one chart</b>, set <code class="cx">InpProfile</code> to your risk level, and enable <b>Algo Trading</b>.</span></li>
+            <li><span class="n">5</span><span>(Recommended) Right-click the bot → <b>Register a Virtual Server</b> so it keeps trading with your computer off.</span></li>
+          </ol>
+          <p class="fine">You keep full custody — it runs on your own terminal and we never see a password. Once it is set up it needs nothing further from this page.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section class="section">
+      <div class="section-head"><span class="section-n">2</span><h2>Choose your risk profile</h2></div>
+      <div class="section-body">
+        <div class="profiles" id="profiles"></div>
+        <p class="note">Set the same level in the bot’s <code class="cx">InpProfile</code> input. You can change it at any time without reinstalling.</p>
+      </div>
+    </section>
+
+    <!-- 3 -->
+    <section class="section">
+      <div class="section-head"><span class="section-n">3</span><h2>Live signals</h2><span class="section-right" id="signalsMeta"></span></div>
+      <div class="section-body">
+        <div id="signals"></div>
+        <details class="aside" id="aside" hidden>
+          <summary id="asideSummary"></summary>
+          <div class="aside-list" id="asideList"></div>
+        </details>
+      </div>
+    </section>
+
+    <p class="disclaimer">
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.1 2.18a9.93 9.93 0 0 1 3.8 0"/><path d="M17.6 3.71a9.95 9.95 0 0 1 2.69 2.7"/><path d="M21.82 10.1a9.93 9.93 0 0 1 0 3.8"/><path d="M20.29 17.6a9.95 9.95 0 0 1-2.7 2.69"/><path d="M13.9 21.82a9.94 9.94 0 0 1-3.8 0"/><path d="M6.4 20.29a9.95 9.95 0 0 1-2.69-2.7"/><path d="M2.18 13.9a9.93 9.93 0 0 1 0-3.8"/><path d="M3.71 6.4a9.95 9.95 0 0 1 2.7-2.69"/></svg>
+      Trading carries risk. This is an automated tool, not financial advice or a profit guarantee. Never risk more than you can afford to lose.
+    </p>
+  </main>
+
+  <!-- ── the access modal: four steps ─────────────────────────────────── -->
+  <div class="modal-root" id="modalRoot" hidden role="dialog" aria-modal="true" aria-label="Get the Clunoid MT5 EA">
+    <div class="modal">
+      <header class="modal-head">
+        <div style="min-width:0;flex:1">
+          <h2>Get the Clunoid EA</h2>
+          <p>The EA runs on <b>clunoid.com technology</b> — it asks the trading engine for its signals as it trades. We share it with our own community only, so there are a few steps first.</p>
+        </div>
+        <button type="button" class="modal-close" id="modalClose" aria-label="Close">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </header>
+
+      <div class="modal-body" id="modalBody">
+        <div id="modalForm">
+          <div class="step" data-step="1">
+            <div class="step-head"><span class="step-n">1</span><h3>Open an MT5 account with Deriv</h3></div>
+            <div class="step-body">
+              <p>Already have one under us? Skip to step 2.</p>
+              <a class="btn-ghost" href="https://t.deriv.link?t=8FJ7FBEALQBP" target="_blank" rel="noopener noreferrer">
+                <img src="/metatrader5.svg" alt="MetaTrader 5" />
+                <span>Create account</span>
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="step" data-step="2">
+            <div class="step-head"><span class="step-n">2</span><h3>Client ID or MT5 ID</h3></div>
+            <div class="step-body">
+              <input class="field" id="clientId" placeholder="019cafdd-b40f-7552-83a9-a0d5d69125d5" autocomplete="off" />
+              <p class="help">Either works — a client ID looks like the example above, an MT5 ID is a short run of digits.
+                <a href="https://home.deriv.com/dashboard/profile" target="_blank" rel="noopener noreferrer">Copy it from your Deriv profile</a></p>
+            </div>
+          </div>
+
+          <div class="step" data-step="3">
+            <div class="step-head"><span class="step-n">3</span><h3>Name and email</h3></div>
+            <div class="step-body">
+              <div class="two">
+                <input class="field" id="name" placeholder="Your name" autocomplete="name" />
+                <input class="field" id="email" type="email" placeholder="you@email.com" autocomplete="email" />
+              </div>
+              <p class="help">So we can reach you about this account. Nothing else.</p>
+              <button type="button" class="btn-primary" id="send" style="margin-top:10px" disabled>
+                <svg id="sendIcon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+                Send for checking
+              </button>
+            </div>
+          </div>
+
+          <div class="sent" id="sentNote" hidden>
+            <b>Sent.</b> We are checking your ID against our community list now. Your code arrives in the <b>support window</b> — it has opened at the corner of this page, and the reply lands there.
+          </div>
+
+          <div class="step" data-step="4">
+            <div class="step-head"><span class="step-n">4</span><h3>Enter your download code</h3></div>
+            <div class="step-body">
+              <div class="row">
+                <input class="field code" id="code" placeholder="MBL-XXXX-XXXX" autocomplete="off" />
+                <button type="button" class="btn-primary" id="redeem" disabled>
+                  <svg id="redeemIcon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                  Download
+                </button>
+              </div>
+              <p class="help">Your code only works on this browser.</p>
+            </div>
+          </div>
+
+          <div class="modal-err" id="modalErr" hidden></div>
+
+          <p class="modal-foot">We check every ID against our Deriv partner list. If yours is not under us, we will say so and ask you to contact Deriv support to be added under <code>019cafdd-b40f-7552-83a9-a0d5d69125d5</code> — then reply in the support window and we will check again.</p>
+        </div>
+
+        <div class="done-wrap" id="modalDone" hidden>
+          <div class="done-ico">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <h3>Downloaded</h3>
+          <p>ClunoidMT5.mq5 is in your downloads. Follow the install steps on this page next. Keep your code — it works again on this browser if you need the file later.</p>
+          <button type="button" class="btn-primary" id="doneClose">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // The access code arrives as a support reply, so the bubble has to exist on
+    // this page for there to be somewhere for it to land.
+    window.MBL_SUPPORT_SOURCE = "MT5 bots";
+    window.MBL_SUPPORT_GREETING = "ask us anything about the MT5 bot. Tell us what happened and what you expected.";
+  </script>
+  <script src="/creators-support.js" defer></script>
+  <script src="/mt5/generalmt5.js" defer></script>
+</body>
+</html>
