@@ -23,7 +23,7 @@ const TABLE = "mbl_ea_requests";
 /** Deriv's partner id — the list an account has to appear under. */
 const PARTNER_ID = "019ddd76-616c-7952-a74d-c410f13ca9cd";
 /** Where somebody without an account is sent to open one under us. */
-const DERIV_SIGNUP = "https://partner-tracking.deriv.com/click?a=18562&o=1&c=3&link_id=1";
+const DERIV_SIGNUP = "https://t.deriv.link?t=5HBLVPVNNFJ8";
 /** Where the client ID is copied from. Plain: the token belongs on signup. */
 const DERIV_PROFILE = "https://home.deriv.com/dashboard/profile";
 /** What one looks like, so nobody has to guess which number we mean. */
