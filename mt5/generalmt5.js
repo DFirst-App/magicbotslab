@@ -5,8 +5,8 @@
  *
  *   1. The risk profile picker, remembered in this browser, which also decides
  *      which signal set is shown.
- *   2. The live signals, fetched through /api/mt5/signals (a proxy to the
- *      clunoid.com engine the EA itself reads) and refreshed every minute.
+ *   2. The live signals, fetched through /api/mt5/signals — the same feed the
+ *      EA itself reads — and refreshed every minute.
  *   3. The access modal: four steps, ending in a download that only a code
  *      issued to THIS browser can unlock. The request goes through the support
  *      pipe, the answer arrives in the support bubble, and the bubble is opened
@@ -278,7 +278,7 @@
       .then(function (blob) {
         var url = URL.createObjectURL(blob);
         var a = document.createElement("a");
-        a.href = url; a.download = "ClunoidMT5.mq5";
+        a.href = url; a.download = "MagicBotsLabMT5.mq5";
         document.body.appendChild(a); a.click(); a.remove();
         URL.revokeObjectURL(url);
         phase = "done";

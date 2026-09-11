@@ -55,13 +55,13 @@
           <div class="card-row">
             <button type="button" class="btn-primary" id="openEa">
               <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-              Download Clunoid EA
+              Download MagicBotsLab EA
             </button>
             <span class="hint">One EA, one chart — no per-market setup.</span>
           </div>
           <ol class="steps">
             <li><span class="n">1</span><span>Copy the file into MT5’s <code class="cx">MQL5/Experts</code> folder — find it via <code class="cx">File → Open Data Folder</code>.</span></li>
-            <li><span class="n">2</span><span>In MT5 go to <code class="cx">Tools → Options → Expert Advisors</code>, tick <b>Allow WebRequest</b> and add <code class="cx">https://www.clunoid.com</code>.</span></li>
+            <li><span class="n">2</span><span>In MT5 go to <code class="cx">Tools → Options → Expert Advisors</code>, tick <b>Allow WebRequest</b> and add <code class="cx">https://magicbotslab.com/</code>.</span></li>
             <li><span class="n">3</span><span>Restart MT5, or press <b>Compile</b> in MetaEditor. The bot then appears under Expert Advisors.</span></li>
             <li><span class="n">4</span><span>Drag it onto <b>any one chart</b>, set <code class="cx">InpProfile</code> to your risk level, and enable <b>Algo Trading</b>.</span></li>
             <li><span class="n">5</span><span>(Recommended) Right-click the bot → <b>Register a Virtual Server</b> so it keeps trading with your computer off.</span></li>
@@ -99,12 +99,12 @@
   </main>
 
   <!-- ── the access modal: four steps ─────────────────────────────────── -->
-  <div class="modal-root" id="modalRoot" hidden role="dialog" aria-modal="true" aria-label="Get the Clunoid MT5 EA">
+  <div class="modal-root" id="modalRoot" hidden role="dialog" aria-modal="true" aria-label="Get the MagicBotsLab MT5 EA">
     <div class="modal">
       <header class="modal-head">
         <div style="min-width:0;flex:1">
-          <h2>Get the Clunoid EA</h2>
-          <p>The EA runs on <b>clunoid.com technology</b> — it asks the trading engine for its signals as it trades. We share it with our own community only, so there are a few steps first.</p>
+          <h2>Get the MagicBotsLab EA</h2>
+          <p>The EA runs on <b>Magic Bots Lab technology</b> — it asks our trading engine for its signals as it trades. We share it with our own community only, so there are a few steps first.</p>
         </div>
         <button type="button" class="modal-close" id="modalClose" aria-label="Close">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -117,7 +117,7 @@
             <div class="step-head"><span class="step-n">1</span><h3>Open an MT5 account with Deriv</h3></div>
             <div class="step-body">
               <p>Already have one under us? Skip to step 2.</p>
-              <a class="btn-ghost" href="https://t.deriv.link?t=8FJ7FBEALQBP" target="_blank" rel="noopener noreferrer">
+              <a class="btn-ghost" href="https://partner-tracking.deriv.com/click?a=18562&o=1&c=3&link_id=1" target="_blank" rel="noopener noreferrer">
                 <img src="/metatrader5.svg" alt="MetaTrader 5" />
                 <span>Create account</span>
                 <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
@@ -128,7 +128,7 @@
           <div class="step" data-step="2">
             <div class="step-head"><span class="step-n">2</span><h3>Client ID or MT5 ID</h3></div>
             <div class="step-body">
-              <input class="field" id="clientId" placeholder="019cafdd-b40f-7552-83a9-a0d5d69125d5" autocomplete="off" />
+              <input class="field" id="clientId" placeholder="019ddd76-616c-7952-a74d-c410f13ca9cd" autocomplete="off" />
               <p class="help">Either works — a client ID looks like the example above, an MT5 ID is a short run of digits.
                 <a href="https://home.deriv.com/dashboard/profile" target="_blank" rel="noopener noreferrer">Copy it from your Deriv profile</a></p>
             </div>
@@ -169,7 +169,7 @@
 
           <div class="modal-err" id="modalErr" hidden></div>
 
-          <p class="modal-foot">We check every ID against our Deriv partner list. If yours is not under us, we will say so and ask you to contact Deriv support to be added under <code>019cafdd-b40f-7552-83a9-a0d5d69125d5</code> — then reply in the support window and we will check again.</p>
+          <p class="modal-foot">We check every ID against our Deriv partner list. If yours is not under us, we will say so and ask you to contact Deriv support to be added under <code>019ddd76-616c-7952-a74d-c410f13ca9cd</code> — then reply in the support window and we will check again.</p>
         </div>
 
         <div class="done-wrap" id="modalDone" hidden>
@@ -177,7 +177,7 @@
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
           </div>
           <h3>Downloaded</h3>
-          <p>ClunoidMT5.mq5 is in your downloads. Follow the install steps on this page next. Keep your code — it works again on this browser if you need the file later.</p>
+          <p>MagicBotsLabMT5.mq5 is in your downloads. Follow the install steps on this page next. Keep your code — it works again on this browser if you need the file later.</p>
           <button type="button" class="btn-primary" id="doneClose">Done</button>
         </div>
       </div>

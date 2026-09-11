@@ -1,7 +1,7 @@
 -- MT5 EA ACCESS — who asked, who was approved, and the code that lets them in.
 --
 -- The General MT5 Expert Advisor is free, but it is only for the trading
--- community: it takes its signals from the clunoid.com engine, and that is
+-- community: it takes its signals from our own engine, and that is
 -- shared with people who came to Deriv through us rather than with anyone who
 -- finds the page. So the file is not a public download; it is a request.
 --

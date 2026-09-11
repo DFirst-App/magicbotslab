@@ -1,8 +1,8 @@
 /**
  * MT5 EA ACCESS — the request, the decision, and the code.
  *
- * The General EA is free but not public: it runs on signals from the
- * clunoid.com engine, and that goes to the trading community rather than to
+ * The General EA is free but not public: it runs on signals from our own
+ * engine, and that goes to the trading community rather than to
  * anyone who finds the page. So the download asks first, the owner checks the
  * ID against the partner list on Deriv, and an approval mints a code.
  *
@@ -21,15 +21,15 @@ const { select, insert, update, configured } = require("./db");
 const TABLE = "mbl_ea_requests";
 
 /** Deriv's partner id — the list an account has to appear under. */
-const PARTNER_ID = "019cafdd-b40f-7552-83a9-a0d5d69125d5";
+const PARTNER_ID = "019ddd76-616c-7952-a74d-c410f13ca9cd";
 /** Where somebody without an account is sent to open one under us. */
-const DERIV_SIGNUP = "https://t.deriv.link?t=8FJ7FBEALQBP";
+const DERIV_SIGNUP = "https://partner-tracking.deriv.com/click?a=18562&o=1&c=3&link_id=1";
 /** Where the client ID is copied from. Plain: the token belongs on signup. */
 const DERIV_PROFILE = "https://home.deriv.com/dashboard/profile";
 /** What one looks like, so nobody has to guess which number we mean. */
-const EXAMPLE_CLIENT_ID = "019cafdd-b40f-7552-83a9-a0d5d69125d5";
+const EXAMPLE_CLIENT_ID = "019ddd76-616c-7952-a74d-c410f13ca9cd";
 /** The file itself, bundled beside the function rather than served from /. */
-const EA_FILE = "ClunoidMT5.mq5";
+const EA_FILE = "MagicBotsLabMT5.mq5";
 
 /* No I, O, 1 or 0 — the alphabet for anything a human copies by eye. */
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";

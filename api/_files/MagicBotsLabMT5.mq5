@@ -1,10 +1,10 @@
 //+------------------------------------------------------------------+
-//|                                                  ClunoidMT5.mq5   |
-//|   Clunoid Trading — Deriv MT5 automation (Model A, custody-free)  |
+//|                                             MagicBotsLabMT5.mq5   |
+//|   Magic Bots Lab — Deriv MT5 automation (custody-free)            |
 //|                                                                   |
-//|   The AI/strategy runs in Clunoid's cloud. This EA polls the      |
+//|   The strategy runs in Magic Bots Lab's cloud. This EA polls the  |
 //|   signal feed and executes on YOUR terminal, on YOUR account —    |
-//|   Clunoid never sees a password. Put it on a VPS (Deriv/MT5       |
+//|   We never see a password. Put it on a VPS (Deriv/MT5             |
 //|   Virtual Hosting) to trade 24/7 with your PC off.                |
 //|                                                                   |
 //|   Opens trades, sets stop-loss & take-profit, TRAILS the stop,    |
@@ -13,10 +13,10 @@
 //|                                                                   |
 //|   One-time setup: Tools > Options > Expert Advisors >             |
 //|     tick "Allow WebRequest for listed URL" and add:               |
-//|         https://www.clunoid.com                                   |
+//|         https://magicbotslab.com/                                 |
 //+------------------------------------------------------------------+
-#property copyright "Clunoid"
-#property link      "https://www.clunoid.com"
+#property copyright "Magic Bots Lab"
+#property link      "https://magicbotslab.com"
 #property version   "3.10"
 #property strict
 
@@ -26,7 +26,7 @@ enum RiskProfile { CONSERVATIVE=0, MODERATE=1, AGGRESSIVE=2 };
 
 input RiskProfile InpProfile        = AGGRESSIVE; // Risk profile — Conservative / Moderate / Aggressive (sets the risk caps)
 input int         InpPollSeconds    = 30;         // How often to poll for signals
-input long        InpMagic          = 77090001;   // Magic number (Clunoid trades only)
+input long        InpMagic          = 77090002;   // Magic number (Magic Bots Lab trades only)
 input int         InpMaxSpreadPts   = 40;         // Skip if spread exceeds this (points)
 input string      InpSymbolSuffix   = "";         // Broker symbol suffix, e.g. ".r" (blank if none)
 input double      InpMaxDailyLossPct= 5;          // Daily-loss cap % of day-start equity (halts new entries)
@@ -46,7 +46,7 @@ struct Sig
    int    nA; double aPrice[8]; double aPct[8];
   };
 
-string  g_base = "https://www.clunoid.com/api/deriv/mt5/signals";
+string  g_base = "https://magicbotslab.com/api/mt5/signals";
 CTrade  g_trade;
 double  g_dayStartEquity = 0.0;
 int     g_dayStart = 0;
@@ -62,9 +62,9 @@ int OnInit()
    g_trade.SetDeviationInPoints(20);
    // Restore last-known risk caps (account-scoped) so a header-less first poll
    // still has limits; a fresh account with none blocks entries until caps arrive.
-   g_maxOpenRisk = GVget("cl_capmax"+AcctSuffix(), 0);
-   g_corrCap     = GVget("cl_capcorr"+AcctSuffix(), 0);
-   g_dailyLoss   = GVget("cl_capdaily"+AcctSuffix(), 0);
+   g_maxOpenRisk = GVget("mbl_capmax"+AcctSuffix(), 0);
+   g_corrCap     = GVget("mbl_capcorr"+AcctSuffix(), 0);
+   g_dailyLoss   = GVget("mbl_capdaily"+AcctSuffix(), 0);
    // Persist the daily-loss baseline PER ACCOUNT so a mid-day reinit/restart (or a
    // demo<->real account switch in the same terminal) doesn't re-anchor it.
    int today = DayOfYearNow();
@@ -75,7 +75,7 @@ int OnInit()
    g_dayStart = today;
 
    EventSetTimer(MathMax(5, InpPollSeconds));
-   PrintFormat("Clunoid MT5 EA v3.1 started — profile=%s, trading forex + Volatility. Ensure https://www.clunoid.com is whitelisted in WebRequest.", ProfileStr());
+   PrintFormat("Magic Bots Lab MT5 EA v3.1 started — profile=%s, trading forex + Volatility. Ensure https://magicbotslab.com/ is whitelisted in WebRequest.", ProfileStr());
    Poll();
    return(INIT_SUCCEEDED);
   }
@@ -102,7 +102,7 @@ double OnTester()
    return profit / (1.0 + ddPct);   // reward profit, penalise drawdown
   }
 
-// Stamp the re-entry cooldown when a Clunoid position CLOSES (not at entry).
+// Stamp the re-entry cooldown when a Magic Bots Lab position CLOSES (not at entry).
 void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest &req, const MqlTradeResult &res)
   {
    if(trans.type!=TRADE_TRANSACTION_DEAL_ADD) return;
@@ -184,7 +184,7 @@ void Poll()
    CleanupPlans();                             // drop plans for closed tickets
 
    string capFlag = (g_maxOpenRisk<=0) ? " · CAPS PENDING (entries blocked)" : "";
-   Comment(StringFormat("Clunoid MT5 v3.1 · %s · forex+volatility · %d signals · %s%s%s%s",
+   Comment(StringFormat("Magic Bots Lab MT5 v3.1 · %s · forex+volatility · %d signals · %s%s%s%s",
            ProfileStr(), nSigs, TimeToString(TimeCurrent(), TIME_SECONDS), dailyHalt?" · DAILY LOSS HALT":"", capFlag, stale?" · STALE FEED":""));
   }
 
@@ -196,11 +196,11 @@ void ParseCaps(string line)
    // "# caps: maxOpenRisk=5 corrCap=2" — only accept positive values, and cache
    // the last-known-good (account-scoped) so a later header-less feed keeps limits.
    int p = StringFind(line, "maxOpenRisk=");
-   if(p>=0) { double v=StringToDouble(StringSubstr(line, p+12)); if(v>0) { g_maxOpenRisk=v; GVset("cl_capmax"+AcctSuffix(), v); } }
+   if(p>=0) { double v=StringToDouble(StringSubstr(line, p+12)); if(v>0) { g_maxOpenRisk=v; GVset("mbl_capmax"+AcctSuffix(), v); } }
    int q = StringFind(line, "corrCap=");
-   if(q>=0) { double v=StringToDouble(StringSubstr(line, q+8)); if(v>0) { g_corrCap=v; GVset("cl_capcorr"+AcctSuffix(), v); } }
+   if(q>=0) { double v=StringToDouble(StringSubstr(line, q+8)); if(v>0) { g_corrCap=v; GVset("mbl_capcorr"+AcctSuffix(), v); } }
    int dl = StringFind(line, "dailyLoss=");
-   if(dl>=0) { double v=StringToDouble(StringSubstr(line, dl+10)); if(v>0) { g_dailyLoss=v; GVset("cl_capdaily"+AcctSuffix(), v); } }
+   if(dl>=0) { double v=StringToDouble(StringSubstr(line, dl+10)); if(v>0) { g_dailyLoss=v; GVset("mbl_capdaily"+AcctSuffix(), v); } }
    // "ts=<unix seconds>" — the feed's generation time, for the staleness guard.
    int r = StringFind(line, "ts=");
    if(r>=0) { long v=StringToInteger(StringSubstr(line, r+3)); if(v>0) g_feedTs=v; }
@@ -259,17 +259,17 @@ void OpenBase(Sig &s)
    if(lots<=0) return;
 
    g_trade.SetTypeFillingBySymbol(sym);
-   bool ok = buy ? g_trade.Buy(lots, sym, price, s.sl, s.tp, "clunoid")
-                 : g_trade.Sell(lots, sym, price, s.sl, s.tp, "clunoid");
+   bool ok = buy ? g_trade.Buy(lots, sym, price, s.sl, s.tp, "mbl")
+                 : g_trade.Sell(lots, sym, price, s.sl, s.tp, "mbl");
    if(ok)
      {
       GVset("cl_add_"+sym, 0);                 // reset pyramid counter for this symbol
       BindPlan(s, lots, s.risk);
       int d=(int)SymbolInfoInteger(sym,SYMBOL_DIGITS);
-      PrintFormat("Clunoid %s %s %.2f lots @ %s SL %s TP %s", s.side, sym, lots,
+      PrintFormat("MBL %s %s %.2f lots @ %s SL %s TP %s", s.side, sym, lots,
                   DoubleToString(price,d), DoubleToString(s.sl,d), DoubleToString(s.tp,d));
      }
-   else PrintFormat("Clunoid order failed %s %s: %d", s.side, sym, g_trade.ResultRetcode());
+   else PrintFormat("MBL order failed %s %s: %d", s.side, sym, g_trade.ResultRetcode());
   }
 
 void DoPyramiding(Sig &sigs[], int n)
@@ -309,13 +309,13 @@ void DoPyramiding(Sig &sigs[], int n)
       if(lots<=0) continue;
 
       g_trade.SetTypeFillingBySymbol(sym);
-      bool ok = buy ? g_trade.Buy(lots, sym, price, sigs[k].sl, sigs[k].tp, "clunoid-add")
-                    : g_trade.Sell(lots, sym, price, sigs[k].sl, sigs[k].tp, "clunoid-add");
+      bool ok = buy ? g_trade.Buy(lots, sym, price, sigs[k].sl, sigs[k].tp, "mbl-add")
+                    : g_trade.Sell(lots, sym, price, sigs[k].sl, sigs[k].tp, "mbl-add");
       if(ok)
         {
          GVset("cl_add_"+sym, done+1);
          BindPlan(sigs[k], lots, apct);
-         PrintFormat("Clunoid ADD #%d %s %s %.2f lots", done+1, sigs[k].side, sym, lots);
+         PrintFormat("MBL ADD #%d %s %s %.2f lots", done+1, sigs[k].side, sym, lots);
         }
      }
   }
@@ -328,7 +328,7 @@ void BindPlan(Sig &s, double lots, double riskPct)
    if(deal>0 && HistoryDealSelect(deal)) posTk=(ulong)HistoryDealGetInteger(deal, DEAL_POSITION_ID);
    if(posTk==0 || !PositionSelectByTicket(posTk)) posTk=FindUnplannedPosition(s.sym+InpSymbolSuffix);
    if(posTk>0) StorePlan(posTk, s, lots, riskPct);
-   else PrintFormat("Clunoid: opened %s but could not bind plan yet (will retry next poll).", s.sym);
+   else PrintFormat("MBL: opened %s but could not bind plan yet (will retry next poll).", s.sym);
   }
 
 // Total + per-cluster open-risk cap, enforced against the live book (incl. adds).
@@ -463,7 +463,7 @@ void DeleteTicketGVs(ulong tk)
    for(int i=0;i<8;i++) { GlobalVariableDel("cl_pp_"+T+"_"+(string)i); GlobalVariableDel("cl_pc_"+T+"_"+(string)i); }
   }
 
-// Attach a plan to any Clunoid position that has none yet (heals a missed bind).
+// Attach a plan to any Magic Bots Lab position that has none yet (heals a missed bind).
 void AttachMissingPlans(Sig &sigs[], int n)
   {
    for(int i=PositionsTotal()-1;i>=0;i--)
@@ -544,7 +544,7 @@ ulong FindUnplannedPosition(string sym)
 //+------------------------------------------------------------------+
 //| Re-entry cooldown (stamped on EXIT via OnTradeTransaction)       |
 //+------------------------------------------------------------------+
-string GVKey(string sym) { return "clunoid_last_"+sym; }
+string GVKey(string sym) { return "mbl_last_"+sym; }
 bool OnCooldown(string sym)
   {
    if(InpReentryCooldownMin<=0) return false;
@@ -596,7 +596,7 @@ string HttpGet(string url)
    if(code==-1)
      {
       int err=GetLastError();
-      if(err==4014 || err==4060) PrintFormat("WebRequest blocked — add https://www.clunoid.com in Tools>Options>Expert Advisors.");
+      if(err==4014 || err==4060) PrintFormat("WebRequest blocked — add https://magicbotslab.com/ in Tools>Options>Expert Advisors.");
       else PrintFormat("WebRequest error %d", err);
       return "";
      }
