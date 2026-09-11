@@ -203,11 +203,26 @@
     }
 
     .header-mt5-btn .full-text {
-      display: inline;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
     }
 
     .header-mt5-btn .short-text {
       display: none;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* The MT5 mark in place of the word. Sized to the text's own line height
+       so the button's box does not change at all: 14px is the cap height of
+       11px Inter plus its leading, which is what the word occupied. */
+    .header-mt5-btn .mt5-logo {
+      height: 14px;
+      width: 18px;            /* the width the word "MT5" occupied, so the box is unchanged */
+      object-fit: contain;
+      display: block;
+      flex: none;
     }
 
     .deriv-balance-wrap {
@@ -1381,7 +1396,12 @@
       }
 
       .header-mt5-btn .short-text {
-        display: inline;
+        display: inline-flex;
+      }
+
+      .header-mt5-btn .mt5-logo {
+        height: 12px;
+        width: 19px;
       }
 
       .status-bar {
@@ -1578,8 +1598,8 @@
       </div>
       <div class="header-end">
         <a class="header-mt5-btn" href="/mt5/generalmt5">
-          <span class="full-text">Explore MT5 Bots →</span>
-          <span class="short-text">MT5 Bots →</span>
+          <span class="full-text">Explore <img class="mt5-logo" src="/logos/metatrader5.svg" alt="MT5" /> Bots →</span>
+          <span class="short-text"><img class="mt5-logo" src="/logos/metatrader5.svg" alt="MT5" /> Bots →</span>
         </a>
         <button class="btn primary" id="connectBtn" type="button" style="display:none;">Reconnect</button>
       </div>

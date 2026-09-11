@@ -268,6 +268,15 @@
     }
     .start-trading-btn .badges { display: inline-flex; gap: 5px; }
 
+    /* The real marks instead of the words. The chip keeps its padding and the
+       image is held to the height the 10px capitals occupied, so the button
+       measures exactly what it did — only what is inside the chips changed. */
+    .start-trading-btn .chip--logo { display: inline-flex; align-items: center; }
+    .start-trading-btn .chip--logo img { height: 12px; width: auto; display: block; }
+    /* The MT5 mark is square; held to the width the letters "MT5" took so the
+       button's overall width is unchanged too. */
+    .start-trading-btn .chip--logo img[alt="MT5"] { width: 20px; object-fit: contain; }
+
     /* Earning by posting is a different kind of thing from trading, so it keeps
        its own colour rather than becoming a second blue button nobody reads.
        Two lines and an arrow: what it is, what it pays, and that it goes
@@ -603,8 +612,8 @@
           <button class="btn start-trading-btn" id="startTradingBtn" type="button">
             <span>Open AI bots</span>
             <span class="badges">
-              <span class="chip">Deriv</span>
-              <span class="chip">MT5</span>
+              <span class="chip chip--logo"><img src="/logos/deriv.svg" alt="Deriv" /></span>
+              <span class="chip chip--logo"><img src="/logos/metatrader5.svg" alt="MT5" /></span>
             </span>
           </button>
           <a class="creators-btn" href="creators.html">
