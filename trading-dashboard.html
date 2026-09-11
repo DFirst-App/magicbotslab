@@ -217,10 +217,12 @@
     /* The MT5 mark in place of the word. Sized to the text's own line height
        so the button's box does not change at all: 14px is the cap height of
        11px Inter plus its leading, which is what the word occupied. */
+    /* The full MetaTrader 5 wordmark, not the icon alone. Held to the text's
+       own height so the button is no taller than it was; it is wider by the
+       width of the word, which is the point. */
     .header-mt5-btn .mt5-logo {
-      height: 14px;
-      width: 18px;            /* the width the word "MT5" occupied, so the box is unchanged */
-      object-fit: contain;
+      height: 13px;
+      width: auto;
       display: block;
       flex: none;
     }
@@ -1400,8 +1402,7 @@
       }
 
       .header-mt5-btn .mt5-logo {
-        height: 12px;
-        width: 19px;
+        height: 11px;
       }
 
       .status-bar {
