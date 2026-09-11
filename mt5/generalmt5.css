@@ -270,3 +270,21 @@ details.aside summary { cursor: pointer; font-size: 12px; font-weight: 500; colo
 .done-wrap h3 { margin: 12px 0 0; font-size: 15px; font-weight: 700; }
 .done-wrap p { margin: 6px 0 0; font-size: 12.5px; line-height: 1.6; color: var(--muted); }
 .done-wrap .btn-primary { margin-top: 16px; }
+
+/* ── the scrollbar ──────────────────────────────────────────────────────────
+ * The modal body scrolls on short screens, and the default bar — pale and
+ * square inside a dark rounded card — read as a defect. Thin, tinted to the
+ * accent, quiet until hovered; and the page's own bar matches it. */
+.modal-body { scrollbar-width: thin; scrollbar-color: rgba(0,210,255,.28) transparent; scrollbar-gutter: stable; }
+.modal-body::-webkit-scrollbar { width: 6px; }
+.modal-body::-webkit-scrollbar-track { background: transparent; }
+.modal-body::-webkit-scrollbar-thumb { background: rgba(0,210,255,.22); border-radius: 999px; }
+.modal-body:hover::-webkit-scrollbar-thumb { background: rgba(0,210,255,.4); }
+.modal-root { scrollbar-width: thin; scrollbar-color: rgba(0,210,255,.28) transparent; }
+.modal-root::-webkit-scrollbar { width: 6px; }
+.modal-root::-webkit-scrollbar-thumb { background: rgba(0,210,255,.22); border-radius: 999px; }
+html { scrollbar-width: thin; scrollbar-color: rgba(0,210,255,.28) #0f1117; }
+html::-webkit-scrollbar { width: 10px; }
+html::-webkit-scrollbar-track { background: #0f1117; }
+html::-webkit-scrollbar-thumb { background: rgba(0,210,255,.22); border-radius: 999px; border: 2px solid #0f1117; }
+html::-webkit-scrollbar-thumb:hover { background: rgba(0,210,255,.4); }

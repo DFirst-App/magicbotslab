@@ -13,7 +13,7 @@
  * real thing. A wrong one simply gets declined, which is a reply, not a wall.
  */
 
-const { readBody, json, isEmail, recordSupportInbound, supportHistory } = require("../_lib/db");
+const { readBody, json, isEmail, recordSupportInbound, supportHistory, isBanned } = require("../_lib/db");
 const { createRequest, attachTelegramMessage, recentRequestCount, approvedCodeFor, PARTNER_ID } = require("../_lib/ea");
 const { recordSupportReply } = require("../_lib/db");
 
@@ -43,6 +43,12 @@ module.exports = async (req, res) => {
   if (!mt5Login) return json(res, 422, { error: "Please paste your client ID or MT5 ID." });
   if (name.length < 2) return json(res, 422, { error: "Please give us a name to put to the account." });
   if (!isEmail(email)) return json(res, 422, { error: "That email does not look right." });
+
+  /* Barred people are turned away before anything is recorded or sent, so a
+     ban is quiet: nothing reaches Telegram and no row accumulates. */
+  if (await isBanned(visitorId, email)) {
+    return json(res, 403, { error: "We cannot take this request. If you think that is a mistake, reach us through the website." });
+  }
 
   /* ALREADY APPROVED — send the code back, do not queue them again. The form
      has no memory of having been answered; a returning visitor fills it in a

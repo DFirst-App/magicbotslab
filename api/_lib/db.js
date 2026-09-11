@@ -251,12 +251,18 @@ async function supportVisitorFor(tgMessageId) {
   return row ? { visitorId: row.visitor_id, email: row.email || null } : null;
 }
 
-/** Park the owner's reply for the visitor to collect. */
-async function recordSupportReply(visitorId, body) {
+/** Park the owner's reply for the visitor to collect. A file with no words is
+ *  a complete answer — a marked-up screenshot says what a paragraph would take
+ *  three tries to — so the text may be empty, and the widget renders whichever
+ *  parts are present. */
+async function recordSupportReply(visitorId, body, attachment) {
   const r = await insert(SUPPORT, {
     visitor_id: visitorId,
     direction: "out",
     body: String(body || "").slice(0, 4000),
+    attachment_url: (attachment && attachment.url) || null,
+    attachment_name: (attachment && attachment.name) || null,
+    attachment_type: (attachment && attachment.type) || null,
   });
   if (!r.ok) console.error("[mbl] could not record support reply:", r.error);
   return r.ok;
@@ -270,7 +276,7 @@ async function collectSupportReplies(visitorId) {
   if (!visitorId) return [];
   const r = await select(
     SUPPORT,
-    `select=id,body,created_at&visitor_id=eq.${encodeURIComponent(visitorId)}&direction=eq.out&seen_at=is.null&order=created_at.asc&limit=20`,
+    `select=${REPLY_FIELDS}&visitor_id=eq.${encodeURIComponent(visitorId)}&direction=eq.out&seen_at=is.null&order=created_at.asc&limit=20`,
   );
   if (!r.ok) { console.error("[mbl] collect failed:", r.error); return []; }
   const rows = r.data || [];
@@ -280,7 +286,32 @@ async function collectSupportReplies(visitorId) {
   const marked = await update(SUPPORT, `id=in.(${ids})`, { seen_at: new Date().toISOString() });
   if (!marked.ok) console.error("[mbl] could not mark seen:", marked.error);
 
-  return rows.map((x) => ({ id: x.id, body: x.body, createdAt: x.created_at }));
+  return rows.map(replyRow);
+}
+
+const REPLY_FIELDS = "id,body,created_at,attachment_url,attachment_name,attachment_type";
+const replyRow = (x) => ({
+  id: x.id, body: x.body, createdAt: x.created_at,
+  attachment: x.attachment_url
+    ? { url: x.attachment_url, name: x.attachment_name || "file", type: x.attachment_type || "application/octet-stream" }
+    : null,
+});
+
+/** The last few replies to this person, WITHOUT marking anything seen.
+ *
+ *  collectSupportReplies is one-shot by design. The cost of that shows up the
+ *  first time the shape of a reply changes: a browser running an older widget
+ *  collects the new rows, keeps only what it understands, and marks them seen
+ *  — and the rest is then unreachable. So there is a way to ask again.
+ *  Idempotent; the widget merges what comes back over what it has, by id. */
+async function recentSupportReplies(visitorId, limit) {
+  if (!visitorId) return [];
+  const r = await select(
+    SUPPORT,
+    `select=${REPLY_FIELDS}&visitor_id=eq.${encodeURIComponent(visitorId)}&direction=eq.out&order=created_at.desc&limit=${limit || 20}`,
+  );
+  if (!r.ok) { console.error("[mbl] recent replies failed:", r.error); return []; }
+  return (r.data || []).map(replyRow).reverse();
 }
 
 
@@ -304,7 +335,106 @@ async function supportHistory(visitorId, limit) {
   });
 }
 
+/**
+ * Everyone who has ever written in, newest activity first.
+ *
+ * Derived from the inbound messages rather than kept as a table of people: a
+ * second table is another thing to write on every path that can create a
+ * person, and the first time one forgets, the list quietly stops being true.
+ * Grouped by visitor, because that is what a conversation is keyed on.
+ */
+async function listPeople(limit) {
+  const r = await select(SUPPORT, `select=visitor_id,name,email,created_at&direction=eq.in&order=created_at.desc&limit=1000`);
+  if (!r.ok) { console.error("[mbl] people list failed:", r.error); return []; }
+  const by = new Map();
+  for (const x of r.data || []) {
+    if (!x.visitor_id) continue;
+    const seen = by.get(x.visitor_id);
+    if (!seen) { by.set(x.visitor_id, { visitorId: x.visitor_id, name: x.name || null, email: x.email || null, first: x.created_at, last: x.created_at, messages: 1 }); continue; }
+    seen.messages += 1;
+    seen.first = x.created_at;                 // rows arrive newest first
+    seen.name = seen.name || x.name || null;   // a later message may carry details an earlier one lacked
+    seen.email = seen.email || x.email || null;
+  }
+  return [...by.values()].sort((a, b) => b.last.localeCompare(a.last)).slice(0, limit || 40);
+}
+
+/* ── the door ──────────────────────────────────────────────────────────────
+ * Matched on either the browser id or the email, because neither survives on
+ * its own. Every check FAILS OPEN: a database that cannot be reached means
+ * nobody is treated as banned — the failure of a nuisance filter should be a
+ * nuisance getting through, never a real person locked out of support. */
+
+const BANS = "mbl_support_bans";
+const banRow = (d) => ({
+  id: d.id, visitorId: d.visitor_id || null, email: d.email || null, name: d.name || null, reason: d.reason || null,
+  active: !!d.active, bannedAt: d.banned_at, unbannedAt: d.unbanned_at || null,
+});
+const banOr = (visitorId, email) => {
+  const ors = [];
+  if (visitorId) ors.push(`visitor_id.eq.${encodeURIComponent(visitorId)}`);
+  if (email) ors.push(`email.ilike.${encodeURIComponent(email)}`);
+  return ors.join(",");
+};
+
+async function isBanned(visitorId, email) {
+  if (!configured() || (!visitorId && !email)) return false;
+  const r = await select(BANS, `select=id&active=is.true&or=(${banOr(visitorId, email)})&limit=1`);
+  if (!r.ok) { console.error("[mbl] ban check failed:", r.error); return false; }
+  return (r.data || []).length > 0;
+}
+
+async function findBan(visitorId, email, onlyActive) {
+  if (!configured() || (!visitorId && !email)) return null;
+  const r = await select(BANS, `select=*&or=(${banOr(visitorId, email)})${onlyActive ? "&active=is.true" : ""}&order=banned_at.desc&limit=1`);
+  if (!r.ok) { console.error("[mbl] ban lookup failed:", r.error); return null; }
+  return r.data && r.data[0] ? banRow(r.data[0]) : null;
+}
+
+/** Re-banning somebody already banned refreshes the row rather than stacking a second. */
+async function banPerson(p) {
+  if (!configured() || (!p.visitorId && !p.email)) return null;
+  const existing = await findBan(p.visitorId, p.email, true);
+  if (existing) {
+    const r = await update(BANS, `id=eq.${existing.id}`, {
+      active: true, unbanned_at: null,
+      reason: p.reason || existing.reason, name: p.name || existing.name,
+      email: p.email || existing.email, visitor_id: p.visitorId || existing.visitorId,
+    });
+    return r.ok && r.data && r.data[0] ? banRow(r.data[0]) : null;
+  }
+  const r = await insert(BANS, { visitor_id: p.visitorId || null, email: p.email || null, name: p.name || null, reason: p.reason || null });
+  if (!r.ok) { console.error("[mbl] ban insert failed:", r.error); return null; }
+  return r.data && r.data[0] ? banRow(r.data[0]) : null;
+}
+
+/** The row stays — `active` goes false and the date is stamped. */
+async function unbanPerson(key) {
+  const found = await findBan(key, key, true);
+  if (!found) return null;
+  const r = await update(BANS, `id=eq.${found.id}`, { active: false, unbanned_at: new Date().toISOString() });
+  return r.ok && r.data && r.data[0] ? banRow(r.data[0]) : null;
+}
+
+async function listBans(limit) {
+  if (!configured()) return [];
+  const r = await select(BANS, `select=*&order=banned_at.desc&limit=${limit || 50}`);
+  if (!r.ok) { console.error("[mbl] ban list failed:", r.error); return []; }
+  return (r.data || []).map(banRow);
+}
+
+/** "lifted" removes only rows already unbanned; "all" removes everything, which
+ *  unbans everyone as a side effect and is worth saying so out loud. */
+async function clearBans(which) {
+  if (!configured()) return 0;
+  const r = await rest(`${BANS}?${which === "all" ? "id=not.is.null" : "active=is.false"}`, { method: "DELETE", headers: { Prefer: "return=representation" } });
+  if (!r.ok) { console.error("[mbl] ban clear failed:", r.error); return 0; }
+  return (r.data || []).length;
+}
+
 module.exports = {
+  recentSupportReplies, listPeople,
+  isBanned, findBan, banPerson, unbanPerson, listBans, clearBans,
   rest, select, insert, update, upsert, remove,
   trim, isEmail, isToken, normaliseHandle, newToken,
   readBody, json, guard, findCreator, rememberDerivAccount, tokenFor, dbFailed, CREATOR_FIELDS, configured,

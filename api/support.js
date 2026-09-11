@@ -13,7 +13,19 @@
  * not a claim to be more than that.
  */
 
-const { readBody, json, recordSupportInbound, supportHistory } = require("./_lib/db");
+const { readBody, json, recordSupportInbound, supportHistory, isBanned } = require("./_lib/db");
+
+/* Screenshots AND documents. A picture is what "it looks wrong" needs; a set
+   file, a log or a statement is what people get asked for and then have
+   nowhere to put. Documents are held to formats that are inert when opened —
+   an executable, or an archive that might hold one, is not something to
+   invite into an inbox. The file arrives base64 in the JSON body, which is why
+   the cap is 3MB: Vercel stops reading a request body at 4.5MB, and base64
+   adds a third. */
+const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+const ALLOWED_DOC_TYPES = ["application/pdf", "text/plain", "text/csv", "application/json"];
+const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_DOC_TYPES];
+const MAX_FILE_BYTES = 3 * 1024 * 1024;
 
 const API = "https://api.telegram.org";
 const COOLDOWN_MS = 20_000;
@@ -103,9 +115,26 @@ module.exports = async (req, res) => {
   const email = str(body.email, 200).toLowerCase();
   const name = str(body.name, 120);
 
-  if (message.length < 2) return json(res, 400, { error: "Write your message first." });
+  /* An attachment on its own is a message. */
+  let file = null;
+  if (body.file && typeof body.file === "object") {
+    const f = body.file;
+    if (!ALLOWED_TYPES.includes(f.type)) return json(res, 400, { error: "Attach a screenshot (PNG, JPG, WEBP, GIF) or a document (PDF, TXT, CSV, JSON)." });
+    let data;
+    try { data = Buffer.from(String(f.data || ""), "base64"); } catch { data = Buffer.alloc(0); }
+    if (!data.length) return json(res, 400, { error: "That file came through empty — try attaching it again." });
+    if (data.length > MAX_FILE_BYTES) return json(res, 400, { error: "That file is too large — keep it under 3MB." });
+    file = { data, type: f.type, name: str(f.name, 100) || (ALLOWED_IMAGE_TYPES.includes(f.type) ? "screenshot.png" : "file") };
+  }
+
+  if (message.length < 2 && !file) return json(res, 400, { error: "Write your message first." });
   if (message.length > MAX_MESSAGE) return json(res, 400, { error: "That message is too long." });
   if (!isEmail(email)) return json(res, 400, { error: "Add the email address we should reply to." });
+
+  /* Barred: accepted to the sender's eye, delivered nowhere. Answering with an
+     error would say exactly what to change to get back in — a different
+     address, a private window — and turn one nuisance into a game. */
+  if (await isBanned(str(body.visitorId, 16), email)) return json(res, 200, { ok: true, email });
 
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chat = process.env.TELEGRAM_CHAT_ID;
@@ -132,7 +161,7 @@ module.exports = async (req, res) => {
     str(body.visitorId, 16) ? `<b>Person:</b> <code>${esc(str(body.visitorId, 16))}</code>` : "",
   ].filter(Boolean).join("\n");
 
-  const lines = [header, renderHistory(history), esc(message)].filter(Boolean);
+  const lines = [header, renderHistory(history), esc(message || (file ? `(${file.name})` : ""))].filter(Boolean);
 
   let messageId = null;
   try {
@@ -156,9 +185,24 @@ module.exports = async (req, res) => {
   // routed back to this person. Awaited but never fatal: the message has
   // already arrived, and failing now would tell them it had not. The cost of a
   // failure here is that one answer has to go by email instead.
+  /* The file goes as its own message under the words. Its own failure is
+     logged but not fatal — the words already arrived. sendPhoto for an image,
+     sendDocument for anything else: Telegram rejects a PDF sent as a photo. */
+  if (file) {
+    const isImage = ALLOWED_IMAGE_TYPES.includes(file.type);
+    const form = new FormData();
+    form.append("chat_id", chat);
+    form.append("caption", `${isImage ? "Screenshot" : file.name} from ${email}`.slice(0, 1000));
+    form.append(isImage ? "photo" : "document", new Blob([file.data], { type: file.type }), file.name);
+    if (messageId) form.append("reply_to_message_id", String(messageId));
+    await fetch(`${API}/bot${token}/${isImage ? "sendPhoto" : "sendDocument"}`, { method: "POST", body: form })
+      .then(async (r) => { if (!r.ok) console.error("[mbl] telegram refused the file:", r.status, await r.text().catch(() => "")); })
+      .catch((e) => console.error("[mbl] telegram file send failed:", e));
+  }
+
   await recordSupportInbound({
     visitorId: str(body.visitorId, 16),
-    body: message,
+    body: message || `(${file.name})`,
     tgMessageId: messageId,
     email,
     name,

@@ -16,7 +16,7 @@
  * last place to be clever.
  */
 
-const { json, collectSupportReplies } = require("./_lib/db");
+const { json, collectSupportReplies, recentSupportReplies } = require("./_lib/db");
 
 const ID = /^[0-9A-F]{8}$/;
 
@@ -27,6 +27,16 @@ module.exports = async (req, res) => {
   const url = new URL(req.url, "http://localhost");
   const visitorId = String(url.searchParams.get("visitorId") || "").toUpperCase();
   if (!ID.test(visitorId)) return json(res, 200, { replies: [] });
+
+  /* ?recent=1 asks again for what has already been delivered, marking nothing.
+     The widget calls it when the bubble opens and merges the answer over what
+     it has stored by id — how a line saved before attachments existed gets its
+     picture, and how anything lost from localStorage comes back. */
+  if (url.searchParams.get("recent") === "1") {
+    const recent = await recentSupportReplies(visitorId);
+    res.setHeader("Cache-Control", "no-store");
+    return json(res, 200, { replies: recent });
+  }
 
   const replies = await collectSupportReplies(visitorId);
   res.setHeader("Cache-Control", "no-store");
