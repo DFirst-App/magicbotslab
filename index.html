@@ -2,6 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <!-- A connected person is sent straight to the dashboard from HERE, before
+       a stylesheet or script is fetched, rather than from the script at the
+       bottom of the page. That script runs only after the whole landing page
+       has downloaded and painted — so opening the installed app meant loading
+       this page in full, then loading the dashboard in full, with the launch
+       screen up the entire time. Same check, same keys, same destination;
+       only the moment it runs has moved. -->
+  <script>
+    (function () {
+      try {
+        if (/[?&](code|error)=/.test(location.search)) return;
+        var token = localStorage.getItem("deriv_access_token");
+        if (!token) return;
+        var s = JSON.parse(localStorage.getItem("deriv_oauth_session") || "null");
+        if (s && s.expires_at && Date.now() >= Number(s.expires_at) - 60000) return;
+        location.replace("dashboard.html");
+      } catch (e) {}
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="google-site-verification" content="urHzQIjn9AkD5Row-lk9rBP8CHUbGSY-zuVgs3Bxfy4" />
   <title>Magic Bots Lab | Automated Trading Bots</title>
