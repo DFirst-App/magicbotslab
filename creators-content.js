@@ -17,7 +17,7 @@ window.MBL = (function () {
 
   /** Every month after the first pays $50 more, up to the ceiling. */
   var STEP = 50;
-  var CEILING = 750;
+  var CEILING = 1250;
 
   /** Paid on top, once, when a month's videos reach 10,000 views. */
   var VIEWS_BONUS = 500;
