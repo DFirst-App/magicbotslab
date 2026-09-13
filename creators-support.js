@@ -29,6 +29,14 @@
  */
 (function () {
   "use strict";
+  /* The language layer's t() when it is on the page, English otherwise; and a
+     {name} filler for the strings built with variables in them. */
+  var T = function (s, vars) {
+    var out = (typeof window !== "undefined" && typeof window.t === "function") ? window.t(s) : s;
+    if (vars) for (var k in vars) out = out.split("{" + k + "}").join(String(vars[k]));
+    return out;
+  };
+
   var NAME_KEY = "mbl_support_name";
   var MAIL_KEY = "mbl_support_email";
   var ID_KEY = "mbl_support_id";
@@ -72,7 +80,7 @@
     var today = new Date();
     if (d.toDateString() === today.toDateString()) return time;
     var yesterday = new Date(today.getTime() - 86400000);
-    if (d.toDateString() === yesterday.toDateString()) return "Yesterday " + time;
+    if (d.toDateString() === yesterday.toDateString()) return T("Yesterday {time}", { time: time });
     return d.toLocaleDateString(undefined, { day: "numeric", month: "short" }) + " " + time;
   }
 
@@ -178,6 +186,8 @@
     if (isEmail(email)) { state.email = email; set(MAIL_KEY, email); }
     if (state.open) draw();
   };
+  // A language arriving after the panel was drawn redraws it.
+  window.addEventListener("langchange", function () { if (state.open) draw(); paintBadge(); });
 
   function newId() { return String(Date.now()) + Math.random().toString(16).slice(2); }
 
@@ -207,9 +217,10 @@
       "</div>" +
 
       '<div class="sup-body" id="supBody">' +
-        '<div class="sup-msg">Hi' + (state.name ? " " + esc(state.name.split(" ")[0]) : "") +
-          " — " + esc(window.MBL_SUPPORT_GREETING || "ask us anything about the Creator Program or the bots. Tell us what happened and what you expected, and add a screenshot if you have one.") +
-          " The answer comes back here.</div>" +
+        '<div class="sup-msg">' + esc(T("Hi{name} — {greeting} The answer comes back here.", {
+          name: state.name ? " " + state.name.split(" ")[0] : "",
+          greeting: T(window.MBL_SUPPORT_GREETING || "ask us anything about the Creator Program or the bots. Tell us what happened and what you expected, and add a screenshot if you have one."),
+        })) + "</div>" +
         state.thread.map(function (l) {
           if (l.from === "us") {
             if (l.system) return '<div class="sup-msg">' + esc(l.text) + "</div>";
@@ -431,7 +442,7 @@
     if (state.open || !n) return;
     var b = document.createElement("span");
     b.className = "sup-badge";
-    b.setAttribute("aria-label", n + (n === 1 ? " new reply" : " new replies"));
+    b.setAttribute("aria-label", T(n === 1 ? "{n} new reply" : "{n} new replies", { n: n }));
     /* A ring that fades outward: the badge alone is easy to miss on a page
        somebody is reading. */
     b.innerHTML = (n > 9 ? "9+" : String(n)) + '<i class="sup-ping" aria-hidden="true"></i>';

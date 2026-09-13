@@ -21,6 +21,14 @@
 
 window.MBLShare = (function () {
   "use strict";
+  /* The language layer's t() when it is on the page, English otherwise; and a
+     {name} filler for the strings built with variables in them. */
+  var T = function (s, vars) {
+    var out = (typeof window !== "undefined" && typeof window.t === "function") ? window.t(s) : s;
+    if (vars) for (var k in vars) out = out.split("{" + k + "}").join(String(vars[k]));
+    return out;
+  };
+
 
   var FAVES_KEY = "mbl_invite_faves";
   var SEEN_KEY = "mbl_invite_prompt_day";
@@ -98,7 +106,7 @@ window.MBLShare = (function () {
       '<div class="inv-head">' +
         '<span class="inv-label">' + (featured ? "Ready to send" : esc(v.label)) + "</span>" +
         '<button type="button" class="inv-star' + (starred ? " on" : "") + '" data-star="' + esc(v.key) + '" ' +
-          'aria-label="' + (starred ? "Unstar" : "Star") + " " + esc(v.label) + '" title="Star this one to keep it at the top">' +
+          'aria-label="' + esc(T(starred ? "Unstar {label}" : "Star {label}", { label: T(v.label) })) + '" title="' + esc(T("Star this one to keep it at the top")) + '">' +
           '<svg viewBox="0 0 24 24" width="14" height="14" fill="' + (starred ? "currentColor" : "none") +
           '" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 3 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8 6.2 20.9l1.1-6.5L2.6 9.8l6.5-.9z"/></svg>' +
         "</button>" +
@@ -175,7 +183,7 @@ window.MBLShare = (function () {
         var all = el.querySelector(".inv-all");
         all.hidden = !all.hidden;
         more.classList.toggle("open", !all.hidden);
-        more.firstChild.nodeValue = all.hidden ? "All versions" : "Hide other versions";
+        more.firstChild.nodeValue = T(all.hidden ? "All versions" : "Hide other versions");
         return;
       }
 

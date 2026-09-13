@@ -17,6 +17,14 @@
  */
 (function () {
   "use strict";
+  /* The language layer's t() when it is on the page, English otherwise; and a
+     {name} filler for the strings built with variables in them. */
+  var T = function (s, vars) {
+    var out = (typeof window !== "undefined" && typeof window.t === "function") ? window.t(s) : s;
+    if (vars) for (var k in vars) out = out.split("{" + k + "}").join(String(vars[k]));
+    return out;
+  };
+
 
   var PROFILE_KEY = "mbl_mt5_profile";
   var NAME_KEY = "mbl_support_name";
@@ -75,7 +83,7 @@
           '<svg class="tick" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>' +
         "</div>" +
         "<p>" + p.blurb + "</p>" +
-        '<div class="risk">Risk per trade ' + p.risk + "%</div>" +
+        '<div class="risk">' + T("Risk per trade {pct}%", { pct: p.risk }) + "</div>" +
       "</button>";
     }).join("");
     Array.prototype.forEach.call($("profiles").querySelectorAll(".profile"), function (b) {
@@ -133,19 +141,19 @@
     }
     if (!data) { box.innerHTML = ""; return; }
 
-    meta.textContent = data.signals.length + " active · " + data.meta.withData + "/" + data.meta.evaluated + " markets scanned · highest-confidence first";
+    meta.textContent = T("{n} active · {a}/{b} markets scanned · highest-confidence first", { n: data.signals.length, a: data.meta.withData, b: data.meta.evaluated });
 
     if (data.signals.length) {
       box.className = "signals";
       box.innerHTML = data.signals.map(signalCard).join("");
     } else {
       box.className = "";
-      box.innerHTML = '<div class="panel-empty">No entries right now — the engine only fires on a clean setup. It re-scans continuously and refreshes here every minute.</div>';
+      box.innerHTML = '<div class="panel-empty">' + T("No entries right now — the engine only fires on a clean setup. It re-scans continuously and refreshes here every minute.") + '</div>';
     }
 
     if (data.standAside && data.standAside.length) {
       aside.hidden = false;
-      $("asideSummary").textContent = "Standing aside on " + data.standAside.length + " markets";
+      $("asideSummary").textContent = T("Standing aside on {n} markets", { n: data.standAside.length });
       $("asideList").innerHTML = data.standAside.map(function (a) {
         return '<div class="aside-row"><b>' + esc(a.name) + "</b><span>" + esc(a.reason) + "</span></div>";
       }).join("");
@@ -170,7 +178,7 @@
         if (!x.ok || x.j.error) throw new Error(x.j.error || "Couldn't load signals.");
         data = x.j;
         var u = $("updated");
-        u.textContent = "updated " + new Date().toLocaleTimeString() + " · auto every 60s";
+        u.textContent = T("updated {time} · auto every 60s", { time: new Date().toLocaleTimeString() });
         u.hidden = false;
       })
       .catch(function (e) {
@@ -251,9 +259,7 @@
         if (window.MBL_SUPPORT_ASK) {
           window.MBL_SUPPORT_ASK({
             name: name, email: email,
-            text: x.j.already
-              ? "Asked for the General MT5 EA again — client / MT5 ID " + clientId + "."
-              : "Requested the General MT5 EA — client / MT5 ID " + clientId + ".",
+            text: T(x.j.already ? "Asked for the General MT5 EA again — client / MT5 ID {id}." : "Requested the General MT5 EA — client / MT5 ID {id}.", { id: clientId }),
           });
         }
       })
@@ -303,6 +309,9 @@
   paintProfiles();
   load();
   setInterval(load, REFRESH_MS);
+  // Cards and the signal meta line carry numbers in sentences built here, so a
+  // language arriving after the first paint has to redraw them.
+  window.addEventListener("langchange", function () { paintProfiles(); paintSignals(); });
 
   // /mt5/generalmt5#get opens straight onto the request, for links that
   // promise the download rather than the page.

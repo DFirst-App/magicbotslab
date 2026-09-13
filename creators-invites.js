@@ -14,19 +14,28 @@
 /** The one shown first when a creator has not starred anything of their own. */
 window.MBL_INVITE_DEFAULT = "short";
 
-window.MBL_INVITES = [
+window.MBL_INVITES = (function () {
+  /* The language layer's t() when it is on the page, English otherwise; and a
+     {name} filler for the strings built with variables in them. */
+  var T = function (s, vars) {
+    var out = (typeof window !== "undefined" && typeof window.t === "function") ? window.t(s) : s;
+    if (vars) for (var k in vars) out = out.split("{" + k + "}").join(String(vars[k]));
+    return out;
+  };
+
+  return [
   {
     key: "straight",
     label: "Straight up",
     body: function (link) {
       return [
-        "I get paid to post about this.",
+        T("I get paid to post about this."),
         "",
-        "Magic Bots Lab has free automated trading bots — and it pays creators to make short videos about them. $100 your first month, up to $1,250 a month once you are going. One video a day, on your own accounts.",
+        T("Magic Bots Lab has free automated trading bots — and it pays creators to make short videos about them. $100 your first month, up to $1,250 a month once you are going. One video a day, on your own accounts."),
         "",
-        "And if making videos is not for you, the bots are free to trade with anyway.",
+        T("And if making videos is not for you, the bots are free to trade with anyway."),
         "",
-        "Nothing to pay, nothing to buy. Go check it out:",
+        T("Nothing to pay, nothing to buy. Go check it out:"),
         link
       ].join("\n");
     }
@@ -36,13 +45,13 @@ window.MBL_INVITES = [
     label: "To a friend",
     body: function (link) {
       return [
-        "This is the thing I have been posting about.",
+        T("This is the thing I have been posting about."),
         "",
-        "It is free trading bots, and they pay you to make short videos about them. I started on $100 and it climbs to $1,250 a month.",
+        T("It is free trading bots, and they pay you to make short videos about them. I started on $100 and it climbs to $1,250 a month."),
         "",
-        "And if you do not fancy posting, just use the bots — they are free to trade with either way.",
+        T("And if you do not fancy posting, just use the bots — they are free to trade with either way."),
         "",
-        "You already post anyway. Go check it out and tell me what you think:",
+        T("You already post anyway. Go check it out and tell me what you think:"),
         link
       ].join("\n");
     }
@@ -52,13 +61,13 @@ window.MBL_INVITES = [
     label: "To another creator",
     body: function (link) {
       return [
-        "If you are already posting daily, this pays for it.",
+        T("If you are already posting daily, this pays for it."),
         "",
-        "Magic Bots Lab pays creators monthly to post about their free trading bots. Starts at $100 and climbs to $1,250 a month. Your accounts, your content, and you are not tied to anything.",
+        T("Magic Bots Lab pays creators monthly to post about their free trading bots. Starts at $100 and climbs to $1,250 a month. Your accounts, your content, and you are not tied to anything."),
         "",
-        "Not keen on posting about it? Run the bots on your own account instead — still free.",
+        T("Not keen on posting about it? Run the bots on your own account instead — still free."),
         "",
-        "Go check it out — two minutes to see if it is for you:",
+        T("Go check it out — two minutes to see if it is for you:"),
         link
       ].join("\n");
     }
@@ -68,11 +77,11 @@ window.MBL_INVITES = [
     label: "Very short",
     body: function (link) {
       return [
-        "Free automated trading bots, and they pay you to post about them. Up to $1,250 a month.",
+        T("Free automated trading bots, and they pay you to post about them. Up to $1,250 a month."),
         "",
-        "Not posting? The bots are still free to trade with.",
+        T("Not posting? The bots are still free to trade with."),
         "",
-        "Go check it out:",
+        T("Go check it out:"),
         link
       ].join("\n");
     }
@@ -82,13 +91,13 @@ window.MBL_INVITES = [
     label: "For a sceptic",
     body: function (link) {
       return [
-        "Before you say it — there is nothing to buy and nothing to pay.",
+        T("Before you say it — there is nothing to buy and nothing to pay."),
         "",
-        "The bots are free. They pay creators to make videos about them — $100 the first month, up to $1,250 a month after that. That is the whole thing.",
+        T("The bots are free. They pay creators to make videos about them — $100 the first month, up to $1,250 a month after that. That is the whole thing."),
         "",
-        "And you do not have to post at all — the bots are free to use on their own.",
+        T("And you do not have to post at all — the bots are free to use on their own."),
         "",
-        "Go check it out yourself rather than taking my word for it:",
+        T("Go check it out yourself rather than taking my word for it:"),
         link
       ].join("\n");
     }
@@ -98,13 +107,13 @@ window.MBL_INVITES = [
     label: "Extra income",
     body: function (link) {
       return [
-        "Looking for something that pays without a boss or a schedule?",
+        T("Looking for something that pays without a boss or a schedule?"),
         "",
-        "Post one short video a day about Magic Bots Lab's free trading bots and get paid every month. $100 to start, up to $1,250. You post on your own accounts, whenever you like.",
+        T("Post one short video a day about Magic Bots Lab's free trading bots and get paid every month. $100 to start, up to $1,250. You post on your own accounts, whenever you like."),
         "",
-        "And if posting is not for you, the bots are free to trade with anyway.",
+        T("And if posting is not for you, the bots are free to trade with anyway."),
         "",
-        "Go check it out:",
+        T("Go check it out:"),
         link
       ].join("\n");
     }
@@ -114,15 +123,16 @@ window.MBL_INVITES = [
     label: "To a group",
     body: function (link) {
       return [
-        "Dropping this here for anyone who posts.",
+        T("Dropping this here for anyone who posts."),
         "",
-        "Magic Bots Lab pays creators monthly to make short videos about their free trading bots. $100 the first month, up to $1,250 as you keep going. Nothing to pay to join.",
+        T("Magic Bots Lab pays creators monthly to make short videos about their free trading bots. $100 the first month, up to $1,250 as you keep going. Nothing to pay to join."),
         "",
-        "And anyone who would rather not post can still use the bots to trade, free.",
+        T("And anyone who would rather not post can still use the bots to trade, free."),
         "",
-        "Go check it out:",
+        T("Go check it out:"),
         link
       ].join("\n");
     }
   }
 ];
+})();

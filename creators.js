@@ -15,6 +15,14 @@
 
 (function () {
   "use strict";
+  /* The language layer's t() when it is on the page, English otherwise; and a
+     {name} filler for the strings built with variables in them. */
+  var T = function (s, vars) {
+    var out = (typeof window !== "undefined" && typeof window.t === "function") ? window.t(s) : s;
+    if (vars) for (var k in vars) out = out.split("{" + k + "}").join(String(vars[k]));
+    return out;
+  };
+
 
   var M = window.MBL;
   var TOKEN_KEY = "mbl_creator_token";
@@ -48,11 +56,18 @@
 
   function money(n) { n = Number(n || 0); return "$" + (n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)); }
 
+  /** The bonus sentence's two numbers, the views count written the reader's way. */
+  function bonusVars() {
+    var loc = (window.i18n && window.i18n.lang) || undefined;
+    return { bonus: money(M.VIEWS_BONUS), views: M.VIEWS_TARGET.toLocaleString(loc) };
+  }
+
   function fmt(d) {
     if (!d) return "—";
     var x = new Date(d);
     if (isNaN(x)) return "—";
-    return x.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+    var loc = (window.i18n && window.i18n.lang) || undefined;
+    return x.toLocaleDateString(loc, { day: "numeric", month: "short", year: "numeric" });
   }
 
   /**
@@ -95,7 +110,7 @@
     var host = document.getElementById("toasts");
     var el = document.createElement("div");
     el.className = "toast" + (bad ? " bad" : "");
-    el.innerHTML = (bad ? "⚠ " : "✓ ") + esc(text);
+    el.innerHTML = (bad ? "⚠ " : "✓ ") + esc(T(text));
     host.appendChild(el);
     setTimeout(function () { el.remove(); }, 4200);
   }
@@ -266,9 +281,7 @@
           '<p style="margin-top:12px">Every month after that pays <b>' + money(M.STEP) + ' more</b> than the one before, up to ' +
           "<b>" + money(M.CEILING) + "</b> a month.</p>" +
           '<div class="note-box" style="margin-top:10px">' +
-            "<b>The " + money(M.VIEWS_BONUS) + " bonus, exactly:</b> if <b>half the videos you post in a month</b> reach " +
-            "<b>" + M.VIEWS_TARGET.toLocaleString() + " views each</b>, we add <b>" + money(M.VIEWS_BONUS) + "</b> on top of that month's pay. " +
-            "Not one video going big — half of them getting there." +
+            T("<b>The {bonus} bonus, exactly:</b> if <b>half the videos you post in a month</b> reach <b>{views} views each</b>, we add <b>{bonus}</b> on top of that month's pay. Not one video going big — half of them getting there.", bonusVars()) +
           "</div>" +
         "</section>" +
 
@@ -296,7 +309,7 @@
         '<section class="card">' +
           '<div class="eyebrow">' + icon(ICONS.earnings) + " Where it goes</div>" +
           '<div class="row">' + l.map(function (r) {
-            return '<span class="pill' + (r.month === 1 ? " on" : "") + '">Month ' + r.month + " · " + money(r.usd) + "</span>";
+            return '<span class="pill' + (r.month === 1 ? " on" : "") + '">' + T("Month {n} · {amount}", { n: r.month, amount: money(r.usd) }) + "</span>";
           }).join("") + "</div>" +
           '<p style="margin-top:12px">Bring other creators in and you earn <b>' + money(M.TEAM_PER_PERSON) +
           "</b> for each one, the moment they are paid. There is no limit on how many.</p>" +
@@ -374,14 +387,14 @@
     return '' +
     '<div class="stack">' +
       '<section class="card accent">' +
-        "<h2>" + (p.started ? "Welcome back, " + esc(c.name.split(" ")[0]) : "You are in, " + esc(c.name.split(" ")[0])) + "</h2>" +
+        "<h2>" + T(p.started ? "Welcome back, {name}" : "You are in, {name}", { name: esc(c.name.split(" ")[0]) }) + "</h2>" +
         (p.started
-          ? "<p>Day <b>" + p.postedDays + "</b> of <b>" + M.QUALIFYING_DAYS + "</b> posted days. " +
+          ? "<p>" + T("Day <b>{n}</b> of <b>{total}</b> posted days.", { n: p.postedDays, total: M.QUALIFYING_DAYS }) + " " +
             (p.doneToday
-              ? '<span class="ok">Today is done — ' + p.postedToday + " logged.</span>"
-              : '<span class="warnt">Today needs ' + p.requiredToday + " video" + (p.requiredToday === 1 ? "" : "s") + ".</span>") + "</p>" +
+              ? '<span class="ok">' + T("Today is done — {n} logged.", { n: p.postedToday }) + "</span>"
+              : '<span class="warnt">' + T(p.requiredToday === 1 ? "Today needs {n} video." : "Today needs {n} videos.", { n: p.requiredToday }) + "</span>") + "</p>" +
             '<div class="bar" style="margin:10px 0 6px"><i style="width:' + p.percent + '%"></i></div>' +
-            '<p style="font-size:11.5px">' + p.remaining + " more posted days to finish this month.</p>"
+            '<p style="font-size:11.5px">' + T("{n} more posted days to finish this month.", { n: p.remaining }) + "</p>"
           : "<p>Your month has not started yet — it begins the day you log your first video. " +
             "Make one video about Magic Bots Lab, post it to your three accounts, then log it in <b>Post log</b>.</p>" +
             '<button class="btn" data-go="log">Log my first video</button>') +
@@ -407,10 +420,7 @@
 
       // The bonus, where a working creator will actually see it.
       '<section class="card"><div class="eyebrow">' + icon(ICONS.earnings) + " The " + money(M.VIEWS_BONUS) + " bonus</div>" +
-        '<p>On top of your monthly pay: if <b class="hi">half the videos you post in a month</b> reach ' +
-        '<b class="hi2">' + M.VIEWS_TARGET.toLocaleString() + ' views each</b>, we add <b class="ok">' +
-        money(M.VIEWS_BONUS) + "</b>. " +
-        '<b class="ok">You are paid either way</b>; views only decide the bonus.</p></section>' +
+        "<p>" + T('On top of your monthly pay: if <b class="hi">half the videos you post in a month</b> reach <b class="hi2">{views} views each</b>, we add <b class="ok">{bonus}</b>. <b class="ok">You are paid either way</b>; views only decide the bonus.', bonusVars()) + "</p></section>" +
 
       '<section class="card">' +
         '<div class="eyebrow">' + icon(ICONS.rules) + " What to say about Magic Bots Lab</div>" +
@@ -441,10 +451,10 @@
           (p.logo ? logo(p.logo, p.name, 18) : "") +
           '<span class="nm">' + esc(p.name) + "</span>" +
           (filled ? '<span class="plat-ok" title="Saved">' + icon('<path d="M20 6 9 17l-5-5"/>', 13) + "</span>" : "") +
-          '<button class="x" data-drop="' + esc(p.key) + '" aria-label="Remove ' + esc(p.name) + '">' + icon(ICONS.x, 14) + "</button>" +
+          '<button class="x" data-drop="' + esc(p.key) + '" aria-label="' + esc(T("Remove {name}", { name: p.name })) + '">' + icon(ICONS.x, 14) + "</button>" +
         "</div>" +
         '<input class="plat-input" data-h="' + esc(p.key) + '" value="' + esc(S.handles[p.key] || "") +
-          '" placeholder="' + esc(p.hint) + '" aria-label="' + esc(p.name) + ' account" spellcheck="false" autocapitalize="none" autocomplete="off" />' +
+          '" placeholder="' + esc(p.hint) + '" aria-label="' + esc(T("{name} account", { name: p.name })) + '" spellcheck="false" autocapitalize="none" autocomplete="off" />' +
       "</div>";
     }).join("");
 
@@ -458,7 +468,7 @@
         '<span style="font-size:11.5px;color:var(--faint)">' +
           (chosen.length === M.PLATFORMS_REQUIRED
             ? "Three chosen. Post on more if you want to — three is the minimum, not a limit."
-            : "You have " + chosen.length + " of " + M.PLATFORMS_REQUIRED + ".") +
+            : T("You have {n} of {total}.", { n: chosen.length, total: M.PLATFORMS_REQUIRED })) +
         "</span>" +
       "</div>";
   }
@@ -545,7 +555,7 @@
       "</section>" +
 
       '<section class="card">' +
-        '<div class="eyebrow">' + icon(ICONS.days) + " Everything you have logged (" + posts.length + ")</div>" +
+        '<div class="eyebrow">' + icon(ICONS.days) + " " + T("Everything you have logged ({n})", { n: posts.length }) + "</div>" +
         (posts.length === 0
           ? "<p>Nothing yet. Your month starts with the first one.</p>"
           : '<div class="tablewrap"><table class="t"><thead><tr><th>Day</th><th>Video</th><th>Where</th><th>Link</th><th></th></tr></thead><tbody>' +
@@ -600,7 +610,7 @@
       '<section class="card ' + (c.payout_method ? "good" : "warn") + '">' +
         '<h3 class="method-cell">' +
           (c.payout_method
-            ? (payoutLogo(c.payout_method) ? logo(payoutLogo(c.payout_method), "", 18) : "") + "You will be paid by " + esc(payoutLabel(c.payout_method))
+            ? (payoutLogo(c.payout_method) ? logo(payoutLogo(c.payout_method), "", 18) : "") + T("You will be paid by {method}", { method: esc(payoutLabel(c.payout_method)) })
             : "No payout method chosen yet") + "</h3>" +
         "<p>You only fill in the account details when there is money to withdraw — there is nothing to enter until then. " +
         "Change the method any time.</p>" +
@@ -614,9 +624,7 @@
         "From month two everyone is on the same ladder: <b>" +
         money(M.STEP) + " more every month</b>, up to <b>" + money(M.CEILING) + "</b>.</p>" +
         '<div class="note-box">' +
-          '<b class="ok">The ' + money(M.VIEWS_BONUS) + ' bonus:</b> if <b class="hi">half the videos you posted that month</b> reach <b class="hi2">' +
-          M.VIEWS_TARGET.toLocaleString() + ' views each</b>, we add <b class="ok">' + money(M.VIEWS_BONUS) +
-          "</b> on top." +
+          T('<b class="ok">The {bonus} bonus:</b> if <b class="hi">half the videos you posted that month</b> reach <b class="hi2">{views} views each</b>, we add <b class="ok">{bonus}</b> on top.', bonusVars()) +
         "</div></section>" +
     "</div>";
   }
@@ -661,18 +669,18 @@
           '<input class="field mono" style="flex:1;min-width:240px" readonly value="' + esc(link) + '" id="teamLink" />' +
           '<button class="btn" data-act="share">' + icon(ICONS.send, 15) + " Share &amp; invite</button>" +
           '<button class="btn ghost" data-act="copyLink">Copy link</button>' +
-          '<button class="btn ghost" data-act="copyCode">Code: ' + esc(c.referral_code || "—") + "</button>" +
+          '<button class="btn ghost" data-act="copyCode">' + T("Code: {code}", { code: esc(c.referral_code || "—") }) + "</button>" +
         "</div>" +
       "</section>" +
 
       '<div class="grid g3">' +
         '<div class="stat"><div class="k">People you brought</div><div class="v hi">' + tt.members + '</div><div class="s">joined through you</div></div>' +
-        '<div class="stat"><div class="k">Earned from your team</div><div class="v ok">' + money(tt.earnedUsd) + '</div><div class="s">' + tt.earning + " of them have been paid</div></div>" +
+        '<div class="stat"><div class="k">Earned from your team</div><div class="v ok">' + money(tt.earnedUsd) + '</div><div class="s">' + T("{n} of them have been paid", { n: tt.earning }) + "</div></div>" +
         '<div class="stat"><div class="k">Waiting on them</div><div class="v warnt">' + money(tt.pendingUsd) + '</div><div class="s">yours once they are paid</div></div>' +
       "</div>" +
 
       '<section class="card">' +
-        '<div class="eyebrow">' + icon(ICONS.team) + " Your team (" + (S.me.team || []).length + ")</div>" +
+        '<div class="eyebrow">' + icon(ICONS.team) + " " + T("Your team ({n})", { n: (S.me.team || []).length }) + "</div>" +
         ((S.me.team || []).length === 0
           ? "<p>Nobody yet. Send your link to one person who would enjoy this — that is how every team starts.</p>"
           : '<div class="tablewrap"><table class="t"><thead><tr><th>Name</th><th>Code</th><th>Country</th><th>Joined</th><th>Status</th><th>You earn</th></tr></thead><tbody>' +
@@ -829,7 +837,7 @@
   function register() {
     var f = S.form;
     if (!f.agreed) return toast("Tick the box to say you have read the rules.", true);
-    if (S.platforms.length !== M.PLATFORMS_REQUIRED) return toast("Choose exactly " + M.PLATFORMS_REQUIRED + " platforms.", true);
+    if (S.platforms.length !== M.PLATFORMS_REQUIRED) return toast(T("Choose exactly {n} platforms.", { n: M.PLATFORMS_REQUIRED }), true);
 
     S.busy = true; render();
 
@@ -891,7 +899,7 @@
     if (on) {
       // Untick: remove every post logged on that day, after asking — this is
       // the one control here that destroys something.
-      if (!confirm("Remove everything logged on " + day + "? This cannot be undone.")) return;
+      if (!confirm(T("Remove everything logged on {day}? This cannot be undone.", { day: day }))) return;
       var ids = (S.me.posts || []).filter(function (p) { return p.posted_on === day; }).map(function (p) { return p.id; });
       var chain = Promise.resolve();
       ids.forEach(function (id) { chain = chain.then(function () { return post("posts", { token: S.token, derivAccess: derivAccess(), action: "undo", postId: id }); }); });
@@ -925,7 +933,7 @@
 
     if (el.dataset.pickCountry) {
       Picker.open(el, (window.MBL_COUNTRIES || []).map(function (c) { return { value: c, label: c }; }),
-        function (v) { S.form.country = v; render(); }, "Type three letters…");
+        function (v) { S.form.country = v; render(); }, T("Type three letters…"));
       return;
     }
 
@@ -934,11 +942,11 @@
       var free = M.PLATFORMS.filter(function (p) { return taken.indexOf(p.key) < 0; })
         .map(function (p) { return { value: p.key, label: p.name, logo: p.logo }; });
       Picker.open(el, free, function (v) {
-        if (S.platforms.length >= M.PLATFORMS_REQUIRED) { toast("Remove one first — " + M.PLATFORMS_REQUIRED + " at a time.", true); return; }
+        if (S.platforms.length >= M.PLATFORMS_REQUIRED) { toast(T("Remove one first — {n} at a time.", { n: M.PLATFORMS_REQUIRED }), true); return; }
         S.platforms.push(v);
         if (S.me && S.platforms.length === M.PLATFORMS_REQUIRED) saveProfile({ platforms: S.platforms }, true);
         render();
-      }, "Search platforms…");
+      }, T("Search platforms…"));
       return;
     }
 
@@ -952,7 +960,7 @@
 
     if (el.dataset.pay) {
       if (S.me) { saveProfile({ payoutMethod: el.dataset.pay }); }
-      else { S.form.payout = el.dataset.pay; render(); toast(payoutLabel(el.dataset.pay) + " chosen."); }
+      else { S.form.payout = el.dataset.pay; render(); toast(T("{label} chosen.", { label: payoutLabel(el.dataset.pay) })); }
       return;
     }
 
@@ -965,7 +973,7 @@
     }
 
     if (el.dataset.undo) {
-      if (!confirm("Undo this video? It stops counting towards your month, and you cannot get it back.")) return;
+      if (!confirm(T("Undo this video? It stops counting towards your month, and you cannot get it back."))) return;
       post("posts", { token: S.token, derivAccess: derivAccess(), action: "undo", postId: el.dataset.undo }).then(function (r) {
         if (!r.ok) return toast((r.data && r.data.error) || "Could not undo that.", true);
         toast("Undone.");
@@ -1005,7 +1013,7 @@
       if (code.length < 4) return toast("Type their code first.", true);
       post("team", { token: S.token, derivAccess: derivAccess(), code: code, direction: dir }).then(function (r) {
         if (!r.ok) return toast((r.data && r.data.error) || "Could not connect that.", true);
-        toast(dir === "they_referred_me" ? "You are now on " + r.data.name + "'s team" : r.data.name + " is now on your team");
+        toast(T(dir === "they_referred_me" ? "You are now on {name}'s team" : "{name} is now on your team", { name: r.data.name }));
         return load();
       });
     }
@@ -1116,11 +1124,14 @@ var Picker = (function () {
 
     // Starts-with before contains: typing "ken" should put Kenya first, not
     // whatever alphabetically-earlier country happens to contain those letters.
-    var hits = opts.filter(function (o) { return !q || o.label.toLowerCase().indexOf(q) >= 0; });
+    // Matched against the name as the reader sees it (their language) and
+    // the English one, so either spelling finds the country.
+    opts.forEach(function (o) { o._l = T(o.label).toLowerCase(); o._e = o.label.toLowerCase(); });
+    var hits = opts.filter(function (o) { return !q || o._l.indexOf(q) >= 0 || o._e.indexOf(q) >= 0; });
     hits.sort(function (a, b) {
       if (!q) return 0;
-      var sa = a.label.toLowerCase().indexOf(q) === 0 ? 0 : 1;
-      var sb = b.label.toLowerCase().indexOf(q) === 0 ? 0 : 1;
+      var sa = (a._l.indexOf(q) === 0 || a._e.indexOf(q) === 0) ? 0 : 1;
+      var sb = (b._l.indexOf(q) === 0 || b._e.indexOf(q) === 0) ? 0 : 1;
       return sa - sb;
     });
 
@@ -1150,7 +1161,7 @@ var Picker = (function () {
     el = document.createElement("div");
     el.className = "picker-panel";
     el.innerHTML =
-      '<div class="picker-search"><input type="text" placeholder="' + esc(placeholder || "Search…") + '" aria-label="Search" /></div>' +
+      '<div class="picker-search"><input type="text" placeholder="' + esc(placeholder || T("Search…")) + '" aria-label="' + esc(T("Search")) + '" /></div>' +
       '<div class="picker-list"></div>';
     document.body.appendChild(el);
 
@@ -1203,4 +1214,7 @@ function pickerButton(attr, value, placeholder, logoSrc) {
 
   render();
   load();
+  // Sentences built here with numbers and names in them are translated as
+  // they are built, so a language change has to build them again.
+  window.addEventListener("langchange", function () { render(); });
 })();
