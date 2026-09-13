@@ -54,7 +54,7 @@
       .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   }
 
-  function money(n) { n = Number(n || 0); return "$" + (n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)); }
+  function money(n) { n = Number(n || 0); return "$" + n.toLocaleString("en-US", { minimumFractionDigits: n % 1 === 0 ? 0 : 2, maximumFractionDigits: 2 }); }
 
   /** The bonus sentence's two numbers, the views count written the reader's way. */
   function bonusVars() {
