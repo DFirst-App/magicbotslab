@@ -318,3 +318,10 @@ html::-webkit-scrollbar-thumb:hover { background: rgba(0,210,255,.4); }
 .algo-on i { background: var(--success); clip-path: polygon(0 0, 100% 50%, 0 100%); }
 .algo-off { border-color: var(--loss); }
 .algo-off i { background: var(--loss); border-radius: 2px; }
+
+/* Three sends without an answer: the button waits, and says why. */
+.send-limit {
+  margin: 10px 0 0; padding: 9px 12px;
+  border: 1px solid rgba(245,165,36,.5); border-radius: 10px;
+  background: rgba(245,165,36,.08); color: #f5a524; font-size: 12.5px; line-height: 1.45;
+}

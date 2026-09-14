@@ -194,6 +194,36 @@
   var phase = "form"; // form | sent | done
   var busy = false;
 
+  /* ── how many more times they may send ──────────────────────────────────
+     A mistake in the ID is fixed by editing and sending again, so nothing is
+     locked after a send. A script hammering the form is another matter:
+     three sends, then a wait for our answer — and any reply from us in the
+     support thread, arriving after the last send, resets the count. The
+     thread is what the bubble keeps in this browser, so no extra call. */
+  var SENDS_KEY = "mbl_ea_sends";
+  var THREAD_KEY = "mbl_support_thread";
+  var MAX_SENDS = 3;
+  function sends() {
+    try { var v = JSON.parse(get(SENDS_KEY) || "null"); if (v && typeof v.n === "number") return v; } catch (e) {}
+    return { n: 0, at: "" };
+  }
+  function repliedSince(iso) {
+    if (!iso) return false;
+    try {
+      var thread = JSON.parse(get(THREAD_KEY) || "[]");
+      return thread.some(function (l) { return l && l.from === "us" && !l.system && String(l.at || "") > iso; });
+    } catch (e) { return false; }
+  }
+  function sendsLeft() {
+    var v = sends();
+    if (v.n > 0 && repliedSince(v.at)) { v = { n: 0, at: "" }; set(SENDS_KEY, JSON.stringify(v)); }
+    return Math.max(0, MAX_SENDS - v.n);
+  }
+  function countSend() {
+    var v = sends();
+    set(SENDS_KEY, JSON.stringify({ n: v.n + 1, at: new Date().toISOString() }));
+  }
+
   function showErr(msg) {
     var e = $("modalErr");
     e.textContent = msg || "";
@@ -211,7 +241,8 @@
     $("modalForm").hidden = phase === "done";
     $("modalDone").hidden = phase !== "done";
     $("sentNote").hidden = !sent;
-    ["clientId", "name", "email"].forEach(function (id) { $(id).disabled = sent; });
+    // The fields stay live after a send: a wrong ID is fixed here, not by
+    // reloading the page.
     Array.prototype.forEach.call(root.querySelectorAll(".step"), function (s) {
       var n = s.getAttribute("data-step");
       s.classList.toggle("done", sent && n !== "4");
@@ -220,8 +251,11 @@
         ? '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'
         : n;
     });
-    $("send").hidden = phase !== "form";
-    $("send").disabled = !formOk() || busy;
+    var left = sendsLeft();
+    $("send").hidden = false;
+    $("send").disabled = !formOk() || busy || left === 0;
+    $("sendLabel").textContent = sent ? T("Send again") : T("Send for checking");
+    $("sendLimit").hidden = left > 0;
     $("redeem").disabled = !$("code").value.trim() || busy;
   }
 
@@ -236,7 +270,7 @@
   function closeModal() { root.hidden = true; }
 
   function send() {
-    if (busy || !formOk()) return;
+    if (busy || !formOk() || sendsLeft() === 0) return;
     busy = true; showErr(null); paintModal();
     var clientId = $("clientId").value.trim();
     var name = $("name").value.trim();
@@ -251,6 +285,7 @@
       .then(function (x) {
         if (!x.ok) throw new Error(x.j.error || "Could not send that. Try again in a moment.");
         set(NAME_KEY, name); set(MAIL_KEY, email);
+        countSend();
         phase = "sent";
 
         /* The bubble opens onto THIS conversation — the request already in it
@@ -305,6 +340,8 @@
   $("redeem").onclick = redeem;
   $("code").addEventListener("keydown", function (e) { if (e.key === "Enter") redeem(); });
   $("refresh").onclick = load;
+  // Our reply landing in the bubble is what unlocks sending again.
+  window.addEventListener("mbl:support-reply", function () { if (!root.hidden) paintModal(); });
 
   /* Click-to-copy for the one string in the steps that must be typed
      exactly. The button says so for a moment, then goes back to "Copy". The
