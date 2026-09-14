@@ -306,6 +306,33 @@
   $("code").addEventListener("keydown", function (e) { if (e.key === "Enter") redeem(); });
   $("refresh").onclick = load;
 
+  /* Click-to-copy for the one string in the steps that must be typed
+     exactly. The button says so for a moment, then goes back to "Copy". The
+     clipboard API needs a secure context; the old selection trick covers a
+     browser without it. */
+  document.addEventListener("click", function (ev) {
+    var b = ev.target.closest("[data-copy]");
+    if (!b) return;
+    var text = b.getAttribute("data-copy");
+    var done = function () {
+      var label = b.querySelector("span");
+      var was = label ? label.textContent : "";
+      b.classList.add("is-copied");
+      if (label) label.textContent = T("Copied");
+      setTimeout(function () { b.classList.remove("is-copied"); if (label) label.textContent = was; }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallback(); });
+    } else fallback();
+    function fallback() {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); done(); } catch (e) { /* nothing more to try */ }
+      ta.remove();
+    }
+  });
+
   paintProfiles();
   load();
   setInterval(load, REFRESH_MS);
