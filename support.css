@@ -198,3 +198,12 @@
 .sup-foot textarea { scrollbar-width: thin; scrollbar-color: rgba(0,210,255,.28) transparent; }
 .sup-foot textarea::-webkit-scrollbar { width: 6px; }
 .sup-foot textarea::-webkit-scrollbar-thumb { background: rgba(0,210,255,.22); border-radius: 999px; }
+
+/* A download code, and the one warning that goes with it. */
+.sup-code {
+  display: inline-block; margin: 2px 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 17px; font-weight: 800; letter-spacing: .08em;
+  color: var(--success, #24d970);
+}
+.sup-warn { color: var(--loss, #f2607d); font-weight: 700; }
