@@ -225,6 +225,7 @@
   }
 
   function showErr(msg) {
+    if (msg && typeof window.tm === "function") msg = window.tm(msg);
     var e = $("modalErr");
     e.textContent = msg || "";
     e.hidden = !msg;
