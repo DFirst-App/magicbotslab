@@ -258,6 +258,12 @@ details.aside summary { cursor: pointer; font-size: 12px; font-weight: 500; colo
   margin-bottom: 12px; border: 1px solid rgba(36,217,112,.35); border-radius: 12px;
   background: rgba(36,217,112,.08); padding: 12px; font-size: 12px; line-height: 1.45;
 }
+/* Where the wait is spent: the two channels, drawn with their own marks. */
+.sent-wait { display: grid; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(36,217,112,.25); }
+.sent-wait-t { font-weight: 600; color: var(--muted); }
+.sent-wait-r { display: flex; flex-wrap: wrap; gap: 8px; }
+.sent-wait .btn-ghost { gap: 7px; }
+.sent-wait .btn-ghost svg { flex: none; }
 .modal-err {
   margin-top: 4px; border: 1px solid rgba(242,96,125,.4); border-radius: 12px;
   background: rgba(242,96,125,.08); color: var(--loss); padding: 12px; font-size: 12.5px;
