@@ -1397,5 +1397,7 @@
 "Use the exact name and email on your Headway account — that is how we match you. <b>The EA works only on the account we approve.</b>":"Use exatamente o nome e o e-mail da sua conta Headway — é assim que identificamos você. <b>O EA só funciona na conta que aprovamos.</b>",
 "We check every MT5 ID against our Headway partner list. If yours is not under us, we will say so and tell you how to ask Headway to attach it to our Partner ID <code>6078336</code> — then reply in the support window and we will check again.":"Verificamos cada ID MT5 na nossa lista de parceiros da Headway. Se o seu não estiver conosco, avisaremos e explicaremos como pedir à Headway para vinculá-lo ao nosso Partner ID <code>6078336</code> — depois responda na janela de suporte e verificaremos de novo.",
 "Requested the General MT5 EA — MT5 ID {id}.":"EA General MT5 solicitado — ID MT5 {id}.",
-"Asked for the General MT5 EA again — MT5 ID {id}.":"EA General MT5 solicitado de novo — ID MT5 {id}."
+"Asked for the General MT5 EA again — MT5 ID {id}.":"EA General MT5 solicitado de novo — ID MT5 {id}.",
+"Already have one under us? Skip to step 2. New to Headway? Open it through our link.":"Já tem uma conosco? Pule para o passo 2. Novo na Headway? Abra pelo nosso link.",
+"Claim $150 + a 50% deposit bonus":"Ganhe $150 + um bônus de depósito de 50%"
 }

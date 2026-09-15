@@ -244,6 +244,15 @@ details.aside summary { cursor: pointer; font-size: 12px; font-weight: 500; colo
    scan — a phone can open the account while the desk keeps the terminal. */
 .hw { display: flex; gap: 12px; align-items: stretch; }
 .hw-l { flex: 1; min-width: 0; }
+/* The bonus, said once and loudly: amber on its own line. */
+.hw-bonus {
+  display: inline-flex; align-items: center; gap: 7px; width: max-content; max-width: 100%;
+  margin-top: 8px; padding: 7px 12px; border-radius: 999px;
+  background: #ffb020; color: #1a1200;
+  font-size: 12.5px; font-weight: 800; letter-spacing: .01em;
+  box-shadow: 0 6px 18px rgba(255, 176, 32, .28);
+}
+.hw-bonus svg { flex: none; }
 .hw-mark { font-weight: 800; letter-spacing: -0.03em; color: #ff5468; font-size: 13.5px; }
 .hw-qr { flex: none; display: grid; justify-items: center; gap: 4px; align-content: center; text-decoration: none; color: var(--faint); font-size: 10.5px; font-weight: 600; }
 .hw-qr img { display: block; width: 84px; height: 84px; padding: 4px; border-radius: 8px; background: #fff; border: 1px solid var(--line); }
