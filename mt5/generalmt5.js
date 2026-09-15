@@ -294,7 +294,7 @@
         if (window.MBL_SUPPORT_ASK) {
           window.MBL_SUPPORT_ASK({
             name: name, email: email,
-            text: T(x.j.already ? "Asked for the General MT5 EA again — client / MT5 ID {id}." : "Requested the General MT5 EA — client / MT5 ID {id}.", { id: clientId }),
+            text: T(x.j.already ? "Asked for the General MT5 EA again — MT5 ID {id}." : "Requested the General MT5 EA — MT5 ID {id}.", { id: clientId }),
           });
         }
       })

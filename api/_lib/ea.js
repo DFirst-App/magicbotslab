@@ -4,7 +4,7 @@
  * The General EA is free but not public: it runs on signals from our own
  * engine, and that goes to the trading community rather than to
  * anyone who finds the page. So the download asks first, the owner checks the
- * ID against the partner list on Deriv, and an approval mints a code.
+ * ID against the partner list on Headway, and an approval mints a code.
  *
  * A code is bound to the visitor it was issued to. That binding is the reason
  * it exists: an approved code that worked for anyone who was sent it would be a
@@ -20,14 +20,23 @@ const { select, insert, update, configured } = require("./db");
 
 const TABLE = "mbl_ea_requests";
 
-/** Deriv's partner id — the list an account has to appear under. */
-const PARTNER_ID = "019ddd76-616c-7952-a74d-c410f13ca9cd";
+/* The broker moved from Deriv to Headway. The Deriv values are kept here,
+   commented, so the switch back is a matter of swapping the constants:
+     PARTNER_ID        "019ddd76-616c-7952-a74d-c410f13ca9cd"
+     DERIV_SIGNUP      "https://t.deriv.link?t=5HBLVPVNNFJ8"
+     DERIV_PROFILE     "https://home.deriv.com/dashboard/profile"
+     EXAMPLE_CLIENT_ID "019ddd76-616c-7952-a74d-c410f13ca9cd"
+   The names stayed so nothing that imports them had to change. */
+/** Our Headway Partner ID — the group an account has to sit under. The
+    sign-up link carries a different token (hwp=8abf6d); that one is the
+    link's, this one is what Headway support asks for. */
+const PARTNER_ID = "6078336";
 /** Where somebody without an account is sent to open one under us. */
-const DERIV_SIGNUP = "https://t.deriv.link?t=5HBLVPVNNFJ8";
-/** Where the client ID is copied from. Plain: the token belongs on signup. */
-const DERIV_PROFILE = "https://home.deriv.com/dashboard/profile";
+const DERIV_SIGNUP = "https://headway.partners/user/signup?hwp=8abf6d";
+/** Where the MT5 ID is read from. Plain words: it is not a page. */
+const DERIV_PROFILE = "the top of your MT5 terminal (the number before the server name), or your Headway personal area";
 /** What one looks like, so nobody has to guess which number we mean. */
-const EXAMPLE_CLIENT_ID = "019ddd76-616c-7952-a74d-c410f13ca9cd";
+const EXAMPLE_CLIENT_ID = "1234567";
 /** The file itself, bundled beside the function rather than served from /. */
 const EA_FILE = "MagicBotsLabMT5.mq5";
 /** A code is good for this many downloads, then it has to be issued again. */
@@ -41,7 +50,7 @@ function codeMessage(code, mt5Login, lead) {
     lead,
     "", code, "",
     `Paste it into step 4 on the bot's page to unlock the download. It works only on this browser, ${MAX_CODE_USES} times.`,
-    `⚠ Works only on Deriv, on the approved account ${mt5Login}. Any other broker or account receives wrong data.`,
+    `⚠ Works only on Headway, on the approved account ${mt5Login}. Any other broker or account receives wrong data.`,
   ].join("\n");
 }
 

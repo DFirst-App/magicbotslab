@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Deriv MT5 — full automation · Magic Bots Lab</title>
+  <title>Headway MT5 — full automation · Magic Bots Lab</title>
   <meta name="description" content="One free Expert Advisor that trades forex and Volatility Indices automatically on your own MetaTrader 5 terminal. Install it once on a single chart and it handles the rest." />
   <link rel="canonical" href="https://magicbotslab.com/mt5/generalmt5" />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://magicbotslab.com/mt5/generalmt5" />
-  <meta property="og:title" content="Deriv MT5 — full automation · Magic Bots Lab" />
+  <meta property="og:title" content="Headway MT5 — full automation · Magic Bots Lab" />
   <meta property="og:description" content="Free MT5 Expert Advisor for forex and Volatility Indices. Download it, set your risk profile and run it on your own terminal." />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="/favicon.ico" sizes="any" />
@@ -42,7 +42,7 @@
       </div>
     </header>
 
-    <h1>Deriv MT5 — full automation</h1>
+    <h1>Headway MT5 — full automation</h1>
     <p class="lede">One Expert Advisor that trades forex and Volatility Indices automatically on your own MetaTrader 5 terminal. Install it once on a single chart and it handles the rest.</p>
 
     <div class="err" id="pageErr" hidden></div>
@@ -113,7 +113,10 @@
 
       <div class="modal-body" id="modalBody">
         <div id="modalForm">
-          <div class="step" data-step="1">
+          <!-- The broker moved from Deriv to Headway. The Deriv step is kept
+               below, switched off with data-broker="deriv" + hidden, so it
+               can come back by removing one attribute. -->
+          <div class="step" data-step="1" data-broker="deriv" hidden>
             <div class="step-head"><span class="step-n">1</span><h3>Open an MT5 account with Deriv</h3></div>
             <div class="step-body">
               <p>Already have one under us? Skip to step 2.</p>
@@ -125,23 +128,43 @@
             </div>
           </div>
 
-          <div class="step" data-step="2">
-            <div class="step-head"><span class="step-n">2</span><h3>Client ID or MT5 ID</h3></div>
+          <div class="step" data-step="1" data-broker="headway">
+            <div class="step-head"><span class="step-n">1</span><h3>Open an MT5 account with Headway</h3></div>
             <div class="step-body">
-              <input class="field" id="clientId" placeholder="019ddd76-616c-7952-a74d-c410f13ca9cd" autocomplete="off" />
-              <p class="help">Either works — a client ID looks like the example above, an MT5 ID is a short run of digits.
-                <a href="https://home.deriv.com/dashboard/profile" target="_blank" rel="noopener noreferrer">Copy it from your Deriv profile</a></p>
+              <div class="hw">
+                <div class="hw-l">
+                  <p>Already have one under us? Skip to step 2. New to Headway? Open it through our link and <b>claim $150 + a 50% deposit bonus</b>.</p>
+                  <a class="btn-ghost" href="https://headway.partners/user/signup?hwp=8abf6d" target="_blank" rel="noopener noreferrer sponsored">
+                    <span class="hw-mark">headway</span>
+                    <span>Create account</span>
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                  </a>
+                  <p class="help">Opening it through this link places the account under our partner group — that is what we check. Then come back here with your new MT5 ID.</p>
+                </div>
+                <a class="hw-qr" href="https://headway.partners/user/signup?hwp=8abf6d" target="_blank" rel="noopener noreferrer sponsored" aria-label="Scan to open a Headway account">
+                  <img src="/logos/headway-signup-qr.svg" alt="QR code — open a Headway MT5 account through the Magic Bots Lab link" width="84" height="84" />
+                  <span>or scan</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="step" data-step="2">
+            <div class="step-head"><span class="step-n">2</span><h3>MT5 ID</h3></div>
+            <div class="step-body">
+              <input class="field" id="clientId" placeholder="1234567" autocomplete="off" inputmode="numeric" spellcheck="false" />
+              <p class="help">The account number MetaTrader 5 shows at the top of the terminal, before the server name. It is also in your Headway personal area.</p>
             </div>
           </div>
 
           <div class="step" data-step="3">
-            <div class="step-head"><span class="step-n">3</span><h3>Name and email</h3></div>
+            <div class="step-head"><span class="step-n">3</span><h3>Name and email — as registered at Headway</h3></div>
             <div class="step-body">
               <div class="two">
                 <input class="field" id="name" placeholder="Your name" autocomplete="name" />
                 <input class="field" id="email" type="email" placeholder="you@email.com" autocomplete="email" />
               </div>
-              <p class="help">So we can reach you about this account. Nothing else.</p>
+              <p class="help">Use the exact name and email on your Headway account — that is how we match you. <b>The EA works only on the account we approve.</b></p>
               <p class="send-limit" id="sendLimit" hidden>You have sent this three times. Wait for our reply in the support window — it unlocks sending again.</p>
               <button type="button" class="btn-primary" id="send" style="margin-top:10px" disabled>
                 <svg id="sendIcon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
@@ -177,7 +200,7 @@
 
           <div class="modal-err" id="modalErr" hidden></div>
 
-          <p class="modal-foot">We check every ID against our Deriv partner list. If yours is not under us, we will say so and ask you to contact Deriv support to be added under <code>019ddd76-616c-7952-a74d-c410f13ca9cd</code> — then reply in the support window and we will check again.</p>
+          <p class="modal-foot">We check every MT5 ID against our Headway partner list. If yours is not under us, we will say so and tell you how to ask Headway to attach it to our Partner ID <code>6078336</code> — then reply in the support window and we will check again.</p>
         </div>
 
         <div class="done-wrap" id="modalDone" hidden>

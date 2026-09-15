@@ -240,6 +240,18 @@ details.aside summary { cursor: pointer; font-size: 12px; font-weight: 500; colo
 }
 .btn-ghost:hover { background: rgba(255,255,255,.05); }
 .btn-ghost img { height: 16px; width: auto; max-width: 108px; }
+/* The way in: Headway's name on the button, and the same link as a code to
+   scan — a phone can open the account while the desk keeps the terminal. */
+.hw { display: flex; gap: 12px; align-items: stretch; }
+.hw-l { flex: 1; min-width: 0; }
+.hw-mark { font-weight: 800; letter-spacing: -0.03em; color: #ff5468; font-size: 13.5px; }
+.hw-qr { flex: none; display: grid; justify-items: center; gap: 4px; align-content: center; text-decoration: none; color: var(--faint); font-size: 10.5px; font-weight: 600; }
+.hw-qr img { display: block; width: 84px; height: 84px; padding: 4px; border-radius: 8px; background: #fff; border: 1px solid var(--line); }
+@media (max-width: 420px) {
+  .hw { flex-direction: column; }
+  .hw-qr { flex-direction: row; justify-content: center; align-items: center; gap: 10px; }
+  .hw-qr img { width: 64px; height: 64px; }
+}
 .btn-ghost svg { color: var(--faint); }
 
 .field {

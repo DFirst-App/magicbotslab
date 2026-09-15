@@ -128,7 +128,7 @@ module.exports = async (req, res) => {
     "",
     `Client / MT5 ID: <code>${esc(mt5Login)}</code>`,
     "",
-    `Check this ID under partner <code>${PARTNER_ID}</code>.`,
+    `Check this MT5 ID under Headway Partner ID <code>${PARTNER_ID}</code>.`,
     "",
     id
       ? "Swipe-reply /approve to send them a code, or /decline &lt;reason&gt; to say no."
