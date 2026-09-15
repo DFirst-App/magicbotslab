@@ -287,6 +287,7 @@
         set(NAME_KEY, name); set(MAIL_KEY, email);
         countSend();
         phase = "sent";
+        openWait();
 
         /* The bubble opens onto THIS conversation — the request already in it
            and the details filled — rather than onto an empty window that gives
@@ -332,9 +333,20 @@
 
   $("openEa").onclick = openModal;
   $("modalClose").onclick = closeModal;
+
+  /* The wait card: opened by a successful send, and again from the note. */
+  function openWait() { $("waitRoot").hidden = false; }
+  function closeWait() { $("waitRoot").hidden = true; }
+  $("waitOpen").onclick = openWait;
+  $("waitClose").onclick = closeWait;
+  $("waitDone").onclick = closeWait;
+  $("waitRoot").addEventListener("mousedown", function (e) { if (e.target === $("waitRoot")) closeWait(); });
   $("doneClose").onclick = closeModal;
   root.addEventListener("mousedown", function (e) { if (e.target === root) closeModal(); });
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !root.hidden) closeModal(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    if (!$("waitRoot").hidden) closeWait(); else if (!root.hidden) closeModal();
+  });
   ["clientId", "name", "email", "code"].forEach(function (id) { $(id).addEventListener("input", paintModal); });
   $("send").onclick = send;
   $("redeem").onclick = redeem;

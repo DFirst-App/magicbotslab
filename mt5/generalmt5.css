@@ -244,13 +244,12 @@ details.aside summary { cursor: pointer; font-size: 12px; font-weight: 500; colo
    scan — a phone can open the account while the desk keeps the terminal. */
 .hw { display: flex; gap: 12px; align-items: stretch; }
 .hw-l { flex: 1; min-width: 0; }
-/* The bonus, said once and loudly: amber on its own line. */
+/* The bonus on its own line, in the site's own accent. */
 .hw-bonus {
   display: inline-flex; align-items: center; gap: 7px; width: max-content; max-width: 100%;
   margin-top: 8px; padding: 7px 12px; border-radius: 999px;
-  background: #ffb020; color: #1a1200;
+  border: 1px solid rgba(0,210,255,.55); background: rgba(0,210,255,.10); color: var(--accent);
   font-size: 12.5px; font-weight: 800; letter-spacing: .01em;
-  box-shadow: 0 6px 18px rgba(255, 176, 32, .28);
 }
 .hw-bonus svg { flex: none; }
 .hw-mark { font-weight: 800; letter-spacing: -0.03em; color: #ff5468; font-size: 13.5px; }
@@ -279,12 +278,6 @@ details.aside summary { cursor: pointer; font-size: 12px; font-weight: 500; colo
   margin-bottom: 12px; border: 1px solid rgba(36,217,112,.35); border-radius: 12px;
   background: rgba(36,217,112,.08); padding: 12px; font-size: 12px; line-height: 1.45;
 }
-/* Where the wait is spent: the two channels, drawn with their own marks. */
-.sent-wait { display: grid; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(36,217,112,.25); }
-.sent-wait-t { font-weight: 600; color: var(--muted); }
-.sent-wait-r { display: flex; flex-wrap: wrap; gap: 8px; }
-.sent-wait .btn-ghost { gap: 7px; }
-.sent-wait .btn-ghost svg { flex: none; }
 .modal-err {
   margin-top: 4px; border: 1px solid rgba(242,96,125,.4); border-radius: 12px;
   background: rgba(242,96,125,.08); color: var(--loss); padding: 12px; font-size: 12.5px;
@@ -352,3 +345,23 @@ html::-webkit-scrollbar-thumb:hover { background: rgba(0,210,255,.4); }
   border: 1px solid rgba(245,165,36,.5); border-radius: 10px;
   background: rgba(245,165,36,.08); color: #f5a524; font-size: 12.5px; line-height: 1.45;
 }
+
+/* ── while you wait ──────────────────────────────────────────────────────
+   A small centred card above the modal: the bonus and the two channels. */
+.sent-more { display: block; margin-top: 8px; padding: 0; border: 0; background: none; color: var(--accent); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.sent-more:hover { text-decoration: underline; }
+.wait-root { position: fixed; inset: 0; z-index: 130; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(3,6,12,.72); backdrop-filter: blur(6px); }
+.wait-root[hidden] { display: none; }
+.wait { position: relative; width: 100%; max-width: 400px; padding: 22px 18px 16px; text-align: center; border: 1px solid var(--line); border-radius: 16px; background: var(--panel-solid); box-shadow: 0 24px 60px rgba(0,0,0,.5); }
+.wait-x { position: absolute; top: 10px; right: 10px; }
+.wait h3 { margin: 10px 0 0; font-size: 17px; font-weight: 700; }
+.wait > p { margin: 6px 0 14px; font-size: 12.5px; line-height: 1.45; color: var(--muted); }
+.wait-list { display: grid; gap: 8px; text-align: left; }
+.wait-b { display: flex; align-items: center; gap: 12px; padding: 11px 13px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); text-decoration: none; transition: background .15s, border-color .15s; }
+.wait-b:hover { background: rgba(255,255,255,.05); border-color: rgba(0,210,255,.45); }
+.wait-b > svg { flex: none; }
+.wait-b span { display: grid; gap: 1px; min-width: 0; }
+.wait-b b { font-size: 13px; }
+.wait-b small { font-size: 11.5px; color: var(--muted); }
+.wait-b--bonus { border-color: rgba(0,210,255,.55); background: rgba(0,210,255,.10); color: var(--accent); }
+.wait-done { display: flex; width: 100%; justify-content: center; margin-top: 12px; }
