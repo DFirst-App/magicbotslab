@@ -235,6 +235,9 @@
 
   function draw() {
     var needsWho = state.editWho || !isEmail(state.email) || !state.name.trim();
+    // Whatever is typed survives a redraw — a redraw is not a reason to lose words.
+    var prior = panel.querySelector("#supText");
+    var keep = prior ? prior.value : "";
 
     panel.innerHTML =
       '<div class="sup-head">' +
@@ -310,6 +313,7 @@
 
     var body = panel.querySelector("#supBody");
     body.scrollTop = body.scrollHeight;
+    if (keep) panel.querySelector("#supText").value = keep;
     // A picture grows the thread after it is drawn; stay at the bottom.
     Array.prototype.forEach.call(body.querySelectorAll("img"), function (im) {
       im.addEventListener("load", function () { body.scrollTop = body.scrollHeight; });
