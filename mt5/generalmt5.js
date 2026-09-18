@@ -224,6 +224,129 @@
     set(SENDS_KEY, JSON.stringify({ n: v.n + 1, at: new Date().toISOString() }));
   }
 
+  /* ── phone: country code + number, and the channel ───────────────────────
+     The country is DETECTED, never demanded: the edge tells us where the
+     request came from (/api/geo), the browser's locale is the fallback, and a
+     choice made here is remembered and wins over both next time. The list is
+     every country, searchable by name (in the visitor's language), by ISO code
+     or by calling code. Nothing is forced — the person types the number they
+     want to be reached on. */
+  var CC_KEY = "mbl_cc", PHONE_KEY = "mbl_phone", CHAN_KEY = "mbl_contact";
+  var COUNTRIES = window.DIAL_COUNTRIES || [];
+  var cc = null;                                    // the chosen [iso, name, dial]
+  var chan = get(CHAN_KEY) === "telegram" ? "telegram" : (get(CHAN_KEY) === "whatsapp" ? "whatsapp" : "");
+  var namesOf = null;
+  try { namesOf = new Intl.DisplayNames([document.documentElement.lang || "en"], { type: "region" }); } catch (e) { namesOf = null; }
+  function countryName(c) {
+    if (namesOf) { try { var n = namesOf.of(c[0]); if (n && n !== c[0]) return n; } catch (e) {} }
+    return c[1];
+  }
+  // Windows has no flag glyphs, so the ISO code stands in for the flag there.
+  var NO_FLAGS = /Win/.test(navigator.platform || "");
+  function flagHtml(iso) {
+    if (NO_FLAGS) return '<span class="cc-flag iso">' + iso + "</span>";
+    var f = iso.replace(/./g, function (ch) { return String.fromCodePoint(127397 + ch.charCodeAt(0)); });
+    return '<span class="cc-flag">' + f + "</span>";
+  }
+  function findCountry(iso) {
+    iso = String(iso || "").toUpperCase();
+    for (var i = 0; i < COUNTRIES.length; i++) if (COUNTRIES[i][0] === iso) return COUNTRIES[i];
+    return null;
+  }
+  function setCountry(c, remember) {
+    if (!c) return;
+    cc = c;
+    $("ccFlag").outerHTML = flagHtml(c[0]).replace('class="cc-flag', 'id="ccFlag" class="cc-flag');
+    $("ccCode").textContent = "+" + c[2];
+    $("ccBtn").setAttribute("aria-label", countryName(c) + " +" + c[2]);
+    if (remember) set(CC_KEY, c[0]);
+    paintModal();
+  }
+  function detectCountry() {
+    var saved = findCountry(get(CC_KEY));
+    if (saved) { setCountry(saved, false); return; }
+    var loc = (navigator.language || "").split("-")[1];
+    var fromLocale = loc && loc.length === 2 ? findCountry(loc) : null;
+    if (fromLocale) setCountry(fromLocale, false);
+    fetch("/api/geo", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        var g = j && findCountry(j.country);
+        // The edge knows where the request came from; the locale only guesses.
+        if (g && !get(CC_KEY)) setCountry(g, false);
+        else if (!cc && fromLocale) setCountry(fromLocale, false);
+      })
+      .catch(function () { if (!cc && fromLocale) setCountry(fromLocale, false); });
+  }
+  function renderList(q) {
+    q = (q || "").trim().toLowerCase().replace(/^\+/, "");
+    var list = $("ccList"), html = "", n = 0;
+    var rows = COUNTRIES.map(function (c) { return { c: c, n: countryName(c) }; })
+      .sort(function (a, b) { return a.n.localeCompare(b.n); });
+    // Words that START with the query first (ni → Niger, Nigeria, Nicaragua);
+    // anything merely containing it only when nothing starts with it.
+    var starts = function (name) { return (" " + name.toLowerCase()).indexOf(" " + q) >= 0; };
+    var hit = function (r) { return !q || starts(r.n) || starts(r.c[1]) || r.c[0].toLowerCase() === q || r.c[2].indexOf(q) === 0; };
+    var loose = function (r) { return r.n.toLowerCase().indexOf(q) >= 0 || r.c[1].toLowerCase().indexOf(q) >= 0; };
+    var shown = rows.filter(hit);
+    if (q && !shown.length) shown = rows.filter(loose);
+    for (var i = 0; i < shown.length; i++) {
+      var c = shown[i].c, name = shown[i].n;
+      n++;
+      html += '<li><button type="button" class="cc-item' + (cc && cc[0] === c[0] ? " is-active" : "") + '" data-iso="' + c[0] + '" role="option">'
+        + flagHtml(c[0]) + '<span class="cc-name">' + name.replace(/</g, "&lt;") + '</span><span class="cc-dial">+' + c[2] + "</span></button></li>";
+    }
+    list.innerHTML = n ? html : '<li class="cc-empty">' + T("No country matches that.") + "</li>";
+  }
+  function openCc() {
+    $("ccPop").hidden = false; $("ccBtn").setAttribute("aria-expanded", "true");
+    $("ccSearch").value = ""; renderList("");
+    setTimeout(function () { $("ccSearch").focus(); var a = $("ccList").querySelector(".is-active"); if (a) a.scrollIntoView({ block: "center" }); }, 20);
+  }
+  function closeCc() { $("ccPop").hidden = true; $("ccBtn").setAttribute("aria-expanded", "false"); }
+  $("ccBtn").onclick = function () { if ($("ccPop").hidden) openCc(); else closeCc(); };
+  $("ccSearch").addEventListener("input", function () { renderList($("ccSearch").value); });
+  $("ccSearch").addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { closeCc(); $("phone").focus(); e.stopPropagation(); }
+    if (e.key === "Enter") { var f = $("ccList").querySelector(".cc-item"); if (f) f.click(); }
+  });
+  $("ccList").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-iso]"); if (!b) return;
+    setCountry(findCountry(b.getAttribute("data-iso")), true); closeCc(); $("phone").focus();
+  });
+  document.addEventListener("mousedown", function (e) { if (!$("ccPop").hidden && !$("phoneWrap").contains(e.target)) closeCc(); });
+  // A number pasted with its own +code decides the country itself.
+  $("phone").addEventListener("input", function () {
+    var v = $("phone").value.replace(/[^\d+]/g, "");
+    if (v.charAt(0) === "+") {
+      var best = null;
+      for (var i = 0; i < COUNTRIES.length; i++) {
+        var d = COUNTRIES[i][2];
+        if (v.slice(1, 1 + d.length) === d && (!best || d.length > best[2].length) && (d !== "1" || !best)) best = COUNTRIES[i];
+      }
+      if (best && best[2] !== "1") { setCountry(best, true); $("phone").value = v.slice(1 + best[2].length); }
+    }
+  });
+  /* The number in E.164: the country's code, then the digits typed, minus a
+     leading trunk zero — "0712…" in Kenya is "+254712…". */
+  function phoneE164() {
+    if (!cc) return "";
+    var digits = $("phone").value.replace(/\D/g, "");
+    if (digits.charAt(0) === "0" && cc[2] !== "1") digits = digits.replace(/^0+/, "");
+    if (digits.length < 6 || digits.length + cc[2].length > 15) return "";
+    return "+" + cc[2] + digits;
+  }
+  function paintChan() {
+    Array.prototype.forEach.call(document.querySelectorAll(".chan-b"), function (b) {
+      b.setAttribute("aria-checked", b.getAttribute("data-chan") === chan ? "true" : "false");
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".chan-b"), function (b) {
+    b.onclick = function () { chan = b.getAttribute("data-chan"); set(CHAN_KEY, chan); paintChan(); paintModal(); };
+  });
+  paintChan();
+  detectCountry();
+
   function showErr(msg) {
     if (msg && typeof window.tm === "function") msg = window.tm(msg);
     var e = $("modalErr");
@@ -232,9 +355,10 @@
   }
 
   function formOk() {
-    return $("clientId").value.trim().length > 0
-      && $("name").value.trim().length > 1
-      && isEmail($("email").value);
+    return $("name").value.trim().length > 1
+      && isEmail($("email").value)
+      && phoneE164() !== ""
+      && (chan === "whatsapp" || chan === "telegram");
   }
 
   function paintModal() {
@@ -242,13 +366,13 @@
     $("modalForm").hidden = phase === "done";
     $("modalDone").hidden = phase !== "done";
     $("sentNote").hidden = !sent;
-    // The fields stay live after a send: a wrong ID is fixed here, not by
+    // The fields stay live after a send: a wrong detail is fixed here, not by
     // reloading the page.
     Array.prototype.forEach.call(root.querySelectorAll(".step"), function (s) {
       var n = s.getAttribute("data-step");
-      s.classList.toggle("done", sent && n !== "4");
+      s.classList.toggle("done", sent && n !== "5");
       var badge = s.querySelector(".step-n");
-      badge.innerHTML = (sent && n !== "4")
+      badge.innerHTML = (sent && n !== "5")
         ? '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'
         : n;
     });
@@ -261,31 +385,35 @@
   }
 
   function openModal() {
-    // Details this browser already knows, so most people only ever type the ID.
+    // Details this browser already knows, so a returning person only checks them.
     if (!$("name").value) $("name").value = get(NAME_KEY);
     if (!$("email").value) $("email").value = get(MAIL_KEY);
+    if (!$("phone").value) $("phone").value = get(PHONE_KEY);
     root.hidden = false;
     paintModal();
-    setTimeout(function () { $("clientId").focus(); }, 60);
+    setTimeout(function () { $("name").focus(); }, 60);
   }
   function closeModal() { root.hidden = true; }
 
   function send() {
     if (busy || !formOk() || sendsLeft() === 0) return;
     busy = true; showErr(null); paintModal();
-    var clientId = $("clientId").value.trim();
     var name = $("name").value.trim();
     var email = $("email").value.trim();
+    var phone = phoneE164();
 
     fetch("/api/mt5/ea-request", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ visitorId: visitorId(), mt5Login: clientId, name: name, email: email, page: location.pathname }),
+      body: JSON.stringify({
+        visitorId: visitorId(), name: name, email: email, phone: phone, country: cc ? cc[0] : "", contact: chan,
+        lang: document.documentElement.lang || "", page: location.pathname,
+      }),
     })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (x) {
         if (!x.ok) throw new Error(x.j.error || "Could not send that. Try again in a moment.");
-        set(NAME_KEY, name); set(MAIL_KEY, email);
+        set(NAME_KEY, name); set(MAIL_KEY, email); set(PHONE_KEY, $("phone").value.trim());
         countSend();
         phase = "sent";
         openWait();
@@ -296,7 +424,7 @@
         if (window.MBL_SUPPORT_ASK) {
           window.MBL_SUPPORT_ASK({
             name: name, email: email,
-            text: T(x.j.already ? "Asked for the General MT5 EA again — MT5 ID {id}." : "Requested the General MT5 EA — MT5 ID {id}.", { id: clientId }),
+            text: T(x.j.already ? "Asked for the General MT5 EA again — {email}, {phone} on {channel}." : "Requested the General MT5 EA — {email}, {phone} on {channel}.", { email: email, phone: phone, channel: chan === "telegram" ? "Telegram" : "WhatsApp" }),
           });
         }
       })
@@ -348,7 +476,7 @@
     if (e.key !== "Escape") return;
     if (!$("waitRoot").hidden) closeWait(); else if (!root.hidden) closeModal();
   });
-  ["clientId", "name", "email", "code"].forEach(function (id) { $(id).addEventListener("input", paintModal); });
+  ["name", "email", "phone", "code"].forEach(function (id) { $(id).addEventListener("input", paintModal); });
   $("send").onclick = send;
   $("redeem").onclick = redeem;
   $("code").addEventListener("keydown", function (e) { if (e.key === "Enter") redeem(); });

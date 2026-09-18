@@ -33,9 +33,8 @@ const TABLE = "mbl_ea_requests";
 const PARTNER_ID = "6078336";
 /** Where somebody without an account is sent to open one under us. */
 const DERIV_SIGNUP = "https://headway.partners/user/signup?hwp=8abf6d";
-/** Where the MT5 ID is read from. Plain words: it is not a page. */
-const DERIV_PROFILE = "the top of your MT5 terminal (the number before the server name), or your Headway personal area";
-/** What one looks like, so nobody has to guess which number we mean. */
+/** Kept for the imports; the Headway flow matches by name and email, not by ID. */
+const DERIV_PROFILE = "your Headway personal area";
 const EXAMPLE_CLIENT_ID = "1234567";
 /** The file itself, bundled beside the function rather than served from /. */
 const EA_FILE = "MagicBotsLabMT5.mq5";
@@ -49,7 +48,7 @@ function codeMessage(code, mt5Login, lead) {
   return [
     lead,
     "", code, "",
-    `Paste it into step 4 on the bot's page to unlock the download. It works only on this browser, ${MAX_CODE_USES} times.`,
+    `Paste it into step 5 on the bot's page to unlock the download. It works only on this browser, ${MAX_CODE_USES} times.`,
     `⚠ Works only on Headway, on the approved account. Any other broker or account receives wrong data.`,
   ].join("\n");
 }
@@ -69,16 +68,18 @@ const normaliseCode = (raw) => String(raw || "").toUpperCase().replace(/[^A-Z0-9
 
 const row = (d) => d ? ({
   id: d.id, visitorId: d.visitor_id, mt5Login: d.mt5_login, name: d.name, email: d.email,
+  phone: d.phone || "", contact: d.contact || "", country: d.country || "",
   status: d.status, code: d.code || null,
 }) : null;
 
-const FIELDS = "id,visitor_id,mt5_login,name,email,status,code";
+const FIELDS = "id,visitor_id,mt5_login,name,email,phone,contact,country,status,code";
 
 /** Record a new request. Returns its id, or null if it could not be stored. */
 async function createRequest(r) {
   if (!configured()) return null;
   const res = await insert(TABLE, {
-    visitor_id: r.visitorId, mt5_login: r.mt5Login, name: r.name, email: r.email, page: r.page || null,
+    visitor_id: r.visitorId, mt5_login: r.mt5Login || r.phone || "", name: r.name, email: r.email, page: r.page || null,
+    phone: r.phone || null, contact: r.contact || null, country: r.country || null,
   });
   if (!res.ok) { console.error("[ea] could not record request:", res.error); return null; }
   return res.data && res.data[0] ? res.data[0].id : null;
@@ -148,24 +149,24 @@ async function pendingRequests(limit) {
 /** The live code this browser already holds, if any, and what is left of it. */
 async function approvedCodeFor(visitorId) {
   if (!configured() || !visitorId) return null;
-  const res = await select(TABLE, `select=code,code_uses,mt5_login,email&visitor_id=eq.${encodeURIComponent(visitorId)}&status=eq.approved&code=not.is.null&order=decided_at.desc&limit=1`);
+  const res = await select(TABLE, `select=code,code_uses,mt5_login,email,phone&visitor_id=eq.${encodeURIComponent(visitorId)}&status=eq.approved&code=not.is.null&order=decided_at.desc&limit=1`);
   if (!res.ok) { console.error("[ea] approved lookup failed:", res.error); return null; }
   const d = res.data && res.data[0];
   if (!d || !d.code) return null;
-  return { code: d.code, usesLeft: Math.max(0, MAX_CODE_USES - (d.code_uses || 0)), mt5Login: d.mt5_login, email: d.email };
+  return { code: d.code, usesLeft: Math.max(0, MAX_CODE_USES - (d.code_uses || 0)), mt5Login: d.mt5_login, email: d.email, phone: d.phone || "" };
 }
 
 /**
- * Was this exact email and ID approved before, on any browser?
+ * Was this exact email and phone approved before, on any browser?
  *
  * The automatic re-approval: somebody whose code is spent, or who is on a new
- * device, sends the form again with the same email and the same ID they were
- * approved with, and gets a fresh code without waiting. The ID is compared
- * exactly; the email without regard to case.
+ * device, sends the form again with the same email and the same phone they
+ * were approved with, and gets a fresh code without waiting. The phone is
+ * compared exactly (E.164); the email without regard to case.
  */
-async function approvedMatch(email, mt5Login) {
-  if (!configured() || !email || !mt5Login) return null;
-  const res = await select(TABLE, `select=id,visitor_id,name&status=eq.approved&code=not.is.null&email=ilike.${encodeURIComponent(email)}&mt5_login=eq.${encodeURIComponent(mt5Login)}&order=decided_at.desc&limit=1`);
+async function approvedMatch(email, phone) {
+  if (!configured() || !email || !phone) return null;
+  const res = await select(TABLE, `select=id,visitor_id,name&status=eq.approved&code=not.is.null&email=ilike.${encodeURIComponent(email)}&phone=eq.${encodeURIComponent(phone)}&order=decided_at.desc&limit=1`);
   if (!res.ok) { console.error("[ea] match lookup failed:", res.error); return null; }
   const d = res.data && res.data[0];
   return d ? { id: d.id, visitorId: d.visitor_id, name: d.name } : null;
