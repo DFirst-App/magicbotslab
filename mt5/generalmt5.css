@@ -282,6 +282,10 @@ details.aside summary { cursor: pointer; font-size: 12px; font-weight: 500; colo
   margin-top: 4px; border: 1px solid rgba(242,96,125,.4); border-radius: 12px;
   background: rgba(242,96,125,.08); color: var(--loss); padding: 12px; font-size: 12.5px;
 }
+/* The "I have downloaded" button: the copy button's shape, the accent's colour. */
+.copy.downloaded { border-color: rgba(0,210,255,.55); color: var(--accent); background: rgba(0,210,255,.08); }
+.copy.downloaded:hover { background: rgba(0,210,255,.16); }
+
 /* ── phone: country code + number ──────────────────────────────────────── */
 .phone { position: relative; display: flex; gap: 8px; }
 .phone .field { flex: 1; min-width: 0; }

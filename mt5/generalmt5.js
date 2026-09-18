@@ -354,11 +354,12 @@
     e.hidden = !msg;
   }
 
+  // The name and email are what gets checked, so they are what unlocks the
+  // button. A phone, if typed, has to be a phone; the channel is optional.
   function formOk() {
     return $("name").value.trim().length > 1
       && isEmail($("email").value)
-      && phoneE164() !== ""
-      && (chan === "whatsapp" || chan === "telegram");
+      && ($("phone").value.replace(/\D/g, "") === "" || phoneE164() !== "");
   }
 
   function paintModal() {
@@ -424,7 +425,9 @@
         if (window.MBL_SUPPORT_ASK) {
           window.MBL_SUPPORT_ASK({
             name: name, email: email,
-            text: T(x.j.already ? "Asked for the General MT5 EA again — {email}, {phone} on {channel}." : "Requested the General MT5 EA — {email}, {phone} on {channel}.", { email: email, phone: phone, channel: chan === "telegram" ? "Telegram" : "WhatsApp" }),
+            text: phone
+              ? T(x.j.already ? "Asked for the General MT5 EA again — {email}, {phone} on {channel}." : "Requested the General MT5 EA — {email}, {phone} on {channel}.", { email: email, phone: phone, channel: chan === "telegram" ? "Telegram" : (chan === "whatsapp" ? "WhatsApp" : "—") })
+              : T(x.j.already ? "Asked for the General MT5 EA again — {email}." : "Requested the General MT5 EA — {email}.", { email: email }),
           });
         }
       })
@@ -481,6 +484,16 @@
   $("redeem").onclick = redeem;
   $("code").addEventListener("keydown", function (e) { if (e.key === "Enter") redeem(); });
   $("refresh").onclick = load;
+  /* "I have downloaded the EA": one tap sends the words to support, with the
+     whole thread and our record of whether this browser was ever approved. */
+  $("downloadedBtn").onclick = function () {
+    if (window.MBL_SUPPORT_SEND) {
+      window.MBL_SUPPORT_SEND({
+        text: T("I have downloaded the EA — please guide me on how to set it up and use it the right way."),
+        kind: "ea-downloaded",
+      });
+    }
+  };
   // Our reply landing in the bubble is what unlocks sending again.
   window.addEventListener("mbl:support-reply", function () { if (!root.hidden) paintModal(); });
 
