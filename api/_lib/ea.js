@@ -50,11 +50,12 @@ function codeMessage(code, mt5Login, lead) {
     "", code, "",
     `Paste it into step 6 on the bot's page to unlock the download. It works only on this browser, ${MAX_CODE_USES} times.`,
     `⚠ Works only on Headway, on the approved account. Any other broker or account receives wrong data.`,
-    MISTAKE_LINE,
   ].join("\n");
 }
 
-/** Every answer ends with this: a wrong decision is a screenshot away from being fixed. */
+/** Every UNSUCCESSFUL answer — a decline, a deposit asked for — ends with this:
+ *  a wrong decision is a screenshot away from being fixed. A code is not an
+ *  answer that can be wrong, so it never carries it. */
 const MISTAKE_LINE = "If we made a mistake, reply here with a screenshot of your Headway account and we will fix it right away.";
 
 /** What somebody is told when their account is under us but not funded yet. */
@@ -64,7 +65,7 @@ function depositMessage(email) {
     "",
     "Deposit any amount you want to start with in your Headway personal area — Headway adds a 50% bonus — then reply here and we send your code right away.",
     "",
-    "If you have already deposited, reply here with a screenshot of it and we will send your code.",
+    MISTAKE_LINE,
   ].join("\n");
 }
 
