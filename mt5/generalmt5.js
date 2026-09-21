@@ -491,7 +491,17 @@
      reload — it keeps the ids of the replies it had already seen, and a reply
      it has not seen is what opens the button again. */
   var DL_LOCK = "mbl_ea_downloaded_lock";
-  function replyIds() { return window.MBL_SUPPORT_REPLY_IDS ? window.MBL_SUPPORT_REPLY_IDS() : []; }
+  /* Our replies: the ones this page holds, plus whatever is stored — another
+     tab of this browser may have been the one that received the answer. */
+  function replyIds() {
+    var ids = window.MBL_SUPPORT_REPLY_IDS ? window.MBL_SUPPORT_REPLY_IDS() : [];
+    try {
+      JSON.parse(get("mbl_support_thread") || "[]").forEach(function (l) {
+        if (l && l.from === "us" && !l.system && l.id && ids.indexOf(l.id) < 0) ids.push(l.id);
+      });
+    } catch (e) {}
+    return ids;
+  }
   function dlLock() { try { return JSON.parse(get(DL_LOCK) || "null"); } catch (e) { return null; } }
   function paintDownloaded(justNow) {
     var b = $("downloadedBtn"), lock = dlLock();
@@ -522,6 +532,8 @@
   });
   // Our reply landing in the bubble is what unlocks sending again.
   window.addEventListener("mbl:support-reply", function () { paintDownloaded(); if (!root.hidden) paintModal(); });
+  // The same thread in another tab of this browser may be the one that receives our answer.
+  window.addEventListener("storage", function (e) { if (e.key === "mbl_support_thread" || e.key === DL_LOCK) paintDownloaded(); });
   paintDownloaded();
 
   /* Click-to-copy for the one string in the steps that must be typed
