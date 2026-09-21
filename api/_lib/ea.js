@@ -48,8 +48,23 @@ function codeMessage(code, mt5Login, lead) {
   return [
     lead,
     "", code, "",
-    `Paste it into step 5 on the bot's page to unlock the download. It works only on this browser, ${MAX_CODE_USES} times.`,
+    `Paste it into step 6 on the bot's page to unlock the download. It works only on this browser, ${MAX_CODE_USES} times.`,
     `⚠ Works only on Headway, on the approved account. Any other broker or account receives wrong data.`,
+    MISTAKE_LINE,
+  ].join("\n");
+}
+
+/** Every answer ends with this: a wrong decision is a screenshot away from being fixed. */
+const MISTAKE_LINE = "If we made a mistake, reply here with a screenshot of your Headway account and we will fix it right away.";
+
+/** What somebody is told when their account is under us but not funded yet. */
+function depositMessage(email) {
+  return [
+    `Your Headway account (${email}) is under our community — but it has no deposit yet, and the EA is for accounts ready to trade.`,
+    "",
+    "Deposit any amount you want to start with in your Headway personal area — Headway adds a 50% bonus — then reply here and we send your code right away.",
+    "",
+    "If you have already deposited, reply here with a screenshot of it and we will send your code.",
   ].join("\n");
 }
 
@@ -282,7 +297,7 @@ async function recentRequestCount(visitorId, withinMinutes) {
 }
 
 module.exports = {
-  PARTNER_ID, DERIV_SIGNUP, DERIV_PROFILE, EXAMPLE_CLIENT_ID, EA_FILE, MAX_CODE_USES, codeMessage,
+  PARTNER_ID, DERIV_SIGNUP, DERIV_PROFILE, EXAMPLE_CLIENT_ID, EA_FILE, MAX_CODE_USES, codeMessage, depositMessage, MISTAKE_LINE,
   createRequest, attachTelegramMessage, requestForTelegramMessage, requestForVisitor,
   pendingRequests, approvedCodeFor, approvedMatch, markAnswered, approveRequest, declineRequest,
   declineCount, checkCode, recentRequestCount, normaliseCode, accessStatusFor,

@@ -106,7 +106,7 @@
       <header class="modal-head">
         <div style="min-width:0;flex:1">
           <h2>Get the MagicBotsLab EA</h2>
-          <p>The EA runs on <b>Magic Bots Lab technology</b> — it asks our trading engine for its signals as it trades. We share it with our own community only, so there are a few steps first.</p>
+          <p>Built on <b>Magic Bots Lab technology</b>, for our Headway community only. A few quick steps:</p>
         </div>
         <button type="button" class="modal-close" id="modalClose" aria-label="Close">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -131,18 +131,18 @@
           </div>
 
           <div class="step" data-step="1" data-broker="headway">
-            <div class="step-head"><span class="step-n">1</span><h3>Open an MT5 account with Headway</h3></div>
+            <div class="step-head"><span class="step-n">1</span><h3>Open a Headway account</h3></div>
             <div class="step-body">
               <div class="hw">
                 <div class="hw-l">
-                  <p>Already have one under us? Skip to step 2. New to Headway? Open it through our link.</p>
+                  <p>Already under us? Skip ahead.</p>
                   <span class="hw-bonus"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Claim $150 + a 50% deposit bonus</span>
                   <a class="btn-ghost" href="https://headway.partners/user/signup?hwp=8abf6d" target="_blank" rel="noopener noreferrer sponsored">
                     <span class="hw-mark">headway</span>
                     <span>Create account</span>
                     <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
                   </a>
-                  <p class="help">Opening it through this link places the account under our partner group — that is what we check. Then come back here with the name and email you registered.</p>
+                  <p class="help">Our link puts your account under our partner group.</p>
                 </div>
                 <a class="hw-qr" href="https://headway.partners/user/signup?hwp=8abf6d" target="_blank" rel="noopener noreferrer sponsored" aria-label="Scan to open a Headway account">
                   <img src="/logos/headway-signup-qr.svg" alt="QR code — open a Headway MT5 account through the Magic Bots Lab link" width="84" height="84" />
@@ -153,18 +153,25 @@
           </div>
 
           <div class="step" data-step="2">
-            <div class="step-head"><span class="step-n">2</span><h3>Name and email — as registered at Headway</h3></div>
+            <div class="step-head"><span class="step-n">2</span><h3>Make a deposit</h3></div>
+            <div class="step-body">
+              <p>Any amount you want to start with — Headway adds a <b>50% bonus</b>. The EA is for funded accounts only.</p>
+            </div>
+          </div>
+
+          <div class="step" data-step="3">
+            <div class="step-head"><span class="step-n">3</span><h3>Full name and email — as registered at Headway</h3></div>
             <div class="step-body">
               <div class="two">
                 <input class="field" id="name" placeholder="Full name" autocomplete="name" />
                 <input class="field" id="email" type="email" placeholder="you@email.com" autocomplete="email" />
               </div>
-              <p class="help">Use the exact full name and email on your Headway account — that is how we find you on our partner list.</p>
+              <p class="help">Exactly as on your Headway account.</p>
             </div>
           </div>
 
-          <div class="step" data-step="3">
-            <div class="step-head"><span class="step-n">3</span><h3>Phone number</h3></div>
+          <div class="step" data-step="4">
+            <div class="step-head"><span class="step-n">4</span><h3>Phone number</h3></div>
             <div class="step-body">
               <div class="phone" id="phoneWrap">
                 <button type="button" class="cc" id="ccBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Country code">
@@ -178,12 +185,12 @@
                   <ul class="cc-list" id="ccList" role="listbox"></ul>
                 </div>
               </div>
-              <p class="help">The number we reach you on after the download, to guide you through setting the EA up and using it the right way.</p>
+              <p class="help">We guide you on it after the download.</p>
             </div>
           </div>
 
-          <div class="step" data-step="4">
-            <div class="step-head"><span class="step-n">4</span><h3>Where should we contact you?</h3></div>
+          <div class="step" data-step="5">
+            <div class="step-head"><span class="step-n">5</span><h3>Contact on</h3></div>
             <div class="step-body">
               <div class="chan" role="radiogroup" aria-label="Contact channel">
                 <button type="button" class="chan-b" data-chan="whatsapp" role="radio" aria-checked="false">
@@ -195,7 +202,6 @@
                   <span>Telegram</span>
                 </button>
               </div>
-              <p class="help">On that number. We show you exactly how to use the EA so you start the right way.</p>
               <p class="send-limit" id="sendLimit" hidden>You have sent this three times. Wait for our reply in the support window — it unlocks sending again.</p>
               <button type="button" class="btn-primary" id="send" style="margin-top:10px" disabled>
                 <svg id="sendIcon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
@@ -205,12 +211,12 @@
           </div>
 
           <div class="sent" id="sentNote" hidden>
-            <span class="sent-t"><b>Sent.</b> We are checking your details against our Headway partner list now. Your code arrives in the <b>support window</b> — it has opened at the corner of this page, and the reply lands there.</span>
+            <span class="sent-t"><b>Sent.</b> We check your Headway account and deposit now. Your code arrives in the <b>support window</b> at the corner of this page.</span>
             <button type="button" class="sent-more" id="waitOpen">While you wait: the bonus and the community →</button>
           </div>
 
-          <div class="step" data-step="5">
-            <div class="step-head"><span class="step-n">5</span><h3>Enter your download code</h3></div>
+          <div class="step" data-step="6">
+            <div class="step-head"><span class="step-n">6</span><h3>Enter your download code</h3></div>
             <div class="step-body">
               <div class="row">
                 <input class="field code" id="code" placeholder="MBL-XXXX-XXXX" autocomplete="off" />
@@ -219,7 +225,7 @@
                   Download
                 </button>
               </div>
-              <p class="help">Your code only works on this browser.</p>
+              <p class="help">Works on this browser only.</p>
             </div>
           </div>
 

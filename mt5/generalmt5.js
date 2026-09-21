@@ -371,9 +371,9 @@
     // reloading the page.
     Array.prototype.forEach.call(root.querySelectorAll(".step"), function (s) {
       var n = s.getAttribute("data-step");
-      s.classList.toggle("done", sent && n !== "5");
+      s.classList.toggle("done", sent && n !== "6");
       var badge = s.querySelector(".step-n");
-      badge.innerHTML = (sent && n !== "5")
+      badge.innerHTML = (sent && n !== "6")
         ? '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>'
         : n;
     });
