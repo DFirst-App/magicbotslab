@@ -485,8 +485,28 @@
   $("code").addEventListener("keydown", function (e) { if (e.key === "Enter") redeem(); });
   $("refresh").onclick = load;
   /* "I have downloaded the EA": one tap sends the words to support, with the
-     whole thread and our record of whether this browser was ever approved. */
+     whole thread and our record of whether this browser was ever approved.
+     Then the button says Sent, in green, and stays that way until we answer:
+     one tap is one message, and ten taps are not ten. The lock survives a
+     reload — it keeps the ids of the replies it had already seen, and a reply
+     it has not seen is what opens the button again. */
+  var DL_LOCK = "mbl_ea_downloaded_lock";
+  function replyIds() { return window.MBL_SUPPORT_REPLY_IDS ? window.MBL_SUPPORT_REPLY_IDS() : []; }
+  function dlLock() { try { return JSON.parse(get(DL_LOCK) || "null"); } catch (e) { return null; } }
+  function paintDownloaded(justNow) {
+    var b = $("downloadedBtn"), lock = dlLock();
+    var seen = (lock && lock.seen) || [];
+    var waiting = !!lock && !replyIds().some(function (id) { return seen.indexOf(id) < 0; });
+    if (lock && !waiting) { try { localStorage.removeItem(DL_LOCK); } catch (e) {} }
+    var was = b.classList.contains("is-sent");
+    b.disabled = waiting;
+    b.classList.toggle("is-sent", waiting);
+    if (justNow) { b.classList.add("just-sent"); setTimeout(function () { b.classList.remove("just-sent"); }, 900); }
+    // English goes in; the language layer translates whatever is written here.
+    if (waiting !== was) b.querySelector("span").textContent = waiting ? "Sent" : "I have downloaded the EA";
+  }
   $("downloadedBtn").onclick = function () {
+    if (this.disabled) return;
     if (window.MBL_SUPPORT_SEND) {
       window.MBL_SUPPORT_SEND({
         text: T("I have downloaded the EA — please guide me on how to set it up and use it the right way."),
@@ -494,8 +514,15 @@
       });
     }
   };
+  // The words actually went out: lock the button on what we have said so far.
+  window.addEventListener("mbl:support-sent", function (e) {
+    if (!e.detail || e.detail.kind !== "ea-downloaded") return;
+    set(DL_LOCK, JSON.stringify({ at: new Date().toISOString(), seen: replyIds() }));
+    paintDownloaded(true);
+  });
   // Our reply landing in the bubble is what unlocks sending again.
-  window.addEventListener("mbl:support-reply", function () { if (!root.hidden) paintModal(); });
+  window.addEventListener("mbl:support-reply", function () { paintDownloaded(); if (!root.hidden) paintModal(); });
+  paintDownloaded();
 
   /* Click-to-copy for the one string in the steps that must be typed
      exactly. The button says so for a moment, then goes back to "Copy". The

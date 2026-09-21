@@ -286,6 +286,12 @@ details.aside summary { cursor: pointer; font-size: 12px; font-weight: 500; colo
 .click-here { color: var(--accent); font-weight: 800; white-space: nowrap; }
 .copy.downloaded { border-color: rgba(0,210,255,.55); color: var(--accent); background: rgba(0,210,255,.08); }
 .copy.downloaded:hover { background: rgba(0,210,255,.16); }
+/* Sent: green, the tick draws itself, and it stays that way until we answer. */
+.copy.downloaded.is-sent, .copy.downloaded.is-sent:hover { color: var(--accent-ink); background: var(--success); border-color: var(--success); cursor: default; }
+.copy.downloaded.just-sent { animation: sent-pop .5s cubic-bezier(.2,.9,.3,1.3); }
+.copy.downloaded.just-sent svg path { stroke-dasharray: 24; stroke-dashoffset: 24; animation: sent-draw .4s .12s ease forwards; }
+@keyframes sent-pop { 0% { transform: scale(.94); } 55% { transform: scale(1.07); } 100% { transform: scale(1); } }
+@keyframes sent-draw { to { stroke-dashoffset: 0; } }
 
 /* ── phone: country code + number ──────────────────────────────────────── */
 .phone { position: relative; display: flex; gap: 8px; }
