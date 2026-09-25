@@ -115,6 +115,10 @@
 
       <div class="modal-body" id="modalBody">
         <div id="modalForm">
+          <!-- Shown when "I have downloaded the EA" was pressed by somebody who
+               is not approved yet: why the request opened instead. -->
+          <div class="gate-note" id="gateNote" role="alert" hidden><b id="gateTitle"></b><span id="gateText"></span></div>
+
           <!-- The broker moved from Deriv to Headway. The Deriv step is kept
                below, switched off with data-broker="deriv" + hidden, so it
                can come back by removing one attribute. -->

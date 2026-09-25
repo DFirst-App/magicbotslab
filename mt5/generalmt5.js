@@ -385,14 +385,32 @@
     $("redeem").disabled = !$("code").value.trim() || busy;
   }
 
-  function openModal() {
+  function openModal(atTop) {
     // Details this browser already knows, so a returning person only checks them.
     if (!$("name").value) $("name").value = get(NAME_KEY);
     if (!$("email").value) $("email").value = get(MAIL_KEY);
     if (!$("phone").value) $("phone").value = get(PHONE_KEY);
     root.hidden = false;
     paintModal();
+    // Opened to explain something: the note at the top is what they read first.
+    if (atTop === true) { $("modalBody").scrollTop = 0; return; }
     setTimeout(function () { $("name").focus(); }, 60);
+  }
+
+  /* Why the popup opened when "I have downloaded the EA" was pressed. English
+     goes in; the language layer translates whatever is written here. */
+  var GATE = {
+    none: ["Not approved yet.", "Request your download code below. Once we approve you, it arrives in the support window."],
+    pending: ["Not approved yet.", "Your request is still being checked. Your code arrives in the support window as soon as you are approved — then enter it in step 6."],
+    declined: ["Your request was not approved.", "Check that your full name and email match your Headway account exactly, then send again."],
+    unknown: ["We could not check your approval.", "Try again in a moment. If you already have a code, enter it in step 6."],
+  };
+  function showGate(state) {
+    var g = GATE[state];
+    $("gateNote").hidden = !g;
+    if (!g) return;
+    $("gateTitle").textContent = g[0];
+    $("gateText").textContent = g[1];
   }
   function closeModal() { root.hidden = true; }
 
@@ -417,6 +435,7 @@
         set(NAME_KEY, name); set(MAIL_KEY, email); set(PHONE_KEY, $("phone").value.trim());
         countSend();
         phase = "sent";
+        showGate(null);
         openWait();
 
         /* The bubble opens onto THIS conversation — the request already in it
@@ -463,7 +482,7 @@
 
   /* ── wire up ────────────────────────────────────────────────────────── */
 
-  $("openEa").onclick = openModal;
+  $("openEa").onclick = function () { showGate(null); openModal(); };
   $("modalClose").onclick = closeModal;
 
   /* The wait card: opened by a successful send, and again from the note. */
@@ -515,14 +534,36 @@
     // English goes in; the language layer translates whatever is written here.
     if (waiting !== was) b.querySelector("span").textContent = waiting ? "Sent" : "I have downloaded the EA";
   }
+  /* Only somebody approved has an EA to set up. Everyone else — never asked,
+     still waiting, or declined — is shown the request instead, with a note
+     saying why, and nothing is sent to support. The server answers from our
+     own record of this browser; if it cannot be asked, the popup opens too,
+     because the popup is also where a code already received is entered. */
+  var checking = false;
   $("downloadedBtn").onclick = function () {
-    if (this.disabled) return;
-    if (window.MBL_SUPPORT_SEND) {
-      window.MBL_SUPPORT_SEND({
-        text: T("I have downloaded the EA — please guide me on how to set it up and use it the right way."),
-        kind: "ea-downloaded",
+    var b = this;
+    if (b.disabled || checking) return;
+    checking = true; b.disabled = true;
+    fetch("/api/mt5/ea-request?visitorId=" + encodeURIComponent(visitorId()), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .catch(function () { return null; })
+      .then(function (j) {
+        checking = false;
+        paintDownloaded();
+        var state = j && j.state;
+        if (state === "approved") {
+          showGate(null);
+          if (window.MBL_SUPPORT_SEND) {
+            window.MBL_SUPPORT_SEND({
+              text: T("I have downloaded the EA — please guide me on how to set it up and use it the right way."),
+              kind: "ea-downloaded",
+            });
+          }
+          return;
+        }
+        showGate(GATE[state] ? state : "unknown");
+        openModal(true);
       });
-    }
   };
   // The words actually went out: lock the button on what we have said so far.
   window.addEventListener("mbl:support-sent", function (e) {

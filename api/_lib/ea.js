@@ -335,9 +335,12 @@ async function accessStatusFor(visitorId) {
   if (!configured() || !visitorId) return { state: "unknown" };
   const v = encodeURIComponent(visitorId);
   const ok = await select(TABLE, `select=code,code_uses,code_used_at,decided_at,name,email&visitor_id=eq.${v}&status=eq.approved&code=not.is.null&order=decided_at.desc&limit=1`);
+  // A lookup that failed says nothing about the person — it is not "never asked".
+  if (!ok.ok) return { state: "unknown" };
   const a = ok.ok && ok.data && ok.data[0];
   if (a) return { state: "approved", code: a.code, uses: a.code_uses || 0, usedAt: a.code_used_at, at: a.decided_at, name: a.name, email: a.email };
   const last = await select(TABLE, `select=status,created_at,decided_at,name,email&visitor_id=eq.${v}&order=created_at.desc&limit=1`);
+  if (!last.ok) return { state: "unknown" };
   const d = last.ok && last.data && last.data[0];
   if (!d) return { state: "none" };
   return { state: d.status === "declined" ? "declined" : "pending", at: d.decided_at || d.created_at, name: d.name, email: d.email };

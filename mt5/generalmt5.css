@@ -278,6 +278,12 @@ details.aside summary { cursor: pointer; font-size: 12px; font-weight: 500; colo
   margin-bottom: 12px; border: 1px solid rgba(36,217,112,.35); border-radius: 12px;
   background: rgba(36,217,112,.08); padding: 12px; font-size: 12px; line-height: 1.45;
 }
+/* Why the popup opened instead of the support message: not approved yet. */
+.gate-note {
+  margin: 0 0 14px; border: 1px solid rgba(245,176,65,.45); border-radius: 12px;
+  background: rgba(245,176,65,.08); color: var(--text); padding: 12px 14px; font-size: 12.5px; line-height: 1.45;
+}
+.gate-note b { display: block; margin-bottom: 3px; color: #f5b041; font-size: 13px; }
 .modal-err {
   margin-top: 4px; border: 1px solid rgba(242,96,125,.4); border-radius: 12px;
   background: rgba(242,96,125,.08); color: var(--loss); padding: 12px; font-size: 12.5px;

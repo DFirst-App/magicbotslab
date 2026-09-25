@@ -15,7 +15,7 @@
  */
 
 const { readBody, json, isEmail, recordSupportInbound, supportHistory, isBanned } = require("../_lib/db");
-const { createRequest, attachTelegramMessage, recentRequestCount, approvedCodeFor, approvedMatch, approveRequest, codeMessage, PARTNER_ID } = require("../_lib/ea");
+const { createRequest, attachTelegramMessage, recentRequestCount, approvedCodeFor, approvedMatch, approveRequest, codeMessage, PARTNER_ID, accessStatusFor } = require("../_lib/ea");
 const { recordSupportReply } = require("../_lib/db");
 
 const API = "https://api.telegram.org";
@@ -36,6 +36,21 @@ function renderHistory(history) {
 
 module.exports = async (req, res) => {
   if (req.method === "OPTIONS") return res.status(204).end();
+
+  /* GET ?visitorId= — is this browser approved? Asked by the "I have
+     downloaded the EA" button before it writes to support: somebody who was
+     never approved is sent to the request instead. Only the state goes back —
+     no name, email or code — and a lookup that failed is a 503, never a
+     wrong answer. It lives here rather than in a file of its own because the
+     project is at its limit of serverless functions. */
+  if (req.method === "GET") {
+    const v = typeof (req.query && req.query.visitorId) === "string" ? req.query.visitorId.trim() : "";
+    if (!/^[A-Za-z0-9-]{4,64}$/.test(v)) return json(res, 400, { error: "Reload the page and try again." });
+    const s = await accessStatusFor(v);
+    if (!s || s.state === "unknown") return json(res, 503, { error: "Could not check just now." });
+    return json(res, 200, { state: s.state });
+  }
+
   if (req.method !== "POST") return json(res, 405, { error: "Method not allowed." });
 
   const body = await readBody(req);
