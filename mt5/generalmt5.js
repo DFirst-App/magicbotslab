@@ -540,15 +540,26 @@
      own record of this browser; if it cannot be asked, the popup opens too,
      because the popup is also where a code already received is entered. */
   var checking = false;
+  var CHECK_TIMEOUT_MS = 15000;
   $("downloadedBtn").onclick = function () {
     var b = this;
     if (b.disabled || checking) return;
     checking = true; b.disabled = true;
-    fetch("/api/mt5/ea-request?visitorId=" + encodeURIComponent(visitorId()), { cache: "no-store" })
+    // The check is usually under a second; the button says it is working anyway.
+    var label = b.querySelector("span");
+    label.textContent = "Checking…";
+    /* A slow answer must not leave the button dead: after the timeout the
+       request opens with "we could not check", which is also where a code
+       already received is entered. */
+    var ctl = window.AbortController ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, CHECK_TIMEOUT_MS);
+    fetch("/api/mt5/ea-request?visitorId=" + encodeURIComponent(visitorId()), { cache: "no-store", signal: ctl ? ctl.signal : undefined })
       .then(function (r) { return r.ok ? r.json() : null; })
       .catch(function () { return null; })
       .then(function (j) {
+        clearTimeout(timer);
         checking = false;
+        label.textContent = "I have downloaded the EA";
         paintDownloaded();
         var state = j && j.state;
         if (state === "approved") {
