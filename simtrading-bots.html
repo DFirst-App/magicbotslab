@@ -362,6 +362,45 @@
       }
     }
 
+    /* The creator programme, moved here from the dashboard: one small pill above
+       the header, in its own orange so it never reads as a trading control. The
+       negative margin pulls it into the page's 24px gap instead of adding to it. */
+    .creators-pill {
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: -14px;
+      padding: 4px 10px 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 154, 60, 0.4);
+      background: rgba(255, 122, 24, 0.1);
+      color: #ffd9b8;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.3;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .creators-pill:hover {
+      background: rgba(255, 122, 24, 0.18);
+      border-color: rgba(255, 154, 60, 0.7);
+    }
+
+    .creators-pill svg { flex: none; color: #ff9a3c; }
+    .creators-pill__t { color: #fff; font-weight: 700; }
+    .creators-pill__amt { color: rgba(255, 217, 184, 0.85); font-weight: 500; }
+    .creators-pill__amt::before { content: "\00B7"; margin-right: 6px; color: rgba(255, 217, 184, 0.5); }
+
+    @media (max-width: 480px) {
+      /* Phones: the language switcher floats at the top right, in the pill's row,
+         so the pill keeps to what it is and never reaches under it. */
+      .creators-pill__amt { display: none; }
+    }
+
     .section-heading {
       display: flex;
       flex-wrap: wrap;
@@ -2092,6 +2131,11 @@
 <body>
   <div class="grid-bg"></div>
   <main class="page">
+    <a class="creators-pill" href="creators.html">
+      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+      <span class="creators-pill__t">Get paid to post</span>
+      <span class="creators-pill__amt">up to $1,250 a month</span>
+    </a>
     <div class="header" id="pageHeader">
       <div class="header-default" id="headerDefault">
         <h1>Automated Trading Bots</h1>
