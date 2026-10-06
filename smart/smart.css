@@ -52,6 +52,8 @@
   --panel-2: #1f2531;
   --text: #f5f7ff;
   --muted: #98a2bd;
+  --faint: #6b7b91;
+  --red: #ff5f6d;
   --border: rgba(255, 255, 255, 0.08);
 }
 
@@ -802,6 +804,13 @@ button { font-family: inherit; }
   .bot-dots { gap: 3px; }
   .bot-dots i { width: 20px; height: 20px; font-size: 11px; }
 }
+
+/* The support bubble (support.css), a size down here, and the trades leave
+   room to scroll their last row clear of it. */
+body .sup-btn { width: 48px; height: 48px; right: 14px; bottom: 14px; }
+body .sup-btn svg { width: 21px; height: 21px; }
+body .sup { bottom: 72px; right: 14px; }
+.bot-log { padding-bottom: 50px; }
 
 @media (prefers-reduced-motion: reduce) {
   .tbal.is-live .tbal-live, .bot-go, .bot-go::before,
