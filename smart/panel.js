@@ -72,10 +72,11 @@
     $("pRate").textContent = (n ? Math.round(won / n * 100) : 0) + "%";
 
     var now = !$("botNow").hidden && $("nowMarket").textContent ? $("nowMarket").textContent + " / " + $("nowSide").textContent : "";
-    var last = r && r.log && r.log[0];
-    $("pMarket").textContent = now || (last ? last.market + " / " + last.label : "-");
+    var last = null;   // the trade that settled last (one booked late keeps its own time)
+    ((r && r.log) || []).forEach(function (x) { if (!last || (x.at || 0) > (last.at || 0)) last = x; });
+    $("pMarket").textContent = now || (last ? marketOf(last) + " / " + last.label : "-");
     $("botTarget").textContent = now ? $("nowMarket").textContent + " · " + $("nowSide").textContent : "--";
-    $("botLast").textContent = last ? (last.won ? T("WIN") : T("LOSS")) + " | " + last.market + " | " + last.label : "--";
+    $("botLast").textContent = last ? (last.won ? T("WIN") : T("LOSS")) + " | " + marketOf(last) + " | " + last.label : "--";
 
     var end = r ? (r.active ? Date.now() : (r.ended && r.ended.at ? r.ended.at * 1000 : Date.now())) : 0;
     $("pTime").textContent = r && r.startedAt ? clock(end - r.startedAt * 1000) : "00:00:00";
@@ -90,13 +91,20 @@
      longer matches (a new run, a resumed one) is drawn again, still. */
   var items = $("historyItems"), shown = [], drawnFor = null;
   function key(x) { return x.id ? String(x.id) : x.at + ":" + x.stake + ":" + x.pl; }
+  /* A trade booked while the market list was not yet in (one taken in after a
+     reload) carries Deriv's code for its market; the name, once it is known. */
+  function marketOf(x) {
+    var h = global.MBLBot && global.MBLBot.hub, m = h && h.markets && h.markets[x.market];
+    return (m && m.name) || x.market;
+  }
+  function titleOf(x) { return marketOf(x) + " · " + x.label; }
   function build(x, cur, animate) {
     var el = document.createElement("div");
     el.className = "history-item " + (x.won ? "win" : "loss") + (animate ? " history-item--enter" : "");
     var meta = document.createElement("div");
     meta.className = "history-meta";
     var title = document.createElement("strong");
-    title.textContent = x.market + " · " + x.label;
+    title.textContent = titleOf(x);
     var time = document.createElement("span");
     time.textContent = new Date(x.at || Date.now()).toLocaleTimeString();
     var stake = document.createElement("span");
@@ -123,10 +131,13 @@
       var animate = fresh <= 2;
       for (var i = fresh - 1; i >= 0; i--) items.insertBefore(build(log[i], cur, animate), items.firstChild);
     }
-    // A trade Deriv booked differently from its exit tick: put its row right.
     Array.prototype.forEach.call(items.children, function (el) {
       var x = el._row;
-      if (!x || (x.won === el._won && x.pl === el._pl)) return;
+      if (!x) return;
+      var title = el.querySelector(".history-meta strong"), t = titleOf(x);
+      if (title && title.textContent !== t) title.textContent = t;
+      // A trade Deriv booked differently from its exit tick: put its row right.
+      if (x.won === el._won && x.pl === el._pl) return;
       el.className = "history-item " + (x.won ? "win" : "loss");
       var p = el.querySelector(".history-profit");
       p.className = "history-profit " + (x.won ? "win" : "loss");
