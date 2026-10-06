@@ -624,11 +624,13 @@ button { font-family: inherit; }
   .bot-dots i { width: 24px; height: 24px; border-radius: 7px; font-size: 12px; }
 }
 @media (max-width: 560px) {
-  .mnav-end { gap: 8px; }
+  .mnav-in { gap: 10px; }
+  .mnav-end { gap: 7px; }
+  .mcreator svg { width: 15px; height: 15px; }
   .mbrand-n { font-size: 14.5px; }
   .mbrand-mark { width: 34px; height: 34px; }
   .mcreator, .tbal-chip, .mnav-lang .lang-btn { height: 36px; }
-  .mcreator { padding: 0 11px; font-size: 13px; }
+  .mcreator { gap: 6px; padding: 0 10px; font-size: 13px; }
   .mnav-in.is-tight .mcreator { width: 36px; }
   .tbal-chip { gap: 7px; padding: 0 9px 0 11px; }
   .tbal-amt { font-size: 14px; }
