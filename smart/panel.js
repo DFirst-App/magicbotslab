@@ -136,16 +136,19 @@
 
   /* ── keeping up ────────────────────────────────────────────────────── */
 
+  /* Changes come in bursts (a trade moves five counters at once): paint once
+     for the lot. A timer, not an animation frame — frames stop while the tab
+     is out of sight, and the panel must be right the moment it is back. */
   var queued = false;
   function paint() {
     if (queued) return;
     queued = true;
-    (global.requestAnimationFrame || setTimeout)(function () {
+    setTimeout(function () {
       queued = false;
-      paintButtons();
-      paintStats();
-      syncTrades();
-    });
+      try { paintButtons(); } catch (e) {}
+      try { paintStats(); } catch (e) {}
+      try { syncTrades(); } catch (e) {}
+    }, 16);
   }
   // bot.js paints its own counters, rows and button on every change: follow them.
   if (global.MutationObserver) {
