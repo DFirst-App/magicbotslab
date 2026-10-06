@@ -43,17 +43,19 @@
        three taps on it. -->
   <section class="hero">
     <div class="hero-balance">
-      <div class="balance-label">Live Balance</div>
       <div class="tbal" id="acct" hidden>
+        <div class="bal-top">
+          <span class="balance-label">Live Balance</span>
+          <span class="live-pill">
+            <span class="tbal-live" aria-hidden="true"></span>
+            <span class="lp lp--on">Connected (Live)</span><span class="lp lp--wait">Reconnecting...</span><span class="lp lp--idle">Connecting...</span>
+          </span>
+        </div>
         <button class="tbal-chip" id="acctBtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="acctMenu">
           <span class="balance-value" id="acctAmt" data-i18n-skip>—</span>
           <span class="account-type" id="acctKind">Real</span>
-          <svg class="tbal-caret" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          <svg class="tbal-caret" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
         </button>
-        <div class="live-pill">
-          <span class="tbal-live" aria-hidden="true"></span>
-          <span class="lp lp--on">Connected (Live)</span><span class="lp lp--wait">Reconnecting...</span><span class="lp lp--idle">Connecting...</span>
-        </div>
         <div class="tbal-menu" id="acctMenu" role="menu" hidden>
           <div class="tbal-list" id="acctList"></div>
         </div>
@@ -264,31 +266,40 @@
       </div>
     </div>
 
-    <div class="bm-view bm-win" id="bmWin" hidden>
+    <!-- Take profit and stop loss: the bots page's own result popups
+         (popup-notifications.js) — tinted glass, the icon in its ring, the
+         details — with this bot's animations. -->
+    <div class="bm-view bm-result bm-result--win" id="bmWin" hidden>
       <div class="bm-confetti" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-      <div class="bm-trophy" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/></svg>
+      <div class="bm-ricon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path class="bm-ricon-tick" d="M5 12.5l4.5 4.5L19 7.5"/></svg>
       </div>
-      <h2>Congratulations!</h2>
-      <p class="bm-step">You hit your take profit.</p>
-      <div class="bm-amount" id="bmWinAmt" data-i18n-skip></div>
-      <p class="bm-win-sum" id="bmWinSum" data-i18n-skip></p>
-      <div class="bm-actions">
-        <button class="bm-btn bm-btn--go btn-blue" type="button" data-bm-close>Done</button>
+      <h2>🎉 Take Profit Reached!</h2>
+      <p class="bm-msg">Congratulations! Your bot has successfully reached the take profit target.</p>
+      <div class="bm-details">
+        <div class="bm-drow"><span>Total Profit:</span><b class="bm-dv bm-dv--pl" id="bmWinAmt" data-i18n-skip></b></div>
+        <div class="bm-drow"><span>Total Trades:</span><b class="bm-dv bm-dv--n" id="bmWinN" data-i18n-skip></b></div>
+        <div class="bm-drow"><span>Won / Lost:</span><b class="bm-dv bm-dv--wl" id="bmWinWL" data-i18n-skip></b></div>
+        <div class="bm-drow"><span>Running Time:</span><b class="bm-dv bm-dv--time" id="bmWinTime" data-i18n-skip></b></div>
       </div>
+      <p class="bm-sum-src" id="bmWinSum" hidden></p>
+      <button class="bm-rclose btn-blue" type="button" data-bm-close>Close</button>
     </div>
 
-    <div class="bm-view" id="bmLoss" hidden>
-      <div class="bm-badge bm-badge--loss" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3z"/><path d="M9 12h6"/></svg>
+    <div class="bm-view bm-result bm-result--loss" id="bmLoss" hidden>
+      <div class="bm-ricon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 2.4 17.6A2 2 0 0 0 4.1 20.6h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9.5v4.5"/><path d="M12 17.2h.01"/></svg>
       </div>
-      <h2>Stop loss reached</h2>
-      <p class="bm-step">The bot stopped at your limit.</p>
-      <div class="bm-amount bm-amount--loss" id="bmLossAmt" data-i18n-skip></div>
-      <p class="bm-win-sum" id="bmLossSum" data-i18n-skip></p>
-      <div class="bm-actions">
-        <button class="bm-btn bm-btn--go btn-blue" type="button" data-bm-close>Done</button>
+      <h2>⚠️ Stop Loss Hit</h2>
+      <p class="bm-msg">The bot has been stopped as the stop loss limit has been reached.</p>
+      <div class="bm-details">
+        <div class="bm-drow"><span>Total Profit:</span><b class="bm-dv bm-dv--pl is-down" id="bmLossAmt" data-i18n-skip></b></div>
+        <div class="bm-drow"><span>Total Trades:</span><b class="bm-dv bm-dv--n" id="bmLossN" data-i18n-skip></b></div>
+        <div class="bm-drow"><span>Won / Lost:</span><b class="bm-dv bm-dv--wl" id="bmLossWL" data-i18n-skip></b></div>
+        <div class="bm-drow"><span>Running Time:</span><b class="bm-dv bm-dv--time" id="bmLossTime" data-i18n-skip></b></div>
       </div>
+      <p class="bm-sum-src" id="bmLossSum" hidden></p>
+      <button class="bm-rclose btn-blue" type="button" data-bm-close>Close</button>
     </div>
 
     <div class="bm-view" id="bmFund" hidden>
