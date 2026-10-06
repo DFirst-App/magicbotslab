@@ -1674,5 +1674,9 @@
 "Status:":"Estado:",
 "Target:":"Objetivo:",
 "No trades yet. Start the bot to begin.":"Aún no hay operaciones. Inicia el bot para empezar.",
-"Smart Scan Bot":"Bot Smart Scan"
+"Smart Scan Bot":"Bot Smart Scan",
+"Total Profit:":"Beneficio total:",
+"Total Trades:":"Operaciones totales:",
+"Running Time:":"Tiempo en marcha:",
+"Won / Lost:":"Ganadas / Perdidas:"
 }

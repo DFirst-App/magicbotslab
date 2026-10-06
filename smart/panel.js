@@ -176,6 +176,27 @@
   // The running time ticks; everything else is checked once a second too, in case.
   setInterval(function () { var r = B(); if (r && r.active) paint(); }, 1000);
 
+  /* ── the take-profit and stop-loss popups' details ─────────────────── */
+
+  /* bot.js writes the profit when it opens either popup; the rest of the
+     details, as on the bots page's own result popups, come from the run. */
+  function fillResult() {
+    var r = B();
+    if (!r) return;
+    var end = r.ended && r.ended.at ? r.ended.at * 1000 : Date.now();
+    var time = r.startedAt ? clock(end - r.startedAt * 1000) : "00:00:00";
+    ["Win", "Loss"].forEach(function (k) {
+      if (!$("bm" + k + "N")) return;
+      $("bm" + k + "N").textContent = String(r.n);
+      $("bm" + k + "WL").textContent = r.won + " / " + r.lost;
+      $("bm" + k + "Time").textContent = time;
+    });
+  }
+  if (global.MutationObserver) {
+    var res = new MutationObserver(fillResult);
+    ["bmWinAmt", "bmLossAmt"].forEach(function (id) { if ($(id)) res.observe($(id), { childList: true, characterData: true, subtree: true }); });
+  }
+
   /* ── the bots page's own way in ───────────────────────────────────── */
 
   // First visit to the bots from here: the bots page opens with its guide, as before.
