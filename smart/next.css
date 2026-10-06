@@ -430,14 +430,17 @@ button, input, select { font-family: inherit; }
   .history-card { min-height: 400px; max-height: min(70vh, 640px); }
 }
 @media (max-width: 860px) {
+  .bot-panel-header { align-items: stretch; }
+  .mode-toggle { width: 100%; }
+  .mode-btn { flex: 1 1 0; padding: 9px 6px; white-space: normal; line-height: 1.2; }
+}
+/* The card stacks only where its one row will not fit. */
+@media (max-width: 720px) {
   .hero { grid-template-columns: 1fr; gap: 10px; padding: 12px 14px; }
   .hero-balance { min-height: 0; }
   .hero-actions { align-items: stretch; }
   .balance-actions { justify-content: flex-start; }
   .balance-hint { text-align: left; }
-  .bot-panel-header { align-items: stretch; }
-  .mode-toggle { width: 100%; }
-  .mode-btn { flex: 1 1 0; padding: 9px 6px; white-space: normal; line-height: 1.2; }
 }
 @media (max-width: 768px) {
   .bot-detail-panel { padding: 16px; border-radius: 16px; gap: 16px; }
