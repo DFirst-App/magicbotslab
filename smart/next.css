@@ -471,6 +471,12 @@ button, input, select { font-family: inherit; }
   .dash-footer .btn { flex: 1 1 0; }
   .tbal-menu { min-width: 0; width: min(330px, calc(100vw - 56px)); }
 }
+@media (max-width: 400px) {
+  /* The bots button keeps its two logos, smaller; on the narrowest screens they go under the words. */
+  .hero .start-trading-btn { height: auto; min-height: 32px; padding: 4px 6px 4px 10px; flex-wrap: wrap; row-gap: 4px; }
+  .chip--logo { padding: 2px 6px; }
+  .chip--logo img { height: 12px; }
+}
 @media (max-width: 420px) {
   .config-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .input-group label { font-size: 10.5px; letter-spacing: 0.03em; }
