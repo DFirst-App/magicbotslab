@@ -1667,5 +1667,12 @@
 "Recovering with {side}":"Récupération avec {side}",
 "Dynamic":"Dynamique",
 "Martingale & recovery":"Martingale et récupération",
-"This Deriv login has no real account yet. Open one on Deriv, then come back here.":"Cette connexion Deriv n'a pas encore de compte réel. Ouvrez-en un sur Deriv, puis revenez ici."
+"This Deriv login has no real account yet. Open one on Deriv, then come back here.":"Cette connexion Deriv n'a pas encore de compte réel. Ouvrez-en un sur Deriv, puis revenez ici.",
+"WIN":"GAIN",
+"LOSS":"PERTE",
+"Last contract:":"Dernier contrat :",
+"Status:":"Statut :",
+"Target:":"Cible :",
+"No trades yet. Start the bot to begin.":"Aucune opération pour l'instant. Démarrez le bot pour commencer.",
+"Smart Scan Bot":"Bot Smart Scan"
 }
