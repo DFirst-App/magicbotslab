@@ -552,14 +552,21 @@
 
   /* The brand, the language, Creator Program and the balance share one row at
      every width. When they do not fit, the header gives things up one at a
-     time until they do (smart.css): the "Dashboard" word, the little arrow,
-     then the words of the Creator Program button. */
-  var NAV_STEPS = ["is-short", "is-snug", "is-tight"];
+     time until they do (smart.css): the name beside the mark, the little
+     arrows, the mark itself, and only then the words of Creator Program. */
+  var NAV_STEPS = ["is-short", "is-snug", "is-bare", "is-tight"];
   function fitNav() {
     var nav = document.querySelector(".mnav-in"), end = nav && nav.querySelector(".mnav-end");
     if (!end) return;
     NAV_STEPS.forEach(function (c) { nav.classList.remove(c); });
-    var room = function () { return end.getBoundingClientRect().right <= nav.getBoundingClientRect().right - (parseFloat(global.getComputedStyle(nav).paddingRight) || 0) + 0.5; };
+    // Room: the right edge of everything in the group, inside the header's padding (the group
+    // spans the row once the mark has gone, so its own box would always fit).
+    var room = function () {
+      var limit = nav.getBoundingClientRect().right - (parseFloat(global.getComputedStyle(nav).paddingRight) || 0) + 0.5;
+      var right = end.getBoundingClientRect().right;
+      Array.prototype.forEach.call(end.children, function (c) { if (c.getClientRects().length) right = Math.max(right, c.getBoundingClientRect().right); });
+      return right <= limit && end.scrollWidth <= end.clientWidth + 0.5;
+    };
     for (var i = 0; i < NAV_STEPS.length && !room(); i++) nav.classList.add(NAV_STEPS[i]);
   }
   function watchNav() {

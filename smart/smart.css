@@ -144,13 +144,20 @@ button { font-family: inherit; }
 .tbal-chip, .mcreator, .bot-type { touch-action: manipulation; }
 
 /* What the header gives up, in order, when it cannot fit everything
-   (smart/deriv.js fitNav): the name beside the mark, then the little arrows,
-   then the words of Creator Program — its icon stays, so it is always there. */
+   (smart/deriv.js fitNav): the name beside the mark, the little arrows, the
+   mark itself, and only on the narrowest phones the words of Creator Program
+   — its icon stays, so it is always there. */
 .mnav-in.is-short .mbrand-t { display: none; }
 .mnav-in.is-snug .lang-caret, .mnav-in.is-snug .tbal-caret { display: none; }
 .mnav-in.is-snug .mnav-lang .lang-btn { padding: 0 8px; }
-.mnav-in.is-snug .tbal-chip { padding-right: 12px; }
-.mnav-in.is-tight .mcreator { width: 38px; padding: 0; justify-content: center; }
+.mnav-in.is-snug .tbal-chip { padding-right: 11px; }
+.mnav-in.is-bare .mbrand { display: none; }
+.mnav-in.is-bare .mnav-end { margin-left: 0; flex: 1; min-width: 0; }
+.mnav-in.is-bare .mcreator { margin-right: auto; }
+/* The narrowest: Creator Program as its icon, and the mark comes back beside it. */
+.mnav-in.is-tight .mnav-end { flex: none; margin-left: auto; }
+.mnav-in.is-tight .mbrand { display: inline-flex; }
+.mnav-in.is-tight .mcreator { width: 38px; padding: 0; margin-right: 0; justify-content: center; }
 .mnav-in.is-tight .mcreator span { display: none; }
 
 /* ── the balance chip ──────────────────────────────────────────────── */
