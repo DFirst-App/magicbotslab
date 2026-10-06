@@ -110,7 +110,9 @@
     return el;
   }
   function syncTrades() {
-    var r = B(), log = (r && r.log) || [], cur = (r && r.currency) || "USD";
+    var r = B(), cur = (r && r.currency) || "USD";
+    // Newest first by the time each trade settled: one booked late (a line that dropped) takes its own place.
+    var log = ((r && r.log) || []).slice().sort(function (a, b) { return (b.at || 0) - (a.at || 0); });
     var keys = log.map(key), fresh = keys.length - shown.length;
     var same = fresh >= 0 && drawnFor === r && keys.slice(fresh).join("|") === shown.join("|");
     if (!same) {
