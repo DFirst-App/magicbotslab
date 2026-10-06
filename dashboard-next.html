@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Magic Bots Lab Dashboard</title>
+  <meta name="theme-color" content="#0f1117" />
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" sizes="any" />
+  <!-- The live feeds open to Deriv the moment the page runs; resolving the host
+       early takes a round trip off the first balance. -->
+  <link rel="dns-prefetch" href="https://api.derivws.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/smart/smart.css" />
+  <link rel="stylesheet" href="/support.css" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Magic Bots Lab" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="stylesheet" href="/install.css" />
+</head>
+<body>
+
+<header class="mnav">
+  <div class="mnav-in">
+    <a class="mbrand" href="dashboard.html" aria-label="Magic Bots Lab">
+      <span class="mbrand-mark" aria-hidden="true"><img src="/favicon.svg" alt="" width="26" height="26" /></span>
+      <span class="mbrand-t">
+        <span class="mbrand-k">Dashboard</span>
+        <span class="mbrand-n" translate="no" data-i18n-skip>Magic Bots Lab</span>
+      </span>
+    </a>
+
+    <div class="mnav-end">
+      <a class="mcreator" href="creators.html" title="Creator Program">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 4.6 4.6 1.9-4.6 1.9L12 16l-1.9-4.6-4.6-1.9 4.6-1.9z"/><path d="M19 15l.8 2.2 2.2.8-2.2.8L19 21l-.8-2.2-2.2-.8 2.2-.8z"/></svg>
+        <span>Creator Program</span>
+      </a>
+      <div class="mnav-lang" data-lang-switch></div>
+
+      <!-- The account in use, and the way to the other one. Real is green; the
+           demo stays out of sight until three taps on this chip. -->
+      <div class="tbal" id="acct" hidden>
+        <button class="tbal-chip" id="acctBtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="acctMenu">
+          <span class="tbal-live" aria-hidden="true"></span>
+          <span class="tbal-kind" id="acctKind">Real</span>
+          <span class="tbal-amt" id="acctAmt" data-i18n-skip>—</span>
+          <svg class="tbal-caret" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="tbal-menu" id="acctMenu" role="menu" hidden>
+          <div class="tbal-list" id="acctList"></div>
+          <div class="tbal-foot">
+            <button class="tbal-out" id="acctOut" type="button" role="menuitem">Disconnect</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="mmain" id="tmain">
+  <!-- Only shown when there is something to say: connecting, or Deriv not
+       answering. Once the balances are live the page is the bot. -->
+  <section class="tstate" id="tState" aria-live="polite" hidden>
+    <div class="tstate-busy" id="tBusy" hidden>
+      <span class="tspin" aria-hidden="true"></span>
+      <p id="tBusyText">Connecting to Deriv…</p>
+    </div>
+    <div class="tnote" id="tNote" hidden>
+      <p id="tNoteText"></p>
+    </div>
+  </section>
+
+  <!-- The Smart Scan bot. Left: the settings and the run. Right: what it is
+       trading now (only while it runs) and every trade of the run.
+       Logic in smart/bot.js, on the connection in smart/deriv.js. -->
+  <section class="bot" id="scan" aria-labelledby="botTitle" hidden>
+    <div class="bot-grid">
+      <aside class="bot-side">
+        <div class="bot-card bot-set">
+          <div class="bot-tags">
+            <span class="bot-tag"><i aria-hidden="true"></i>Live scan</span>
+            <span class="bot-tag bot-tag--warm">Martingale &amp; recovery</span>
+          </div>
+          <div class="bot-types" id="botTypes" role="tablist" aria-label="Trade type">
+            <button class="bot-type" type="button" role="tab" data-type="evenodd">Even / Odd</button>
+            <button class="bot-type" type="button" role="tab" data-type="risefall">Rise / Fall</button>
+            <button class="bot-type" type="button" role="tab" data-type="overunder">Over / Under</button>
+            <button class="bot-type" type="button" role="tab" data-type="matchdiff">Matches / Differs</button>
+          </div>
+          <h1 id="botTitle">Smart Scan bot</h1>
+          <p class="bot-lede" id="botLede">Finds the best Even/Odd market and side, then trades it one 1-tick contract at a time until your take profit or stop loss.</p>
+
+          <div class="bot-fields">
+            <label class="bot-f bot-f--wide" id="botVarWrap" hidden><span id="botVarLabel">Prediction</span>
+              <span class="bot-in bot-in--select"><select id="botVar"></select>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span></label>
+            <label class="bot-f"><span>Stake</span>
+              <span class="bot-in"><input id="botStake" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" /><em data-bot-cur data-i18n-skip>USD</em></span></label>
+            <label class="bot-f"><span>Martingale</span>
+              <span class="bot-in"><input id="botMult" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" /><em data-i18n-skip>×</em></span></label>
+            <label class="bot-f"><span>Take profit</span>
+              <span class="bot-in"><input id="botTp" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" /><em data-bot-cur data-i18n-skip>USD</em></span></label>
+            <label class="bot-f"><span>Stop loss</span>
+              <span class="bot-in"><input id="botSl" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" /><em data-bot-cur data-i18n-skip>USD</em></span></label>
+          </div>
+          <div class="bot-note">
+            <p class="bot-min" id="botMin" data-i18n-skip>Smallest stake: $0.35</p>
+            <!-- Off: every visit starts from the defaults. On: the settings stay in this browser. -->
+            <label class="bot-keep"><input type="checkbox" id="botKeep" role="switch" /><i aria-hidden="true"></i><span>Save settings</span></label>
+          </div>
+
+          <button class="btn btn-blue btn-lg bot-go" id="botGo" type="button">
+            <svg class="bot-go-play" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.6-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+            <svg class="bot-go-stop" viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="3"/></svg>
+            <span id="botGoText">Scan &amp; start</span>
+          </button>
+          <p class="bot-msg" id="botMsg" role="alert" hidden></p>
+        </div>
+
+        <div class="bot-card bot-run">
+          <div class="bot-state bot-state--idle" id="botState"><i aria-hidden="true"></i><span id="botStateText">Ready</span></div>
+          <div class="bot-pl">
+            <span>Profit / loss</span>
+            <b class="bot-pl-v" id="botPl" data-i18n-skip>0.00</b>
+          </div>
+          <dl class="bot-stats">
+            <div><dt>Trades</dt><dd id="botN" data-i18n-skip>0</dd></div>
+            <div><dt>Won</dt><dd id="botWon" data-i18n-skip>0</dd></div>
+            <div><dt>Lost</dt><dd id="botLost" data-i18n-skip>0</dd></div>
+            <div><dt>Next stake</dt><dd id="botNext" data-i18n-skip>—</dd></div>
+            <div><dt>Losses in a row</dt><dd id="botStreak" data-i18n-skip>0</dd></div>
+          </dl>
+        </div>
+        <p class="bot-risk">Trading carries risk. Every trade can lose its stake.</p>
+      </aside>
+
+      <div class="bot-main">
+        <div class="bot-card bot-now" id="botNow" hidden>
+          <div class="bot-now-h">
+            <span class="bot-now-k"><i aria-hidden="true"></i>Live scan</span>
+            <span class="bot-live">Best market right now</span>
+          </div>
+          <div class="bot-now-b">
+            <div class="bot-now-t">
+              <div class="bot-now-m" id="nowMarket" translate="no"></div>
+              <div class="bot-now-side" id="nowSide"></div>
+            </div>
+            <div class="bot-now-p">
+              <b id="nowShare" data-i18n-skip></b>
+              <span>of the last 10 ticks</span>
+            </div>
+          </div>
+          <div class="bot-dots" id="nowDots" aria-hidden="true"></div>
+        </div>
+
+        <div class="bot-card bot-trades">
+          <div class="bot-card-h">
+            <h2>Recent trades</h2>
+            <span class="bot-live" id="logN" data-i18n-skip></span>
+          </div>
+          <div class="bot-log-head" aria-hidden="true">
+            <span>Time</span><span>Market</span><span>Side</span><span class="r">Stake</span><span class="r">Result</span><span class="r">Total</span>
+          </div>
+          <div class="bot-log-wrap">
+            <ul class="bot-log" id="botLog" translate="no"></ul>
+            <div class="bot-empty" id="botEmpty">
+              <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg>
+              <p>No trades yet</p>
+              <span>Press Scan &amp; start. Every new run begins with a clean log.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- The bot's popups: the scan, its result, a scan that failed, take profit,
+     stop loss and a balance too small for the next stake. One sheet, six
+     views; smart/bot.js switches between them. -->
+<div class="bm-root" id="bmRoot" role="dialog" aria-modal="true" aria-labelledby="bmTitle" hidden>
+  <div class="bm-back" data-bm-close></div>
+  <div class="bm">
+    <button class="bm-x" type="button" data-bm-close aria-label="Close">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+
+    <div class="bm-view" id="bmScan">
+      <div class="bm-radar" aria-hidden="true"><i></i><i></i><i></i>
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      </div>
+      <h2 id="bmTitle">Scanning Even/Odd markets</h2>
+      <p class="bm-step" id="bmStep">Connecting to the markets…</p>
+      <div class="bm-bar"><i id="bmBar"></i></div>
+      <p class="bm-pct" id="bmPct" data-i18n-skip>0%</p>
+    </div>
+
+    <div class="bm-view" id="bmDone" hidden>
+      <svg class="bm-tick" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M15 27.5l7 7 15-16"/></svg>
+      <h2>Best trade found</h2>
+      <div class="bm-pick">
+        <span class="bm-pick-m" id="bmMarket" translate="no"></span>
+        <b class="bm-pick-side" id="bmSide"></b>
+        <span class="bm-pick-s" id="bmShare" data-i18n-skip></span>
+        <div class="bot-dots bm-dots" id="bmDots" aria-hidden="true"></div>
+      </div>
+      <dl class="bm-sum">
+        <div><dt>Stake</dt><dd id="bmStake" data-i18n-skip></dd></div>
+        <div><dt>Martingale</dt><dd id="bmMult" data-i18n-skip></dd></div>
+        <div><dt>Take profit</dt><dd id="bmTp" data-i18n-skip></dd></div>
+        <div><dt>Stop loss</dt><dd id="bmSl" data-i18n-skip></dd></div>
+      </dl>
+      <p class="bm-live"><i aria-hidden="true"></i><span>Trading started</span></p>
+    </div>
+
+    <div class="bm-view" id="bmErr" hidden>
+      <div class="bm-erricon" aria-hidden="true">!</div>
+      <h2>The scan did not finish</h2>
+      <p class="bm-step" id="bmErrText"></p>
+      <div class="bm-actions">
+        <button class="btn btn-line btn-lg" type="button" data-bm-close>Close</button>
+        <button class="btn btn-blue btn-lg" type="button" id="bmRetry">Try again</button>
+      </div>
+    </div>
+
+    <div class="bm-view bm-win" id="bmWin" hidden>
+      <div class="bm-confetti" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="bm-trophy" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/></svg>
+      </div>
+      <h2>Congratulations!</h2>
+      <p class="bm-step">You hit your take profit.</p>
+      <div class="bm-amount" id="bmWinAmt" data-i18n-skip></div>
+      <p class="bm-win-sum" id="bmWinSum" data-i18n-skip></p>
+      <div class="bm-actions">
+        <button class="btn btn-blue btn-lg" type="button" data-bm-close>Done</button>
+      </div>
+    </div>
+
+    <div class="bm-view" id="bmLoss" hidden>
+      <div class="bm-badge bm-badge--loss" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3z"/><path d="M9 12h6"/></svg>
+      </div>
+      <h2>Stop loss reached</h2>
+      <p class="bm-step">The bot stopped at your limit.</p>
+      <div class="bm-amount bm-amount--loss" id="bmLossAmt" data-i18n-skip></div>
+      <p class="bm-win-sum" id="bmLossSum" data-i18n-skip></p>
+      <div class="bm-actions">
+        <button class="btn btn-blue btn-lg" type="button" data-bm-close>Done</button>
+      </div>
+    </div>
+
+    <div class="bm-view" id="bmFund" hidden>
+      <div class="bm-badge bm-badge--fund" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V5.5A1.5 1.5 0 0 0 17.5 4h-12A2.5 2.5 0 0 0 3 6.5v11A2.5 2.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V15"/><path d="M3 6.5A2.5 2.5 0 0 0 5.5 9H20v6h-4a3 3 0 0 1 0-6"/><circle cx="16.5" cy="12" r=".6" fill="currentColor"/></svg>
+      </div>
+      <h2>Top up to keep trading</h2>
+      <p class="bm-step" id="bmFundText" data-i18n-skip></p>
+      <p class="bm-fund-note" id="bmFundNote" data-i18n-skip></p>
+      <div class="bm-actions">
+        <button class="btn btn-line btn-lg" type="button" data-bm-close>Close</button>
+        <a class="btn btn-blue btn-lg" id="bmFundGo" href="https://home.deriv.com/dashboard/portfolio" target="_blank" rel="noopener" data-bm-close data-i18n-skip>Deposit on Deriv</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>window.MBL_SUPPORT_SOURCE = "Magic Bots Lab · Dashboard";</script>
+<script src="/i18n/i18n.js"></script>
+<script src="/smart/deriv.js"></script>
+<script src="/smart/bot.js"></script>
+<script src="/creators-support.js" defer></script>
+<script src="/install.js" defer></script>
+</body>
+</html>
