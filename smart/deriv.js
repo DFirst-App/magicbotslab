@@ -345,6 +345,7 @@
     this.pending = {};       // req_id → { resolve, reject, timer }
     this.streams = {};       // req_id → function (message)
     this.waiting = false;    // a reconnect is scheduled
+    this.fetching = false;   // a one-time URL is being asked for
   }
   /** Resolves once the socket is open, or rejects after `ms`. */
   Feed.prototype.whenOpen = function (ms) {
@@ -479,26 +480,32 @@
     if (painted) paint();
     this.timer = setTimeout(function () {
       self.waiting = false;
-      if (self.stopped) return;
+      // One request for a URL at a time: the one in flight opens the line or retries.
+      if (self.stopped || self.fetching) return;
       // Offline: keep trying on the backoff (the "online" event brings it back sooner).
       if (navigator.onLine === false) return self.retry();
+      self.fetching = true;
       rest("POST", ACCOUNTS_URL + "/" + encodeURIComponent(self.id) + "/otp").then(function (r) {
+        self.fetching = false;
         if (self.stopped) return;
         var url = r.body && ((r.body.data && r.body.data.url) || r.body.url);
         if (url) return self.open(url);
         if (r.status === 401) return expired();
         self.retry();
-      }, function () { self.retry(); });
+      }, function () { self.fetching = false; self.retry(); });
     }, wait);
   };
 
-  /** Reopen anything that is not live, at once. */
+  /** Reopen anything that is not live, at once. A line already on its way is left to
+   *  arrive: one still opening (its own 12 s guard ends one that hangs), or one whose URL
+   *  is being asked for. Waking phones fire online, visibility and network events
+   *  together; each must not throw away the line the last one started. */
   function revive() {
     Object.keys(feeds).forEach(function (id) {
-      var f = feeds[id];
-      if (f.stopped) return;
-      var stale = Date.now() - f.last > STALE_MS;
-      if (!f.ws || f.ws.readyState > 1 || stale) { f.close(); f.tries = 0; f.retry(true); }
+      var f = feeds[id], ws = f.ws;
+      if (f.stopped || f.fetching || (ws && ws.readyState === 0)) return;
+      var stale = ws && ws.readyState === 1 && Date.now() - f.last > STALE_MS;
+      if (!ws || ws.readyState > 1 || stale) { f.close(); f.tries = 0; f.retry(true); }
     });
   }
 
@@ -542,7 +549,7 @@
   setInterval(function () {
     Object.keys(feeds).forEach(function (id) {
       var f = feeds[id];
-      if (!f.stopped && !f.waiting && (!f.ws || f.ws.readyState > 1)) { f.tries = 0; f.retry(true); }
+      if (!f.stopped && !f.waiting && !f.fetching && (!f.ws || f.ws.readyState > 1)) { f.tries = 0; f.retry(true); }
     });
   }, 30000);
   // A token near its end is renewed in good time (when it can be), checked every 30 minutes.
