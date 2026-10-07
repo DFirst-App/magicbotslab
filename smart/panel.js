@@ -199,14 +199,26 @@
 
   /* ── the bots page's own way in ───────────────────────────────────── */
 
-  // First visit to the bots from here: the bots page opens with its guide, as before.
-  var bots = $("startTradingBtn");
-  if (bots) bots.addEventListener("click", function (e) {
+  // First visit to the bots from here: the bots page opens with its guide, as before —
+  // from the button in the balance card and from its copy at the foot alike.
+  function botsGuide(e) {
     var g = global.MBLGuide;
     if (!g || g.isDone(g.KEYS.dashboardBots)) return;
     g.mark(g.KEYS.dashboardBots);
     e.preventDefault();
     global.location.href = "trading-dashboard.html?guide=1";
+  }
+  var bots = $("startTradingBtn");
+  if (bots) bots.addEventListener("click", botsGuide);
+  Array.prototype.forEach.call(document.querySelectorAll("[data-bots-link]"), function (a) { a.addEventListener("click", botsGuide); });
+
+  // The foot's Disconnect is the topbar's: the same checks, the same sign-out (smart/deriv.js).
+  Array.prototype.forEach.call(document.querySelectorAll("[data-acct-out]"), function (b) {
+    b.addEventListener("click", function () {
+      var out = $("acctOut");
+      if (out && !out.disabled) out.click();
+      b.disabled = !!(out && out.disabled);
+    });
   });
 
   paint();

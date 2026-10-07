@@ -97,7 +97,8 @@
     <div class="bot-panel-header">
       <div class="bot-panel-id">
         <div class="bot-panel-name" id="botTitle">Smart Scan Bot</div>
-        <div class="bot-panel-desc" id="botLede">Finds the best Even/Odd market and side, then trades it one 1-tick contract at a time until your take profit or stop loss.</div>
+        <!-- No description on the card (space): bot.js still writes the line here, never shown. -->
+        <div class="bot-panel-desc" id="botLede" hidden></div>
       </div>
       <div class="mode-toggle bot-types" id="botTypes" role="tablist" aria-label="Trade type">
         <button class="mode-btn bot-type" type="button" role="tab" data-type="evenodd">Even / Odd<i class="bot-watch" aria-hidden="true"><b></b><b></b><b></b></i></button>
@@ -215,6 +216,21 @@
       <ul id="botLog"></ul>
     </div>
   </section>
+
+  <!-- Phones and tablets: the account's buttons wait here at the foot, so the balance and
+       the bot come first. The same links; Disconnect and the bots' guide are handed to the
+       buttons at the top (smart/panel.js). -->
+  <nav class="dash-more" aria-label="More">
+    <a class="btn start-trading-btn" href="trading-dashboard.html" data-bots-link>
+      <span>Open AI bots</span>
+      <span class="badges">
+        <span class="chip chip--logo"><img src="/logos/deriv.svg" alt="Deriv" /></span>
+        <span class="chip chip--logo"><img src="/logos/metatrader5.svg" alt="MT5" /></span>
+      </span>
+    </a>
+    <a class="btn btn--mt5" href="https://t.deriv.link?t=5HBLVPVNNFJ8" target="_blank" rel="noopener noreferrer sponsored"><img class="btn-logo" src="/metatrader5.svg" alt="" aria-hidden="true" width="15" height="15" />Create MT5 account</a>
+    <button class="btn btn--ghost" type="button" data-acct-out>Disconnect</button>
+  </nav>
 
   <footer class="dash-footer">
     <a class="btn social-btn social-btn--whatsapp" href="https://whatsapp.com/channel/0029Vb6sxFG9xVJWbyIwL110" target="_blank" rel="noopener noreferrer">Join WhatsApp</a>
