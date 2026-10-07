@@ -25,7 +25,7 @@
  * under /api is ever cached, and neither is any other origin.
  */
 
-const VERSION = "mbl-shell-v5";
+const VERSION = "mbl-shell-v6";
 const NET_TIMEOUT_MS = 2500;
 
 /* What the launch screen is waiting on. The start page and everything it
@@ -36,6 +36,7 @@ const SHELL = [
   "/dashboard.html",
   "/smart/smart.css",
   "/smart/deriv.js",
+  "/smart/watch.js",
   "/smart/bot.js",
   "/smart/panel.js",
   "/styles.css",

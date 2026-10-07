@@ -1678,5 +1678,14 @@
 "Total Profit:":"Profit total :",
 "Total Trades:":"Total des opérations :",
 "Running Time:":"Durée de fonctionnement :",
-"Won / Lost:":"Gagnées / Perdues :"
+"Won / Lost:":"Gagnées / Perdues :",
+"Safe":"Sécurité",
+"Unstable conditions detected":"Conditions instables détectées",
+"The bot paused after a winning trade, with your profit kept. It resumes by itself as soon as conditions are stable again, and carries on to your take profit.":"Le bot s'est mis en pause après un trade gagnant, votre profit est conservé. Il reprend tout seul dès que les conditions redeviennent stables et continue jusqu'à votre take profit.",
+"The bot is waiting to place its first trade. It starts by itself as soon as conditions are stable again, and trades on to your take profit.":"Le bot attend pour placer son premier trade. Il démarre tout seul dès que les conditions redeviennent stables et trade jusqu'à votre take profit.",
+"Stop trading":"Arrêter de trader",
+"Keep waiting":"Continuer d'attendre",
+"Paused — waiting for stable conditions…":"En pause — en attente de conditions stables…",
+"Stable again — trading resumed.":"De nouveau stable — trading repris.",
+"Win rate:":"Taux de réussite :"
 }

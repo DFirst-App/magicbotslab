@@ -220,6 +220,31 @@ button, input, select { font-family: inherit; }
 .mode-btn:disabled { opacity: .45; cursor: not-allowed; }
 .bot-types.is-locked .mode-btn.is-on { opacity: 1; cursor: default; }
 
+/* The watch, on each type: three signal bars in the tab's corner — all three lit green,
+   two amber, one red (blinking), a soft wave while it is still reading, nothing with no
+   markets. bot.js sets data-watch on the tab; the percentage is the bars' title. */
+.mode-btn.bot-type { position: relative; }
+.bot-watch { position: absolute; top: 2px; right: 3px; display: inline-flex; align-items: flex-end; gap: 1.5px; height: 7px; opacity: 0; transition: opacity .3s ease; }
+.bot-watch b { display: block; width: 2.5px; border-radius: 1px; background: rgba(148, 163, 184, 0.28); transition: background-color .35s ease, box-shadow .35s ease; }
+.bot-watch b:nth-child(1) { height: 3px; }
+.bot-watch b:nth-child(2) { height: 5px; }
+.bot-watch b:nth-child(3) { height: 7px; }
+.bot-type[data-watch="green"] .bot-watch, .bot-type[data-watch="yellow"] .bot-watch, .bot-type[data-watch="red"] .bot-watch, .bot-type[data-watch="warm"] .bot-watch { opacity: 1; }
+.bot-type[data-watch="green"] .bot-watch b { background: var(--green); box-shadow: 0 0 4px rgba(36, 217, 112, 0.55); }
+.bot-type[data-watch="yellow"] .bot-watch b:nth-child(-n+2) { background: var(--warning); box-shadow: 0 0 4px rgba(252, 211, 77, 0.5); }
+.bot-type[data-watch="red"] .bot-watch b:nth-child(1) { background: var(--red); box-shadow: 0 0 5px rgba(255, 95, 109, 0.65); animation: mbl-watch-blink 1.2s ease-in-out infinite; }
+.bot-type[data-watch="warm"] .bot-watch b { animation: mbl-watch-wave 1.2s ease-in-out infinite; }
+.bot-type[data-watch="warm"] .bot-watch b:nth-child(2) { animation-delay: .15s; }
+.bot-type[data-watch="warm"] .bot-watch b:nth-child(3) { animation-delay: .3s; }
+/* Phones: the tabs' words reach the corner, so the bars sit above them, a touch smaller. */
+@media (max-width: 480px) {
+  .mode-btn.bot-type { padding-top: 11px; }
+  .bot-watch { top: 3px; gap: 1px; }
+  .bot-watch b { width: 2px; }
+}
+@keyframes mbl-watch-blink { 50% { opacity: .35; } }
+@keyframes mbl-watch-wave { 0%, 100% { background: rgba(148, 163, 184, 0.22); } 50% { background: rgba(148, 163, 184, 0.7); } }
+
 .bot-panel-grid { display: grid; gap: 20px; width: 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .bot-column { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
 .bot-history-column { display: flex; flex-direction: column; }
@@ -233,6 +258,7 @@ button, input, select { font-family: inherit; }
 .config-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: end; }   /* a label on two lines keeps its box in line */
 .config-note { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 14px; margin-top: -6px; }
 .config-note small { color: rgba(152, 162, 189, 0.75); font-size: 12px; line-height: 1.4; }
+.bot-toggles { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px 16px; margin-left: auto; }
 .input-group { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .input-group--wide { grid-column: 1 / -1; }
 .input-group label { font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
@@ -260,6 +286,7 @@ button, input, select { font-family: inherit; }
 .bot-keep input:checked + i::after { transform: translateX(13px); }
 .bot-keep input:checked ~ span, .bot-keep:hover span { color: var(--text); }
 .bot-keep input:focus-visible + i { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bot-safe input:checked + i { background: rgba(36, 217, 112, 0.8); }
 
 .config-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 
@@ -593,6 +620,29 @@ button, input, select { font-family: inherit; }
 @keyframes popupSlideIn { from { opacity: 0; transform: scale(0.9) translateY(-20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 
 .bm-result { position: relative; }
+
+/* The watch's reading in a popup: ten cells lit to the figure, in the reading's colour, the
+   figure beside them; grown from nothing as the popup opens, the last cell blinking red. */
+.bm-watch { --wc: 148, 163, 184; display: flex; align-items: center; gap: 12px; margin: 0 0 18px; padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(var(--wc), 0.3); background: rgba(15, 17, 23, 0.4); transition: border-color .4s ease; }
+#bmDone .bm-watch { margin: 14px 0 0; }
+.bm-watch[data-watch="off"] { display: none; }
+.bm-watch[data-watch="green"] { --wc: 36, 217, 112; }
+.bm-watch[data-watch="yellow"] { --wc: 252, 211, 77; }
+.bm-watch[data-watch="red"] { --wc: 255, 95, 109; }
+.bm-watch-bar { position: relative; flex: 1; height: 10px; background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.09) 0 calc(10% - 3px), transparent calc(10% - 3px) 10%); }
+.bm-watch-bar i { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgb(var(--wc)) 0 calc(10% - 3px), transparent calc(10% - 3px) 10%); filter: drop-shadow(0 0 4px rgba(var(--wc), 0.55));
+  clip-path: inset(0 calc(100% - var(--watch, 0) * 100%) 0 0); transition: clip-path .9s cubic-bezier(.2, .8, .2, 1); animation: mbl-gauge-grow 1s cubic-bezier(.2, .8, .2, 1) both; }
+.bm-watch[data-watch="red"] .bm-watch-bar i { animation: mbl-gauge-grow 1s cubic-bezier(.2, .8, .2, 1) both, mbl-watch-blink 1.4s 1s ease-in-out infinite; }
+.bm-watch[data-watch="warm"] .bm-watch-bar i { clip-path: inset(0 70% 0 0); background: repeating-linear-gradient(90deg, rgba(148, 163, 184, 0.6) 0 calc(10% - 3px), transparent calc(10% - 3px) 10%); filter: none; animation: mbl-watch-blink 1.1s ease-in-out infinite; }
+.bm-watch-pct { min-width: 44px; font-size: 16px; font-weight: 800; text-align: right; font-variant-numeric: tabular-nums; color: rgb(var(--wc)); transition: color .4s ease; }
+@keyframes mbl-gauge-grow { from { clip-path: inset(0 100% 0 0); } }
+
+/* Safe's pause: the result card in amber, two buttons (full width, stacked, on a phone). */
+.bm:has(> #bmHold:not([hidden])) { --r-line: rgba(252, 211, 77, 0.4); --r-tint: rgba(252, 211, 77, 0.14); --r-tint-2: rgba(252, 211, 77, 0.07); --r-ink: #fcd34d; }
+.bm-result--hold .bm-ricon svg { animation: mbl-watch-blink 1.6s .6s ease-in-out infinite; }
+.bm-result--hold .bm-actions { margin-top: 0; }
+#bmHoldPl:not(.is-up):not(.is-down) { color: inherit; }
+@media (max-width: 400px) { .bm-result--hold .bm-actions { flex-direction: column-reverse; } }
 .bm-ricon {
   display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; margin: 0 auto 20px;
   border-radius: 50%; border: 2px solid var(--r-line); color: var(--r-ink);
@@ -677,7 +727,7 @@ button, input, select { font-family: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .primary-btn.btn-liquid-glow, .secondary-btn.btn-liquid-glow, .primary-btn.btn-liquid-glow::before, .secondary-btn.btn-liquid-glow::before,
   .tbal.is-live .tbal-live, .bot-now, .bot-now-k i, .history-item--enter, .history-item--enter.win, .history-item--enter.loss,
-  .bm, .bm-back, .bm-radar i, .bm-radar svg, .bm-bar i::after, .bm-erricon, .bm-badge, .bm-tick, .bm-live i, .bm-ricon, .bm-ricon svg, .bm-dv--pl { animation: none; }
+  .bm, .bm-back, .bm-radar i, .bm-radar svg, .bm-bar i::after, .bm-erricon, .bm-badge, .bm-tick, .bm-live i, .bm-ricon, .bm-ricon svg, .bm-dv--pl, .bot-watch b, .bm-watch-bar i { animation: none; }
   .bm-result--win .bm-ricon-tick { animation: none; stroke-dashoffset: 0; }
   .bm-tick circle, .bm-tick path { animation: none; stroke-dashoffset: 0; }
   .bm-confetti { display: none; }
