@@ -32,7 +32,8 @@
  * The setup card is on screen whenever the simulation is: it opens with the
  * page and has no Close — Start reloads into it again. Practice and testing
  * need the real page's behaviour, not a page that passes for real money: the
- * card is what keeps it from that.
+ * card is what keeps it from that. Behind it, a pill beside Connected (Live)
+ * says the same: SIMULATION, not real money.
  *
  * ── How an outcome is arranged ──────────────────────────────────────────────
  *
@@ -836,9 +837,23 @@
   if (RealSocket) SimWebSocket.prototype = RealSocket.prototype;
   global.WebSocket = SimWebSocket;
 
+  /* ── it says what it is ────────────────────────────────────────────── */
+
+  /** The pill beside Connected (Live), for as long as the mode is on. */
+  function badge() {
+    var row = document.querySelector("#acct .bal-top");
+    if (!row) return;
+    var b = document.createElement("span");
+    b.className = "sim-badge";
+    b.setAttribute("data-i18n-skip", "");
+    b.innerHTML = '<i aria-hidden="true"></i><b>Simulation</b><span>not real money</span>';
+    row.appendChild(b);
+  }
+
   /* ── the card: three clicks on the green dot by the balance ────────── */
 
   function card() {
+    badge();
     var c = setup();
     /* Two whole numbers, from and to: each streak, gap or ten draws its own from between them. */
     function pair(id, lo, hi) {
