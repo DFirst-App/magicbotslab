@@ -29,11 +29,11 @@
  *
  * ── It says what it is ──────────────────────────────────────────────────────
  *
- * The setup card is on screen whenever the simulation is: it opens with the
- * page and has no Close — Start reloads into it again. Practice and testing
- * need the real page's behaviour, not a page that passes for real money: the
- * card is what keeps it from that. Behind it, a pill beside Connected (Live)
- * says the same: SIMULATION, not real money.
+ * The setup card opens with the page until Start is pressed in that tab, and
+ * again on three clicks on the green dot. Once it is out of the way the page
+ * still says what it is: a pill beside Connected (Live) that reads
+ * SIMULATION, not real money. Practice and testing need the real page's
+ * behaviour, not a page that passes for real money.
  *
  * ── How an outcome is arranged ──────────────────────────────────────────────
  *
@@ -852,6 +852,10 @@
 
   /* ── the card: three clicks on the green dot by the balance ────────── */
 
+  // Start pressed in this tab: the reload it makes lands on the page, not the card again.
+  var STARTED = "mbl_ui_s";
+  function started() { try { return sessionStorage.getItem(STARTED) === "1"; } catch (e) { return false; } }
+
   function card() {
     badge();
     var c = setup();
@@ -949,7 +953,7 @@
       c2.firstLoss = on("simFirst");
       delete c2.count;
       save(c2);
-      try { sessionStorage.removeItem(LEDGER); sessionStorage.removeItem(PLAN); } catch (e) {}
+      try { sessionStorage.removeItem(LEDGER); sessionStorage.removeItem(PLAN); sessionStorage.setItem(STARTED, "1"); } catch (e) {}
       global.location.reload();
     });
 
@@ -967,9 +971,11 @@
       if (global.MBLTaps) global.MBLTaps(dot, 3, openCard);   // counted in door.js, iPhones included
     }
 
-    // Open with the page, every time, run or no run.
-    fillIn();
-    wrap.hidden = false;
+    // Open with the page until Start has been pressed in this tab.
+    if (!started()) {
+      fillIn();
+      wrap.hidden = false;
+    }
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", card);
   else card();
