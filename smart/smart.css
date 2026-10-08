@@ -69,6 +69,27 @@ button, input, select { font-family: inherit; }
 .brand-block { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; flex: 1 1 auto; min-width: 0; }
 .brand-kicker { margin: 0; font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
 .brand-title { margin: 0; font-family: "Inter", "Plus Jakarta Sans", system-ui, sans-serif; font-size: 15px; line-height: 1.1; font-weight: 700; letter-spacing: -0.01em; color: #9fc4ff; }
+/* The "o" of Magic Bots Lab (smart/door.js). It looks like every other letter on
+   purpose; its target is a little wider than the letter so three taps land on a
+   phone. The field the first visit asks for opens under the word in the page's
+   own input colours, so nothing in the header moves; the only announcement is a
+   second of colour on the word. */
+.brand-kicker { touch-action: manipulation; }
+.brand-kicker .door { position: relative; }
+.brand-kicker .door::before { content: ""; position: absolute; inset: -10px -5px; }
+.door-box { position: absolute; z-index: 500; margin: 0; }
+.door-box[hidden] { display: none; }
+/* 16px: anything smaller and an iPhone zooms the page in when the field opens. */
+.door-key {
+  display: block; width: 7.5em;
+  padding: 5px 9px; border: 1px solid var(--border-strong); border-radius: 9px;
+  background: var(--panel); color: var(--text); font: inherit; font-size: 16px;
+  -webkit-text-security: disc;
+}
+.door-key:focus { outline: none; }
+@keyframes door-lit { 0% { color: var(--muted); } 22%, 70% { color: var(--accent); } 100% { color: var(--muted); } }
+.brand-kicker.lit { animation: door-lit 1s ease-in-out; }
+@media (prefers-reduced-motion: reduce) { .brand-kicker.lit { animation-duration: 1ms; color: var(--accent); } }
 .topbar-lang { display: flex; align-items: center; flex: none; }
 .topbar-lang:empty { display: none; }
 .topbar-actions { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
