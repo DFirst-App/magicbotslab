@@ -59,6 +59,8 @@
         <div class="tbal-menu" id="acctMenu" role="menu" hidden>
           <div class="tbal-list" id="acctList"></div>
         </div>
+        <!-- No real account on this Deriv login (smart/deriv.js): the way to open one, in place of the balance. -->
+        <a class="tbal-open-real" id="acctOpenReal" href="https://home.deriv.com/dashboard/home" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg><span>Create real account</span></a>
       </div>
     </div>
     <div class="hero-actions">
@@ -334,6 +336,24 @@
       <div class="bm-actions">
         <button class="bm-btn" type="button" data-bm-close>Close</button>
         <a class="bm-btn bm-btn--fund btn-blue" id="bmFundGo" href="https://home.deriv.com/dashboard/portfolio" target="_blank" rel="noopener" data-bm-close data-i18n-skip>Deposit on Deriv</a>
+      </div>
+    </div>
+
+    <!-- No real account yet (smart/deriv.js): why the bot needs one, the three steps, and the
+         way to open it on Deriv. Once a visit by itself, and again on Start. -->
+    <div class="bm-view bm-real" id="bmReal" hidden>
+      <div class="bm-badge bm-badge--real" aria-hidden="true"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg></div>
+      <h2 id="bmRealTitle">Open your real account to start trading</h2>
+      <p class="bm-real-why" id="bmRealText"></p>
+      <p class="bm-step">The Smart Scan bot trades on a real Deriv account. Setting one up on Deriv takes a few minutes, and the bot is ready the moment it appears here.</p>
+      <ol class="bm-real-steps">
+        <li>Open your real account on Deriv</li>
+        <li>Add funds to it</li>
+        <li>Come back here and start the bot</li>
+      </ol>
+      <div class="bm-actions bm-actions--real">
+        <a class="bm-btn bm-btn--real btn-blue" href="https://home.deriv.com/dashboard/home" target="_blank" rel="noopener noreferrer" data-bm-close><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg><span>Set up my real account</span></a>
+        <button class="bm-btn" type="button" data-bm-close>Later</button>
       </div>
     </div>
 

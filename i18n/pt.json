@@ -1687,5 +1687,15 @@
 "Keep waiting":"Continuar aguardando",
 "Paused — waiting for stable conditions…":"Em pausa — aguardando condições estáveis…",
 "Stable again — trading resumed.":"Estável novamente — operações retomadas.",
-"Win rate:":"Taxa de acerto:"
+"Win rate:":"Taxa de acerto:",
+"Create real account":"Criar conta real",
+"Open your real account to start trading":"Abra sua conta real para começar a operar",
+"This Deriv login has no trading account yet.":"Este login da Deriv ainda não tem nenhuma conta de trading.",
+"This Deriv login has only a demo account so far.":"Este login da Deriv por enquanto só tem uma conta demo.",
+"The Smart Scan bot trades on a real Deriv account. Setting one up on Deriv takes a few minutes, and the bot is ready the moment it appears here.":"O bot Smart Scan opera numa conta real da Deriv. Criá-la na Deriv leva alguns minutos, e o bot fica pronto assim que ela aparecer aqui.",
+"Open your real account on Deriv":"Abra sua conta real na Deriv",
+"Add funds to it":"Adicione fundos a ela",
+"Come back here and start the bot":"Volte aqui e inicie o bot",
+"Set up my real account":"Configurar minha conta real",
+"Later":"Depois"
 }
