@@ -212,6 +212,9 @@
   if (bots) bots.addEventListener("click", botsGuide);
   Array.prototype.forEach.call(document.querySelectorAll("[data-bots-link]"), function (a) { a.addEventListener("click", botsGuide); });
 
+  // iPhones show a button's pressed state (smart.css .btn:active) only on a page that listens to touches.
+  document.addEventListener("touchstart", function () {}, { passive: true });
+
   // The foot's Disconnect is the topbar's: the same checks, the same sign-out (smart/deriv.js).
   Array.prototype.forEach.call(document.querySelectorAll("[data-acct-out]"), function (b) {
     b.addEventListener("click", function () {

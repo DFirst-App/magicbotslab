@@ -103,9 +103,15 @@ button, input, select { font-family: inherit; }
   white-space: nowrap; color: var(--text); -webkit-tap-highlight-color: transparent;
 }
 .btn:hover { transform: translateY(-1px); }
+/* A tap shows the moment the finger lands, whatever the page is busy with: pressed in, a touch brighter. */
+.btn { touch-action: manipulation; }
+.btn:not(:disabled):active { transform: scale(0.97); filter: brightness(1.12); transition-duration: 0s; }
 .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .btn--mt5 { background: linear-gradient(135deg, rgba(62, 157, 203, 0.22), rgba(0, 83, 131, 0.1)); color: #d9edf9; border-color: rgba(62, 157, 203, 0.4); }
-.btn--mt5 .btn-logo { width: 15px; height: 15px; flex: 0 0 auto; display: block; }
+.btn .btn-logo { width: 15px; height: 15px; flex: 0 0 auto; display: block; }
+/* The channels' logos sit in the line of their small text: a pixel under the MT5 one, so the buttons keep their height. */
+.social-btn .btn-logo { width: 14px; height: 14px; margin: -1px 0; }
+.social-btn--whatsapp .btn-logo { border-radius: 4px; }
 .btn--ghost { background: var(--surface-2); color: #e4ebf7; }
 .btn--ghost:hover { background: rgba(255, 255, 255, 0.09); }
 .btn--ghost:disabled { opacity: .55; cursor: default; transform: none; }
@@ -464,7 +470,8 @@ button, input, select { font-family: inherit; }
 .dash-footer { margin-top: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 /* The account's buttons at the foot: only on phones and tablets (below). */
 .dash-more { display: none; }
-.social-btn { justify-content: center; padding: 9px 14px; font-size: 11px; }
+/* Their logos' room comes out of the side padding and the gap: each button is as wide as it was without one. */
+.social-btn { justify-content: center; padding: 9px 5px; gap: 4px; font-size: 11px; }
 .social-btn--whatsapp { background: linear-gradient(135deg, rgba(74, 222, 128, 0.18), rgba(22, 163, 74, 0.06)); color: #d3ffe6; border-color: rgba(74, 222, 128, 0.35); }
 .social-btn--telegram { background: linear-gradient(135deg, rgba(97, 165, 255, 0.2), rgba(37, 99, 235, 0.06)); color: #dbe9ff; border-color: rgba(97, 165, 255, 0.35); }
 
