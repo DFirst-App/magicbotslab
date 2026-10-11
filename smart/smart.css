@@ -318,6 +318,16 @@ button, input, select { font-family: inherit; }
   font-size: 11.5px; line-height: 1.45; color: rgba(229, 233, 242, 0.85);
 }
 .bot-risk-line b { color: rgb(var(--rc)); font-weight: 700; }
+/* The safe figure, a button: one click puts it in its field. Green — the safe choice. */
+.bot-risk-use {
+  display: inline-flex; align-items: center; gap: 4px; margin: 0 1px; padding: 1px 9px 1px 7px; vertical-align: 1px;
+  border: 1px solid rgba(36, 217, 112, 0.45); border-radius: 999px; background: rgba(36, 217, 112, 0.12); color: var(--green);
+  font: inherit; font-size: 11.5px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.5; cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, box-shadow .15s ease, transform .1s ease;
+}
+.bot-risk-use:hover { background: rgba(36, 217, 112, 0.2); border-color: var(--green); box-shadow: 0 0 10px rgba(36, 217, 112, 0.25); }
+.bot-risk-use:active { transform: translateY(1px); }
+.bot-risk-use:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .config-note small { color: rgba(152, 162, 189, 0.75); font-size: 12px; line-height: 1.4; }
 .bot-toggles { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px 16px; margin-left: auto; }
 .input-group { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
