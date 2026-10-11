@@ -298,6 +298,26 @@ button, input, select { font-family: inherit; }
 
 .config-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: end; }   /* a label on two lines keeps its box in line */
 .config-note { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 14px; margin-top: -6px; }
+/* The figures' risk on this balance (bot.js paintRisk): a tag beside Initial Stake and Take
+   Profit — green Safe, amber High, red Too high — and, when one is not safe, a note on why
+   with the safe figure, in the stake coach's own box. */
+.input-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 8px; min-width: 0; }
+.bot-risk {
+  --rc: 36, 217, 112;
+  display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 999px;
+  border: 1px solid rgba(var(--rc), 0.35); background: rgba(var(--rc), 0.1); color: rgb(var(--rc));
+  font-size: 10.5px; font-weight: 700; line-height: 1.3; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;
+}
+.bot-risk::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 6px rgba(var(--rc), 0.6); }
+.bot-risk[data-risk="high"], .bot-risk-line[data-risk="high"] { --rc: 252, 211, 77; }
+.bot-risk[data-risk="over"], .bot-risk-line[data-risk="over"] { --rc: 255, 95, 109; }
+.bot-risk-note { display: flex; flex-direction: column; gap: 6px; margin-top: -8px; }
+.bot-risk-line {
+  --rc: 36, 217, 112;
+  margin: 0; padding: 8px 10px; border-radius: 10px; border: 1px solid rgba(var(--rc), 0.25); background: rgba(var(--rc), 0.07);
+  font-size: 11.5px; line-height: 1.45; color: rgba(229, 233, 242, 0.85);
+}
+.bot-risk-line b { color: rgb(var(--rc)); font-weight: 700; }
 .config-note small { color: rgba(152, 162, 189, 0.75); font-size: 12px; line-height: 1.4; }
 .bot-toggles { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px 16px; margin-left: auto; }
 .input-group { display: flex; flex-direction: column; gap: 8px; min-width: 0; }

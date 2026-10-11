@@ -106,7 +106,7 @@
         <button class="mode-btn bot-type" type="button" role="tab" data-type="evenodd">Even / Odd<i class="bot-watch" aria-hidden="true"><b></b><b></b><b></b></i></button>
         <button class="mode-btn bot-type" type="button" role="tab" data-type="risefall">Rise / Fall<i class="bot-watch" aria-hidden="true"><b></b><b></b><b></b></i></button>
         <button class="mode-btn bot-type" type="button" role="tab" data-type="overunder">Over / Under<i class="bot-watch" aria-hidden="true"><b></b><b></b><b></b></i></button>
-        <button class="mode-btn bot-type" type="button" role="tab" data-type="matchdiff">Matches / Differs<i class="bot-watch" aria-hidden="true"><b></b><b></b><b></b></i></button>
+        <button class="mode-btn bot-type" type="button" role="tab" data-type="matchdiff">Differs<i class="bot-watch" aria-hidden="true"><b></b><b></b><b></b></i></button>
       </div>
     </div>
 
@@ -120,12 +120,13 @@
               <div class="select-wrap"><select id="botVar"></select>
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div>
             </div>
+            <!-- Safe / High / Too high for the balance (bot.js paintRisk). -->
             <div class="input-group">
-              <label for="botStake">Initial Stake (USD)</label>
+              <div class="input-head"><label for="botStake">Initial Stake (USD)</label><span class="bot-risk" id="botStakeRisk" data-i18n-skip hidden></span></div>
               <input type="text" id="botStake" inputmode="decimal" autocomplete="off" spellcheck="false" />
             </div>
             <div class="input-group">
-              <label for="botTp">Take Profit (USD)</label>
+              <div class="input-head"><label for="botTp">Take Profit (USD)</label><span class="bot-risk" id="botTpRisk" data-i18n-skip hidden></span></div>
               <input type="text" id="botTp" inputmode="decimal" autocomplete="off" spellcheck="false" />
             </div>
             <div class="input-group">
@@ -137,6 +138,7 @@
               <input type="text" id="botMult" inputmode="decimal" autocomplete="off" spellcheck="false" />
             </div>
           </div>
+          <div class="bot-risk-note" id="botRisk" data-i18n-skip hidden></div>
           <div class="config-note">
             <small id="botMin" data-i18n-skip>Smallest stake: $0.35</small>
             <span class="bot-toggles">
