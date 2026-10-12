@@ -129,7 +129,8 @@
               <div class="input-head"><label for="botTp">Take Profit (USD)</label><span class="bot-risk" id="botTpRisk" data-i18n-skip hidden></span></div>
               <input type="text" id="botTp" inputmode="decimal" autocomplete="off" spellcheck="false" />
             </div>
-            <div class="input-group">
+            <!-- Shown while the Stop loss switch is on (off unless turned on: no stop loss). -->
+            <div class="input-group" id="botSlWrap" hidden>
               <label for="botSl">Stop Loss (USD)</label>
               <input type="text" id="botSl" inputmode="decimal" autocomplete="off" spellcheck="false" />
             </div>
@@ -147,6 +148,8 @@
               <!-- The risk guide (off unless turned on): Safe / High / Too high on the stake and the take
                    profit, and the safe figure. On or off, each type starts from its own figures. -->
               <label class="bot-keep"><input type="checkbox" id="botGuide" role="switch" /><i aria-hidden="true"></i><span>Risk guide</span></label>
+              <!-- The stop loss (off unless turned on): off, a run has none and its field is hidden. -->
+              <label class="bot-keep"><input type="checkbox" id="botSlOn" role="switch" /><i aria-hidden="true"></i><span>Stop loss</span></label>
             </span>
           </div>
 
@@ -319,6 +322,8 @@
       </div>
       <h2>⚠️ Stop Loss Hit</h2>
       <p class="bm-msg">The bot has been stopped as the stop loss limit has been reached.</p>
+      <!-- What the run did past the risk guide (bot.js mistakes), when it did. -->
+      <div class="bm-why" id="bmLossWhy" data-i18n-skip hidden></div>
       <div class="bm-details">
         <div class="bm-drow"><span>Total Profit:</span><b class="bm-dv bm-dv--pl is-down" id="bmLossAmt" data-i18n-skip></b></div>
         <div class="bm-drow"><span>Total Trades:</span><b class="bm-dv bm-dv--n" id="bmLossN" data-i18n-skip></b></div>
@@ -335,6 +340,7 @@
       </div>
       <h2>Top up to keep trading</h2>
       <p class="bm-step" id="bmFundText" data-i18n-skip></p>
+      <div class="bm-why" id="bmFundWhy" data-i18n-skip hidden></div>
       <p class="bm-fund-note" id="bmFundNote" data-i18n-skip></p>
       <div class="bm-actions">
         <button class="bm-btn" type="button" data-bm-close>Close</button>
