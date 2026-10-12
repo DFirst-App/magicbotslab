@@ -209,6 +209,11 @@
             <span class="history-n" id="logN" data-i18n-skip></span>
           </div>
           <div class="history-list" id="historyList">
+            <!-- A wait the run is in (bot.js waitOf): shown, moving, until it trades again. -->
+            <div class="bot-wait" id="botWait" role="status" aria-live="polite" hidden>
+              <span class="bot-wait-eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+              <span class="bot-wait-t"><strong id="botWaitText" data-i18n-skip></strong><span>The bot carries on by itself — no need to do anything.</span></span>
+            </div>
             <div class="history-item" id="botEmpty"><div class="history-meta">No trades yet. Start the bot to begin.</div><div class="history-profit">—</div></div>
             <div class="history-items" id="historyItems" translate="no"></div>
           </div>

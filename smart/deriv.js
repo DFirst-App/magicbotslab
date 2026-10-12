@@ -33,9 +33,8 @@
  * Nothing here ever interrupts a running bot: a token that has lapsed waits
  * until no run is going (the open sockets stay authorised meanwhile).
  *
- * The demo account. Magic Bots Lab trades real accounts; as on its bots page,
- * the demo stays out of sight until three taps on the balance show it for this
- * visit, and choosing the real account again puts it away.
+ * The demo account is listed under the real one (owner, Oct 12: no longer out of
+ * sight). A login with only a demo trades on it, and is offered a real account.
  */
 
 (function (global) {
@@ -133,7 +132,7 @@
   var accounts = [];      // { id, type, currency, balance, status }
   var feeds = {};         // id → Feed
   var picked = null;      // the id shown in the chip
-  var showDemo = false;   // the demo, revealed for this visit
+  var showDemo = true;    // the demo is listed with the real account, always
 
   function isReal(a) {
     var t = String(a.account_type || a.type || "").toLowerCase(), id = String(a.account_id || a.loginid || "");
@@ -181,16 +180,17 @@
     if (on && on.type === "demo") { showDemo = true; store.set(PICK, on.id); }
     picked = pickShown();
     if (!picked) return noReal("real");
-    needReal = null;
+    // Only a demo: it is in use, and the bot offers a real account (needsReal() "real").
+    needReal = accounts.some(function (a) { return a.type === "real"; }) ? null : "real";
     $("acct").classList.remove("is-noreal");
     clearState();
     $("acct").hidden = false;
     painted = true;
     paint();
     accounts.forEach(function (a) {
-      if (a.status !== "active") return;
-      var f = feeds[a.id] || (feeds[a.id] = new Feed(a.id));
-      f.retry(true);
+      // A feed already open (the demo in use when a real account comes in) is left as it is.
+      if (a.status !== "active" || feeds[a.id]) return;
+      (feeds[a.id] = new Feed(a.id)).retry(true);
     });
     startPolling();
   }
@@ -217,6 +217,7 @@
   function lookAgain() {
     // Offline, nothing can be read: the "online" that follows looks at once.
     if (!needReal || gone || document.visibilityState === "hidden" || navigator.onLine === false || Date.now() - lookedAt < 4000) return;
+    if (needReal === "real" && busy()) return;           // a run on the demo: the real account can wait
     lookedAt = Date.now();
     rest("GET", ACCOUNTS_URL).then(function (r) {
       if (!needReal) return;
@@ -325,24 +326,8 @@
     $("acctBtn").setAttribute("aria-expanded", String(open));
     if (open) { paintMenu(); var on = menu.querySelector('[aria-checked="true"]'); if (on) on.focus(); }
   }
-  /** Three taps within 600 ms of each other, counted here (an iPhone reports every tap as a first click). */
-  function taps(el, n, fn) {
-    var count = 0, last = 0;
-    el.addEventListener("click", function (e) {
-      var now = Date.now();
-      count = now - last <= 600 ? count + 1 : 1;
-      last = now;
-      if (count >= n) { count = 0; fn(e); }
-    });
-  }
   function bindSwitcher() {
     $("acctBtn").addEventListener("click", function () { openMenu($("acctMenu").hidden); });
-    // The demo for this visit: three taps on the balance, as three on Real on the bots page.
-    taps($("acctBtn"), 3, function () {
-      if (busy() || showDemo || !accounts.some(function (a) { return a.type === "demo"; })) return;
-      showDemo = true;
-      openMenu(true);
-    });
     document.addEventListener("click", function (e) {
       if (!$("acctMenu").hidden && !e.target.closest("#acct")) openMenu(false);
     }, true);
@@ -352,7 +337,6 @@
       if (busy()) { openMenu(false); return; }          // a running bot keeps its account
       picked = row.getAttribute("data-id");
       var a = account(picked);
-      if (a && a.type === "real") showDemo = false;      // back to real: the demo goes out of sight again
       store.set(PICK, picked);
       openMenu(false);
       paint();

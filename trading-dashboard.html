@@ -1633,7 +1633,7 @@
           </div>
           <div class="mode-toggle" aria-label="Account mode">
             <button class="mode-btn active" id="realModeBtn" type="button">Real</button>
-            <button class="mode-btn" id="demoModeBtn" type="button" style="display:none;">Demo</button>
+            <button class="mode-btn" id="demoModeBtn" type="button">Demo</button>
           </div>
           <div class="bot-stat">Account: <strong id="botAccountId">--</strong></div>
           <div class="bot-stat">Balance: <strong id="botBalance">--</strong></div>
@@ -2002,7 +2002,7 @@
     let botInstance = null;
     let activeBotKey = null;
     let botStates = {};
-    let demoModeUnlocked = false;
+    let demoModeUnlocked = true;   // the demo is shown beside Real (owner, Oct 12: no longer hidden)
     let realTapCount = 0;
     let realTapTimer = null;
     let lastKnownBalance = null;
@@ -3062,9 +3062,6 @@
 
       if (botRunning) {
         return;
-      }
-      if (currentMode === "demo") {
-        demoModeUnlocked = false;
       }
       setMode("real");
       updateDemoButtonVisibility();
