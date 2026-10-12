@@ -246,6 +246,8 @@ button, input, select { font-family: inherit; }
 .bot-panel-id { min-width: 0; flex: 1 1 320px; }
 .bot-panel-name { font-size: 16px; font-weight: 700; }
 .bot-panel-desc { margin-top: 2px; font-size: 13px; line-height: 1.45; color: var(--muted); }
+/* The risk line under the bot's name (owner). */
+.bot-panel-risk { margin: 3px 0 0; font-size: 12px; line-height: 1.4; color: var(--muted); }
 
 /* The trade type: the bots page's mode toggle, the bots page's cyan when on. */
 .mode-toggle { display: inline-flex; flex: none; max-width: 100%; border: 1px solid rgba(148, 163, 184, 0.25); border-radius: 10px; overflow: hidden; }
