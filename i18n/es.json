@@ -325,7 +325,7 @@
 "Randomly selects between Differ, Under 9, and Over 0 trades across all markets with intelligent stop conditions and digit tracking.":"Elige al azar entre operaciones Difiere, Menor 9 y Mayor 0 en todos los mercados con condiciones de parada inteligentes y seguimiento de dígitos.",
 "<b>This is footage, not the video.</b> You are collecting a clip of a bot trading so you have something real to build your edit around.":"<b>Esto es material, no el vídeo.</b> Estás recopilando un clip de un bot operando para tener algo real sobre lo que montar tu edición.",
 "Join WhatsApp or Telegram and we’ll announce MT5 drops, download links, and updates the moment they’re ready—no spam, just release news.":"Únete a WhatsApp o Telegram y anunciaremos los lanzamientos MT5, enlaces de descarga y novedades en cuanto estén listos — sin spam, solo noticias de lanzamientos.",
-"Trading carries risk. This is an automated tool, not financial advice or a profit guarantee. Never risk more than you can afford to lose.":"Operar conlleva riesgo. Esta es una herramienta automatizada, no asesoramiento financiero ni una garantía de beneficios. Nunca arriesgues más de lo que puedas permitirte perder.",
+"Trading carries risk. Never risk more than you can afford to lose.":"Operar conlleva riesgo. Nunca arriesgues más de lo que puedas permitirte perder.",
 "Monitors R100 momentum, RSI, and volatility snapshots to fire NOTOUCH contracts with directional barriers only when range strength spikes.":"Vigila el momentum, el RSI y las instantáneas de volatilidad de R100 para lanzar contratos NOTOUCH con barreras direccionales solo cuando la fuerza del rango se dispara.",
 "You keep full custody — it runs on your own terminal and we never see a password. Once it is set up it needs nothing further from this page.":"Conservas la custodia total — se ejecuta en tu propio terminal y nunca vemos una contraseña. Una vez configurado, no necesita nada más de esta página.",
 "Your account needs more funds to run the trading bot effectively. Adding funds will help you maximize your trading opportunities and achieve better results.":"Tu cuenta necesita más fondos para ejecutar el bot de trading con eficacia. Añadir fondos te ayudará a aprovechar al máximo tus oportunidades de trading y lograr mejores resultados.",
@@ -1733,6 +1733,5 @@
 "Stop loss too small ({sl}) — set at least {need}.":"Stop loss demasiado bajo ({sl}) — pon al menos {need}.",
 "Tip":"Consejo",
 "The bot carries on by itself — no need to do anything.":"El bot continúa solo; no tienes que hacer nada.",
-"Analyzing the markets…":"Analizando los mercados…",
-"Trading carries risk. Never risk more than you can afford to lose.":"Operar conlleva riesgo. Nunca arriesgues más de lo que puedas permitirte perder."
+"Analyzing the markets…":"Analizando los mercados…"
 }

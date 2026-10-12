@@ -325,7 +325,7 @@
 "Randomly selects between Differ, Under 9, and Over 0 trades across all markets with intelligent stop conditions and digit tracking.":"Choisit au hasard entre des trades Diffère, Inférieur 9 et Supérieur 0 sur tous les marchés avec des conditions d'arrêt intelligentes et un suivi des chiffres.",
 "<b>This is footage, not the video.</b> You are collecting a clip of a bot trading so you have something real to build your edit around.":"<b>Ce sont des images, pas la vidéo.</b> Vous collectez un clip d'un bot en train de trader pour avoir quelque chose de réel autour duquel construire votre montage.",
 "Join WhatsApp or Telegram and we’ll announce MT5 drops, download links, and updates the moment they’re ready—no spam, just release news.":"Rejoignez WhatsApp ou Telegram et nous annoncerons les sorties MT5, les liens de téléchargement et les mises à jour dès qu'ils seront prêts — pas de spam, seulement des nouvelles de versions.",
-"Trading carries risk. This is an automated tool, not financial advice or a profit guarantee. Never risk more than you can afford to lose.":"Le trading comporte des risques. Ceci est un outil automatisé, pas un conseil financier ni une garantie de profit. Ne risquez jamais plus que ce que vous pouvez vous permettre de perdre.",
+"Trading carries risk. Never risk more than you can afford to lose.":"Le trading comporte des risques. Ne risquez jamais plus que ce que vous pouvez vous permettre de perdre.",
 "Monitors R100 momentum, RSI, and volatility snapshots to fire NOTOUCH contracts with directional barriers only when range strength spikes.":"Surveille le momentum, le RSI et les instantanés de volatilité de R100 pour lancer des contrats NOTOUCH à barrières directionnelles seulement quand la force du range s'emballe.",
 "You keep full custody — it runs on your own terminal and we never see a password. Once it is set up it needs nothing further from this page.":"Vous gardez la garde totale — il tourne sur votre propre terminal et nous ne voyons jamais de mot de passe. Une fois configuré, il n'a plus besoin de rien de cette page.",
 "Your account needs more funds to run the trading bot effectively. Adding funds will help you maximize your trading opportunities and achieve better results.":"Votre compte a besoin de plus de fonds pour faire tourner le bot de trading efficacement. Ajouter des fonds vous aidera à tirer le meilleur de vos opportunités de trading et à obtenir de meilleurs résultats.",
@@ -1733,6 +1733,5 @@
 "Stop loss too small ({sl}) — set at least {need}.":"Stop loss trop bas ({sl}) — mettez au moins {need}.",
 "Tip":"Conseil",
 "The bot carries on by itself — no need to do anything.":"Le bot reprend tout seul, vous n’avez rien à faire.",
-"Analyzing the markets…":"Analyse des marchés…",
-"Trading carries risk. Never risk more than you can afford to lose.":"Le trading comporte des risques. Ne risquez jamais plus que ce que vous pouvez vous permettre de perdre."
+"Analyzing the markets…":"Analyse des marchés…"
 }
