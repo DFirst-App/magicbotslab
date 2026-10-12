@@ -608,7 +608,8 @@ button, input, select { font-family: inherit; }
   .dash-more .btn { flex: 1 1 0; justify-content: center; min-height: 36px; }
   .dash-more .start-trading-btn { flex-basis: 100%; }
   .dash-footer { margin-top: 8px; gap: 8px; }
-  .history-card { min-height: 260px; }
+  /* Recent Trades takes more than half the screen, empty or not (owner). */
+  .history-card { min-height: 56vh; min-height: 56dvh; }
 }
 @media (max-width: 768px) {
   .bot-detail-panel { gap: 10px; }
