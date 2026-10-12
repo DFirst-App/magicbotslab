@@ -80,8 +80,6 @@
 
     var end = r ? (r.active ? Date.now() : (r.ended && r.ended.at ? r.ended.at * 1000 : Date.now())) : 0;
     $("pTime").textContent = r && r.startedAt ? clock(end - r.startedAt * 1000) : "00:00:00";
-    $("botPl").classList.toggle("positive", !!(r && r.pl > 0));
-    $("botPl").classList.toggle("negative", !!(r && r.pl < 0));
   }
 
   /* ── Recent Trades ─────────────────────────────────────────────────── */
