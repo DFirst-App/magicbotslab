@@ -843,18 +843,19 @@ button, input, select { font-family: inherit; }
 }
 
 /* What went wrong (bot.js mistakes): the run's figures past the risk guide, as points, inside
-   the stop-loss and top-up popups — which keep their size: while the points show the rest of
-   the card goes compact (smaller icon and title, the details two by two), and bot.js gives
-   their box what is left of the popup's usual height (it scrolls for the rest). */
-.bm-why { margin: 0 0 10px; padding: 9px 12px; text-align: left; border-radius: 10px; border: 1px solid rgba(255, 95, 109, 0.32); background: rgba(15, 17, 23, 0.5);
-  max-height: 210px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: rgba(255, 95, 109, 0.4) transparent; }
-/* More points below than the box shows: they fade out at its foot until it is scrolled to the end. */
-.bm-why.is-more { -webkit-mask-image: linear-gradient(#000 calc(100% - 26px), rgba(0, 0, 0, 0.15)); mask-image: linear-gradient(#000 calc(100% - 26px), rgba(0, 0, 0, 0.15)); }
+   the stop-loss and top-up popups, shown in full (the popup grows to hold them, nothing scrolls
+   inside it), then the note as a green tip. While they show, the rest of the card goes compact
+   (smaller icon and title, the details two by two). */
+.bm-why { margin: 0 0 10px; display: grid; gap: 8px; text-align: left; }
+.bm-why-box { padding: 9px 12px; border-radius: 10px; border: 1px solid rgba(255, 95, 109, 0.32); background: rgba(15, 17, 23, 0.5); }
 .bm-why-h { margin: 0 0 5px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #ff5f6d; }
 .bm-why ul { margin: 0; padding: 0 0 0 14px; display: grid; gap: 4px; }
-.bm-why li { font-size: 12px; line-height: 1.38; color: #e8ecf8; }
+.bm-why li { font-size: 12px; line-height: 1.38; color: #e8ecf8; overflow-wrap: anywhere; }
 .bm-why li::marker { color: #ff5f6d; }
-.bm-why-note { margin: 6px 0 0; padding-top: 6px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 11px; line-height: 1.38; font-weight: 600; color: #fcd34d; }
+.bm-why-tip { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; border-radius: 10px; border: 1px solid rgba(36, 217, 112, 0.34); background: rgba(36, 217, 112, 0.08); }
+.bm-why-tip-i { flex: none; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: rgba(36, 217, 112, 0.16); color: var(--green); }
+.bm-why-tip p { margin: 0; font-size: 11.5px; line-height: 1.42; font-weight: 600; color: #e8ecf8; }
+.bm-why-tip b { display: block; margin-bottom: 2px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--green); }
 .bm:has(> .bm-result.has-why:not([hidden])) { padding-top: 20px; padding-bottom: 20px; }
 .bm-result.has-why .bm-ricon { width: 40px; height: 40px; margin-bottom: 8px; }
 .bm-result.has-why .bm-ricon svg { width: 20px; height: 20px; }
@@ -876,9 +877,19 @@ button, input, select { font-family: inherit; }
 #bmFund.has-why .bm-actions { margin-top: 10px; }
 #bmFund.has-why .bm-btn { padding: 10px; }
 @media (max-width: 480px) {
-  .bm-why { padding: 8px 10px; }
+  .bm-why-box, .bm-why-tip { padding: 8px 10px; }
   .bm-why li { font-size: 11.5px; }
+  .bm-why-tip p { font-size: 11px; }
   .bm-result.has-why h2 { font-size: 16.5px; }
   .bm-result.has-why .bm-details { padding: 7px 10px; gap: 2px 10px; }
   .bm-result.has-why .bm-drow { font-size: 11px; }
+}
+/* A short screen: the popups with points set closer still, so all of each shows at once. */
+@media (max-height: 680px) {
+  .bm:has(> .bm-result.has-why:not([hidden])) { padding-top: 16px; padding-bottom: 14px; }
+  .bm-why { gap: 6px; margin-bottom: 8px; }
+  .bm-why-box, .bm-why-tip { padding: 7px 10px; }
+  .bm-why-tip-i { width: 22px; height: 22px; }
+  .bm-result.has-why .bm-ricon { width: 34px; height: 34px; margin-bottom: 6px; }
+  .bm-result.has-why .bm-details { margin-bottom: 8px; }
 }
