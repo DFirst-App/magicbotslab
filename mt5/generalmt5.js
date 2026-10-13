@@ -589,6 +589,21 @@
   window.addEventListener("storage", function (e) { if (e.key === "mbl_support_thread" || e.key === DL_LOCK) paintDownloaded(); });
   paintDownloaded();
 
+  /* The step itself shows only to an approved browser (checked on every visit); everyone else
+     sees the set-up steps without it, numbered from 1. The server refuses the ask too. */
+  function renumber() {
+    var n = 0;
+    Array.prototype.forEach.call(document.querySelectorAll("ol.steps > li"), function (li) {
+      var k = li.querySelector(".n");
+      if (k && !li.hidden) k.textContent = String(++n);
+    });
+  }
+  renumber();
+  fetch("/api/mt5/ea-request?visitorId=" + encodeURIComponent(visitorId()), { cache: "no-store" })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .catch(function () { return null; })
+    .then(function (j) { $("dlStep").hidden = !(j && j.state === "approved"); renumber(); });
+
   /* Click-to-copy for the one string in the steps that must be typed
      exactly. The button says so for a moment, then goes back to "Copy". The
      clipboard API needs a secure context; the old selection trick covers a
